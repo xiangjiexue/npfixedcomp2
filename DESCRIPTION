@@ -1,0 +1,12 @@
+Package: npfixedcomp2
+Type: Package
+Title: What the package does (short line)
+Version: 1.0
+Date: 2021-01-04
+Author: Xiangjie Xue
+Maintainer: Xiangjie Xue <xxjiexxjie@gmail.com>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Imports: Rcpp (>= 1.0.5)
+LinkingTo: Rcpp, RcppEigen
+RoxygenNote: 7.1.1
