@@ -121,4 +121,69 @@ inline Eigen::VectorXd dnpnorm_(const Eigen::VectorXd &x,
 	}
 }
 
+// Simple implementaion of CDF of normal mixture.
+struct pnormptr{
+	pnormptr(const double &mu_, const double &stdev_, const bool& lt_, const bool& lg_ = false) : mu(mu_), stdev(stdev_), lt(lt_), lg(lg_) {};
+
+	const double operator()(const double & x) const {
+		return R::pnorm5(x, mu, stdev, lt, lg);
+	}
+
+	double mu, stdev;
+	bool lt, lg;
+};
+
+inline Eigen::MatrixXd pnormarray(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const double& stdev, 
+	const bool &lt = true, const bool &lg = false){
+	Eigen::MatrixXd ans(x.size(), mu0.size());
+	for (auto i = mu0.size() - 1; i >= 0; i--){
+		std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), pnormptr(mu0[i], stdev, lt, lg));
+	}
+	return ans;
+}
+
+inline Eigen::VectorXd pnpnormorigin(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &stdev = 1, const bool &lt = true){
+	if (mu0.size() == 1){
+		Eigen::VectorXd ans(x.size());
+		std::transform(x.data(), x.data() + x.size(), ans.data(), pnormptr(mu0[0], stdev, lt));
+		if (pi0[0] == 1) {return ans;} else {return ans * pi0[0];}
+	}else{
+		Eigen::MatrixXd ans(x.size(), mu0.size());
+		for (auto i = mu0.size() - 1; i >= 0; i--){
+			std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), pnormptr(mu0[i], stdev, lt));
+		}
+		return ans * pi0;
+	}
+}
+
+inline Eigen::VectorXd pnpnormlog(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &stdev = 1, const bool &lt = true){
+	Eigen::VectorXd ans(x.size());
+	if (mu0.size() == 1){
+		std::transform(x.data(), x.data() + x.size(), ans.data(), pnormptr(mu0[0], stdev, lt, true));
+		if (pi0[0] != 1) {ans = ans + Eigen::VectorXd::Constant(x.size(), std::log1p(pi0[0] - 1));}
+	}else{
+		Eigen::MatrixXd temp = pnormarray(x, mu0, stdev, lt, true);
+		ans = temp.col(0) + Eigen::VectorXd::Constant(x.size(), std::log1p(pi0[0] - 1));
+		for (int i = 1; i < mu0.size(); i++){
+			ans = (ans + log1pexp(temp.col(i) + Eigen::VectorXd::Constant(x.size(), std::log1p(pi0[i] - 1)) - ans)).eval();
+		}
+	}
+	return ans;
+}
+
+inline Eigen::VectorXd pnpnorm_(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
+	const double& stdev, const bool &lt = true, const bool& lg = false){
+	if (lg){
+		return pnpnormlog(x, mu0, pi0, stdev, lt);
+	}else{
+		return pnpnormorigin(x, mu0, pi0, stdev, lt);
+	}
+}
+
 #endif

@@ -75,6 +75,7 @@ inline void sortmix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0){
 	}
 }
 
+
 class npfixedcomp
 {
 public:
@@ -97,20 +98,10 @@ public:
 
 	// For each method, need passing lossfunction, gradfun, computeweights
 
-	virtual void print() const{
-		Rcpp::Rcout<<"data: "<<this->data.transpose()<<std::endl;
-		Rcpp::Rcout<<"mu0fixed: "<<this->mu0fixed.transpose()<<std::endl;
-		Rcpp::Rcout<<"pi0fixed: "<<this->pi0fixed.transpose()<<std::endl;
-		Rcpp::Rcout<<"beta: "<<this->beta<<std::endl;
-		Rcpp::Rcout<<"length: "<<this->len<<std::endl;
-		Rcpp::Rcout<<"gridpoints: "<<this->gridpoints.transpose()<<std::endl;
-		Rcpp::Rcout<<"initial loss: "<<this->lossfunction(initpt, initpr)<<std::endl;
-	}
-
 	// check loss function
 	void checklossfun(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0, const Eigen::VectorXd &eta,
 		const Eigen::VectorXd &p, const int &maxit = 100) const{
-		double llorigin = this->lossfunction(mu0, pi0);
+		double llorigin = this->lossfunction(this->mapping(mu0, pi0));
 		double sigma = 0.5, alpha = 1/3, u = -1.;
 		double con = - p.dot(eta);
 		double lhs, rhs;
@@ -118,7 +109,7 @@ public:
 		do{
 			u++;
 			pi0new = (pi0 + std::pow(sigma, u) * eta).eval();
-			lhs = this->lossfunction(mu0, pi0new);
+			lhs = this->lossfunction(this->mapping(mu0, pi0new));
 			rhs = llorigin + alpha * std::pow(sigma, u) * con;
 			if (lhs < rhs){
 				pi0 = pi0new;
@@ -132,44 +123,33 @@ public:
 
 	// collapsing
 	void collapse(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0, const double &tol = 1e-6) const{
-		double ll = this->lossfunction(mu0, pi0), nll;
+		double ll = this->lossfunction(this->mapping(mu0, pi0)), nll;
 		double ntol = std::max(tol * 0.1, ll * 1e-16), prec;
 		Eigen::VectorXd mu0new = mu0, pi0new = pi0;
 		do {
 			if (mu0.size() <= 1) break;
 			prec = 10 * diff_(mu0).minCoeff();
 			collapsemix(mu0new, pi0new, prec);
-			nll = this->lossfunction(mu0new, pi0new);
+			nll = this->lossfunction(this->mapping(mu0new, pi0new));
 			if (nll <= ll + ntol){
 				pi0.lazyAssign(pi0new);
 				mu0.lazyAssign(mu0new);
 			}else{break;}
 		} while(true);
 	}
-	
-
-	// vectorised function for gradfund1 (can be overwriten)
-	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
-		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1) const{
-		ansd0.resize(mu.size());
-		ansd1.resize(mu.size());
-		for (auto i = 0; i < mu.size(); i++){
-			this->gradfun(mu[i], mu0, pi0, ansd0[i], ansd1[i]);
-		}
-	}
 
 	void Brmin(double & x, double & fx, const double &lb, const double &ub, 
-		const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, const double & tol = 1e-6) const{
+		const Eigen::VectorXd &dens, const double & tol = 1e-6) const{
 		double fa, fb, a = lb, b = ub, duma, dumb;
-		this->gradfun(a, mu0, pi0, duma, fa);
-		this->gradfun(b, mu0, pi0, dumb, fb);
+		this->gradfun(a, dens, duma, fa);
+		this->gradfun(b, dens, dumb, fb);
 
 		double s = a, fs = fb, dums, c, fc, dumc;
 
 		// this function will only be called if flb * fub < 0
 		while (std::abs(fb) > tol & std::abs(fs) > tol & std::abs(b - a) > tol){
 			c = (a + b) / 2;
-			this->gradfun(c, mu0, pi0, dumc, fc);
+			this->gradfun(c, dens, dumc, fc);
 
 			if (fa != fc & fb != fc){
 				s = a * fb * fc / (fa - fb) / (fa - fc) +
@@ -180,7 +160,7 @@ public:
 			}
 
 			if (s > a & s < b){
-				this->gradfun(s, mu0, pi0, dums, fs);
+				this->gradfun(s, dens, dums, fs);
 			}else{
 				s = c; fs = fc; dums = dumc;
 			}
@@ -212,9 +192,9 @@ public:
 		}
 	}
 
-	Eigen::VectorXd solvegradd1(const Eigen::VectorXd &mu0, const Eigen::VectorXd & pi0) const{
+	Eigen::VectorXd solvegradd1(const Eigen::VectorXd &dens) const{
 		Eigen::VectorXd pointsval, pointsgrad;
-		this->gradfunvec(gridpoints, mu0, pi0, pointsval, pointsgrad);
+		this->gradfunvec(gridpoints, dens, pointsval, pointsgrad);
 		int length = 0;
     	double x, fx;
     	Eigen::VectorXd ans(this->len);
@@ -224,7 +204,7 @@ public:
     	}
     	for (auto i = 0; i < gridpoints.size() - 1; i++){
     		if (pointsgrad[i] < 0 & pointsgrad[i + 1] > 0){
-    			this->Brmin(x, fx, gridpoints[i], gridpoints[i + 1], mu0, pi0);
+    			this->Brmin(x, fx, gridpoints[i], gridpoints[i + 1], dens);
     			if (fx < 0){
     				ans[length] = x;
     				length++;
@@ -243,14 +223,15 @@ public:
 	void computemixdist(const double &tol = 1e-6, const int &maxit = 100, const bool &verbose = false) const{
 		Eigen::VectorXd mu0 = initpt, pi0 = initpr * (1. - pi0fixed.sum());
 		int iter = 0, convergence = 0;
-		double closs = this->lossfunction(mu0, pi0), nloss;
-		Eigen::VectorXd newpoints;
+		Eigen::VectorXd newpoints, dens = this->mapping(mu0, pi0);
+		double closs = this->lossfunction(dens), nloss;
 
 		do{
-			newpoints.lazyAssign(this->solvegradd1(mu0, pi0));
-			this->computeweights(mu0, pi0, newpoints); // return using mu0, pi0? remember to sort
+			newpoints.lazyAssign(this->solvegradd1(dens));
+			this->computeweights(mu0, pi0, dens, newpoints); // return using mu0, pi0? remember to sort
 			iter++;
-			nloss = this->lossfunction(mu0, pi0);
+			dens = this->mapping(mu0, pi0);
+			nloss = this->lossfunction(dens);
 
 			if (verbose){
 				Rcpp::Rcout<<"Iteration: "<<iter<<" with loss "<<nloss<<std::endl;
@@ -279,31 +260,59 @@ public:
 
 		sortmix(mu0new, pi0new);
 		Eigen::VectorXd maxgrad, maxgrad2;
-		this->gradfunvec(mu0, mu0, pi0, maxgrad, maxgrad2);
+		this->gradfunvec(mu0, dens, maxgrad, maxgrad2);
 		double dd0, dd02;
-		this->gradfun(0, mu0, pi0, dd0, dd02);
+		this->gradfun(0, dens, dd0, dd02);
 
 		Rcpp::List r = Rcpp::List::create(Rcpp::Named("iter") = iter,
 			Rcpp::Named("family") = "npnorm",
-			Rcpp::Named("max.gradient") = -1 * maxgrad.minCoeff(),
+			Rcpp::Named("min.gradient") = maxgrad.minCoeff(),
 			Rcpp::Named("beta") = this->beta,
 			Rcpp::Named("mix") = Rcpp::List::create(Rcpp::Named("pt") = mu0new, Rcpp::Named("pr") = pi0new),
-			Rcpp::Named("ll") = -closs,
-			Rcpp::Named("dd0") = -dd0,
+			Rcpp::Named("ll") = closs,
+			Rcpp::Named("dd0") = dd0,
 			Rcpp::Named("convergence") = convergence);
 
 		this->result = Rcpp::clone(r);
 	}
 
-	// dummy
-	virtual double lossfunction(const Eigen::VectorXd & mu0, const Eigen::VectorXd &pi0) const{
+	// functions to each specific type
+	virtual void print(const int & level = 0) const{
+		Rcpp::Rcout<<"mu0fixed: "<<this->mu0fixed.transpose()<<std::endl;
+		Rcpp::Rcout<<"pi0fixed: "<<this->pi0fixed.transpose()<<std::endl;
+		Rcpp::Rcout<<"beta: "<<this->beta<<std::endl;
+		Rcpp::Rcout<<"length: "<<this->len<<std::endl;
+		Rcpp::Rcout<<"gridpoints: "<<this->gridpoints.transpose()<<std::endl;
+		Rcpp::Rcout<<"initial loss: "<<this->lossfunction(this->mapping(initpt, initpr))<<std::endl;
+
+		if (level == 1){
+			Rcpp::Rcout<<"data: "<<this->data.transpose()<<std::endl;
+		}
+	}
+
+	virtual Eigen::VectorXd mapping(const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
+		return Eigen::VectorXd::Zero(1);
+	}
+
+	virtual double lossfunction(const Eigen::VectorXd & maps) const{
 		return 0;
 	}
 
-	virtual void gradfun(const double &mu, const Eigen::VectorXd & mu0, const Eigen::VectorXd &pi0,
+	virtual void gradfun(const double &mu, const Eigen::VectorXd &dens,
 		double &ansd0, double & ansd1) const{}
 
-	virtual void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &newpoints) const{}
+	// vectorised function for gradfund1 (can be overwriten)
+	virtual void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens, 
+		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1) const{
+		ansd0.resize(mu.size());
+		ansd1.resize(mu.size());
+		for (auto i = 0; i < mu.size(); i++){
+			this->gradfun(mu[i], dens, ansd0[i], ansd1[i]);
+		}
+	}
+
+	virtual void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
+		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{}
 
 };
 

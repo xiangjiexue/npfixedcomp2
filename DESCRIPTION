@@ -7,6 +7,6 @@ Author: Xiangjie Xue
 Maintainer: Xiangjie Xue <xxjiexxjie@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
-Imports: Rcpp (>= 1.0.5)
+Imports: Rcpp (>= 1.0.5), nspmix, RcppEigen
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.1.1

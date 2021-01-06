@@ -31,3 +31,11 @@ Eigen::VectorXd dnpnorm(const Eigen::VectorXd &x,
 	const double &stdev = 1, const bool &lg = false){
 	return dnpnorm_(x, mu0, pi0, stdev, lg);
 }
+
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd pnpnorm(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
+	return pnpnorm_(x, mu0, pi0, stdev, lt, lg);
+}

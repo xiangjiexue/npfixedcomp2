@@ -22,6 +22,16 @@ dnpnorm <- function(x, mu0, pi0, stdev = 1, lg = FALSE) {
 }
 
 #' @export
+pnpnorm <- function(x, mu0, pi0, stdev = 1, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_pnpnorm', PACKAGE = 'npfixedcomp2', x, mu0, pi0, stdev, lt, lg)
+}
+
+#' @export
+npnormcvm_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+    .Call('_npfixedcomp2_npnormcvm_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+#' @export
 npnormll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
     .Call('_npfixedcomp2_npnormll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
