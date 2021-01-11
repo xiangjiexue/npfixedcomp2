@@ -17,6 +17,8 @@ public:
 		this->precompute.resize(this->len);
 		this->precompute = Eigen::VectorXd::LinSpaced(this->len, 1, 2 * this->len - 1) / 2 / this->len - 
 			pnpnorm_(this->data, this->mu0fixed, this->pi0fixed, this->beta);
+		family = "npnorm";
+		flag = "d1";
 	}
 
 	double lossfunction(const Eigen::VectorXd &maps) const{
@@ -37,6 +39,8 @@ public:
 
 	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
 		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1) const{
+		ansd0.resize(mu.size());
+		ansd1.resize(mu.size());
 		Eigen::VectorXd fullden = dens - this->precompute;
 		double scale = 1 - this->pi0fixed.sum();
 		ansd0 = fullden.transpose() * (pnormarray(this->data, mu, this->beta) * scale - dens.rowwise().replicate(mu.size())) * 2;
@@ -74,7 +78,6 @@ public:
 	}
 };
 
-//' @export
 // [[Rcpp::export]]
 Rcpp::List npnormcvm_(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fixed, const Eigen::VectorXd &pi0fixed,
 	const double &beta, const Eigen::VectorXd &initpt, const Eigen::VectorXd &initpr, const Eigen::VectorXd &gridpoints,

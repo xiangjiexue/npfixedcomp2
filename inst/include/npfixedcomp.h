@@ -54,16 +54,6 @@ inline void collapsemix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0,
 	}
 }
 
-// sort mixing distribution
-class comparemu0
-{
-private:
-	Eigen::VectorXd mu0;
-public:
-	comparemu0(const Eigen::VectorXd &mu0_) : mu0(mu0_) {};
-
-	const bool operator()(const int & x, const int & y) const {return mu0[x] < mu0[y];};
-};
 // This is much faster than previous version
 inline void sortmix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0){
 	Eigen::VectorXd mu0new = mu0, pi0new = pi0;
@@ -73,6 +63,32 @@ inline void sortmix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0){
 		mu0[i] = mu0new[index[i]];
 		pi0[i] = pi0new[index[i]];
 	}
+}
+
+class comparedist
+{
+private:
+	Eigen::VectorXd mu0;
+	double target;
+public:
+	comparedist(const Eigen::VectorXd &mu0_, const double &target_) : mu0(mu0_), target(target_) {};
+
+	const bool operator()(const int & x, const int & y) const {return std::pow(mu0[x] - target, 2.) < std::pow(mu0[y] - target, 2.);};
+};
+
+inline double newmin(const Eigen::VectorXd &x, const Eigen::VectorXd &fx, double &rg){
+	Eigen::VectorXi ind = Eigen::VectorXi::LinSpaced(x.size(), 0, x.size() - 1);
+	std::sort(ind.data(), ind.data() + ind.size(), comparedist(x, x.tail(1)[0]));
+	Eigen::Vector3d x1;
+	x1<<x[ind[0]], x[ind[1]], x[ind[2]];
+	Eigen::Vector3d fx1;
+	fx1<<fx[ind[0]], fx[ind[1]], fx[ind[2]];
+	Eigen::MatrixXd A(3, 3);
+	A.col(0) = x1.array().square(); A.col(1) = x1; A.col(2).setOnes();
+	x1 = A.inverse() * fx1;
+	double ans = -x1[1] / x1[0] * 0.5;
+	rg = std::abs(ans - x.tail(1)[0]);
+	return ans;
 }
 
 
@@ -89,6 +105,7 @@ public:
 	const Eigen::Ref<const Eigen::VectorXd> gridpoints;
 	int len;
 	mutable Rcpp::List result;
+	std::string family, flag;
 
 	npfixedcomp(const Eigen::VectorXd &data_, const Eigen::VectorXd &mu0fixed_, const Eigen::VectorXd &pi0fixed_,
 		const double &beta_, const Eigen::VectorXd &initpt_, const Eigen::VectorXd &initpr_, const Eigen::VectorXd &gridpoints_) : data(data_),
@@ -219,6 +236,61 @@ public:
     	return ans;
 	}
 
+	void Dfmin(double & x, double & fx, const Eigen::VectorXd &x1, const Eigen::VectorXd &fx1,
+		const Eigen::VectorXd &dens, const double &tol = 1e-6) const{
+		double rg = std::numeric_limits<double>::infinity();
+		double newpoint, fnewpoint, dummy;
+		Eigen::VectorXd xx(x1), fxx(fx1);
+		while (rg > tol){
+			newpoint = newmin(xx, fxx, rg);
+			this->gradfun(newpoint, dens, fnewpoint, dummy);
+			xx.conservativeResize(xx.size() + 1);
+			fxx.conservativeResize(fxx.size() + 1);
+			xx.tail(1)[0] = newpoint;
+			fxx.tail(1)[0] = fnewpoint;
+		}
+
+		x = xx.tail(1)[0]; fx = fxx.tail(1)[0];
+	}
+
+	Eigen::VectorXd solvegradd0(const Eigen::VectorXd &dens) const{
+		Eigen::VectorXd pointsval, pointsgrad; // pointsgrad not referenced.
+		this->gradfunvec(gridpoints, dens, pointsval, pointsgrad);
+		int length = 0;
+    	double x, fx;
+    	Eigen::VectorXd ans(this->len);
+    	if (pointsval.head(1)[0] < 0){
+    		ans[length] = gridpoints.head(1)[0];
+    		length++;
+    	}
+    	Eigen::VectorXd inputx(3), inputfx(3);
+    	for (auto i = 0; i < gridpoints.size() - 2; i++){
+    		if ((pointsval[i + 1] - pointsval[i] < 0) & (pointsval[i + 2] - pointsval[i + 1] > 0)){
+    			inputx << gridpoints[i], gridpoints[i + 2], gridpoints[i + 1];
+    			inputfx << pointsval[i], pointsval[i + 2], pointsval[i + 1];
+    			this->Dfmin(x, fx, inputx, inputfx, dens);
+    			if (fx < 0){
+    				ans[length] = x;
+    				length++;
+    			}
+    		}
+    	}
+    	if (pointsval.tail(1)[0] < 0){
+    		ans[length] = gridpoints.tail(1)[0];
+    		length++;
+    	}
+    	ans.conservativeResize(length);
+    	return ans;
+	}
+
+	Eigen::VectorXd solvegrad(const Eigen::VectorXd &dens) const{
+		if (this->flag == "d1"){
+			return solvegradd1(dens);
+		}else{
+			return solvegradd0(dens);
+		}
+	}
+
 	// compute mixing distribution
 	void computemixdist(const double &tol = 1e-6, const int &maxit = 100, const bool &verbose = false) const{
 		Eigen::VectorXd mu0 = initpt, pi0 = initpr * (1. - pi0fixed.sum());
@@ -227,7 +299,7 @@ public:
 		double closs = this->lossfunction(dens), nloss;
 
 		do{
-			newpoints.lazyAssign(this->solvegradd1(dens));
+			newpoints.lazyAssign(this->solvegrad(dens));
 			this->computeweights(mu0, pi0, dens, newpoints); // return using mu0, pi0? remember to sort
 			iter++;
 			dens = this->mapping(mu0, pi0);
@@ -261,16 +333,14 @@ public:
 		sortmix(mu0new, pi0new);
 		Eigen::VectorXd maxgrad, maxgrad2;
 		this->gradfunvec(mu0, dens, maxgrad, maxgrad2);
-		double dd0, dd02;
-		this->gradfun(0, dens, dd0, dd02);
 
 		Rcpp::List r = Rcpp::List::create(Rcpp::Named("iter") = iter,
-			Rcpp::Named("family") = "npnorm",
+			Rcpp::Named("family") = family,
 			Rcpp::Named("min.gradient") = maxgrad.minCoeff(),
 			Rcpp::Named("beta") = this->beta,
 			Rcpp::Named("mix") = Rcpp::List::create(Rcpp::Named("pt") = mu0new, Rcpp::Named("pr") = pi0new),
 			Rcpp::Named("ll") = closs,
-			Rcpp::Named("dd0") = dd0,
+			Rcpp::Named("flag") = flag,
 			Rcpp::Named("convergence") = convergence);
 
 		this->result = Rcpp::clone(r);

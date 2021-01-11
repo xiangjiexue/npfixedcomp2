@@ -15,6 +15,8 @@ public:
 		const Eigen::VectorXd &gridpoints_) : npfixedcomp(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
 		this->precompute.resize(this->len);
 		this->precompute = dnpnorm_(this->data, this->mu0fixed, this->pi0fixed, this->beta);
+		this->family = "npnorm";
+		this->flag = "d1";
 	}
 
 	double lossfunction(const Eigen::VectorXd &maps) const{
@@ -36,6 +38,8 @@ public:
 
 	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
 		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1) const{
+		ansd0.resize(mu.size());
+		ansd1.resize(mu.size());
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
 		Eigen::MatrixXd temp = dnormarray(this->data, mu, this->beta);
@@ -78,7 +82,6 @@ public:
 	}
 };
 
-//' @export
 // [[Rcpp::export]]
 Rcpp::List npnormll_(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fixed, const Eigen::VectorXd &pi0fixed,
 	const double &beta, const Eigen::VectorXd &initpt, const Eigen::VectorXd &initpr, const Eigen::VectorXd &gridpoints,

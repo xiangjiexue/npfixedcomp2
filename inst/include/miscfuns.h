@@ -186,4 +186,132 @@ inline Eigen::VectorXd pnpnorm_(const Eigen::VectorXd &x,
 	}
 }
 
+// Simple implementaion of density of one-parameter normal mixture.
+struct dnormcptr{
+	dnormcptr(const double &mu_, const double &n_) : mu(mu_), n(n_) {};
+
+	const double operator()(const double & x) const {
+		return R::dnorm4(x, mu, (1 - mu * mu) / std::sqrt(n), false);
+	}
+
+	double mu, n;
+};
+
+inline Eigen::MatrixXd dnormcarrayorigin(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const double& n){
+	Eigen::MatrixXd ans(x.size(), mu0.size());
+	for (auto i = mu0.size() - 1; i >= 0; i--){
+		std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), dnormcptr(mu0[i], n));
+	}
+	return ans;
+}
+
+inline Eigen::MatrixXd dnormcarray(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const double& n, const bool& lg = false){
+	if (lg){
+		return dnormcarrayorigin(x, mu0, n).array().log();
+	}else{
+		return dnormcarrayorigin(x, mu0, n);
+	}
+}
+
+inline Eigen::VectorXd dnpnormcorigin(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, const double &n){
+	if (mu0.size() == 1){
+		Eigen::VectorXd ans(x.size());
+		std::transform(x.data(), x.data() + x.size(), ans.data(), dnormcptr(mu0[0], n));
+		if (pi0[0] == 1) {return ans;} else {return ans * pi0[0];}
+	}else{
+		Eigen::MatrixXd ans(x.size(), mu0.size());
+		for (auto i = mu0.size() - 1; i >= 0; i--){
+			std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), dnormcptr(mu0[i], n));
+		}
+		return ans * pi0;	
+	}
+}
+
+inline Eigen::VectorXd dnpnormc_(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
+	const double& n, const bool& lg = false){
+	if (lg){
+		return dnpnormcorigin(x, mu0, pi0, n).array().log();
+	}else{
+		return dnpnormcorigin(x, mu0, pi0, n);
+	}
+}
+
+// Simple implementaion of density of t mixture.
+struct dtptr{
+	dtptr(const double &mu_, const double &n_) : mu(mu_), n(n_) {};
+
+	const double operator()(const double & x) const {
+		return R::dnt(x, n, mu, false);
+	}
+
+	double mu, n;
+};
+
+inline Eigen::MatrixXd dtarrayorigin(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const double& n){
+	Eigen::MatrixXd ans(x.size(), mu0.size());
+	for (auto i = mu0.size() - 1; i >= 0; i--){
+		std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), dtptr(mu0[i], n));
+	}
+	return ans;
+}
+
+inline Eigen::MatrixXd dtarray(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const double& n, const bool& lg = false){
+	if (lg){
+		return dtarrayorigin(x, mu0, n).array().log();
+	}else{
+		return dtarrayorigin(x, mu0, n);
+	}
+}
+
+inline Eigen::VectorXd dnptorigin(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, const double &n){
+	if (mu0.size() == 1){
+		Eigen::VectorXd ans(x.size());
+		std::transform(x.data(), x.data() + x.size(), ans.data(), dtptr(mu0[0], n));
+		if (pi0[0] == 1) {return ans;} else {return ans * pi0[0];}
+	}else{
+		Eigen::MatrixXd ans(x.size(), mu0.size());
+		for (auto i = mu0.size() - 1; i >= 0; i--){
+			std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), dtptr(mu0[i], n));
+		}
+		return ans * pi0;	
+	}
+}
+
+inline Eigen::VectorXd dnpt_(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
+	const double& n, const bool& lg = false){
+	if (lg){
+		return dnptorigin(x, mu0, pi0, n).array().log();
+	}else{
+		return dnptorigin(x, mu0, pi0, n);
+	}
+}
+
+// class for comparison
+// sort mixing distribution
+class comparemu0
+{
+private:
+	Eigen::VectorXd mu0;
+public:
+	comparemu0(const Eigen::VectorXd &mu0_) : mu0(mu0_) {};
+
+	const bool operator()(const int & x, const int & y) const {return mu0[x] < mu0[y];};
+};
+
+inline void sort1(Eigen::VectorXd &x){
+	std::sort(x.data(), x.data() + x.size(), std::less<double>());
+}
+
+inline void sort2(Eigen::VectorXd &x){
+	std::sort(x.data(), x.data() + x.size(), std::greater<double>());
+}
+
 #endif

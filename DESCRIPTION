@@ -1,12 +1,18 @@
 Package: npfixedcomp2
 Type: Package
-Title: What the package does (short line)
+Title: Non-parametric estimation of mixing distribution with possibily fixed components
 Version: 1.0
 Date: 2021-01-04
-Author: Xiangjie Xue
-Maintainer: Xiangjie Xue <xxjiexxjie@gmail.com>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R: 
+    person(given = "Xiangjie",
+           family = "Xue",
+           role = c("aut", "cre"),
+           email = "x.xue@auckland.ac.nz")
+Description: Non-parametric estimation of mixing distribution with possibly fixed components. 
+License: GPL-2
 Imports: Rcpp (>= 1.0.5), nspmix, RcppEigen
 LinkingTo: Rcpp, RcppEigen
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1

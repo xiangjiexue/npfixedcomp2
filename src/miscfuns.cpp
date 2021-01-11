@@ -5,25 +5,30 @@
 
 // [[Rcpp::depends(RcppEigen)]]
 
-//' @export
 // [[Rcpp::export]]
 Eigen::VectorXd pnnlssum(const Eigen::MatrixXd &A, 
 	const Eigen::VectorXd &b, const double &sum){
 	return pnnlssum_(A, b, sum);
 }
 
-//' @export
+
 // [[Rcpp::export]]
 Eigen::VectorXd pnnqp(const Eigen::MatrixXd &q, const Eigen::VectorXd &p, const double &sum){
 	return pnnqp_(q, p, sum);
 }
 
-//' @export
-// [[Rcpp::export]]
-Eigen::VectorXd diff(const Eigen::VectorXd &x){
-	return diff_(x);
-}
-
+//' The density and the distribution function of non-parametric normal distribution
+//'
+//' \code{dnpnorm} gives the density, \code{pnpnorm} gives the distribution function.
+//'
+//' @title non-parametric normal distribution
+//' @param x vector of observations, vector of quantiles
+//' @param mu0 the vector of support points
+//' @param stdev standard deviation.
+//' @param pi0 the vector of weights correponding to the support points
+//' @param lt logical; if TRUE, the lower probability is computed
+//' @param lg logical; if TRUE, the result will be given in log scale.
+//' @rdname npnorm
 //' @export
 // [[Rcpp::export]]
 Eigen::VectorXd dnpnorm(const Eigen::VectorXd &x, 
@@ -32,10 +37,70 @@ Eigen::VectorXd dnpnorm(const Eigen::VectorXd &x,
 	return dnpnorm_(x, mu0, pi0, stdev, lg);
 }
 
+// [[Rcpp::export]]
+Eigen::MatrixXd dnormarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &stdev = 1, const bool &lg = false){
+	return dnormarray(x, mu0, stdev, lg);
+}
+
+//' @rdname npnorm
 //' @export
 // [[Rcpp::export]]
 Eigen::VectorXd pnpnorm(const Eigen::VectorXd &x, 
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
 	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
 	return pnpnorm_(x, mu0, pi0, stdev, lt, lg);
+}
+
+//' The density and the distribution function of non-parametric one-parameter normal distribution
+//'
+//' \code{dnpnormc} gives the density
+//'
+//' @title non-parametric one-parameter normal distribution
+//' @param x vector of observations, vector of quantiles
+//' @param mu0 the vector of support points
+//' @param n number of observations (not the length of x)
+//' @param pi0 the vector of weights correponding to the support points
+//' @param lg logical; if TRUE, the result will be given in log scale.
+//' @rdname npnormc
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd dnpnormc(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &n, const bool &lg = false){
+	return dnpnormc_(x, mu0, pi0, n, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd dnormcarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &n, const bool &lg = false){
+	return dnormcarray(x, mu0, n, lg);
+}
+
+//' The density and the distribution function of non-parametric t distribution
+//'
+//' \code{dnpnorm} gives the density.
+//'
+//' @title non-parametric t distribution
+//' @param x vector of observations, vector of quantiles
+//' @param mu0 the vector of support points
+//' @param df degree of freedom.
+//' @param pi0 the vector of weights correponding to the support points
+//' @param lg logical; if TRUE, the result will be given in log scale.
+//' @rdname npt
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd dnpt(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &df, const bool &lg = false){
+	return dnpt_(x, mu0, pi0, df, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd dtarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &df, const bool &lg = false){
+	return dtarray(x, mu0, df, lg);
 }
