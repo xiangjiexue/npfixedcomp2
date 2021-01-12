@@ -76,6 +76,10 @@ dtarray_ <- function(x, mu0, df, lg = FALSE) {
     .Call('_npfixedcomp2_dtarray_', PACKAGE = 'npfixedcomp2', x, mu0, df, lg)
 }
 
+npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+    .Call('_npfixedcomp2_npnormad_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
 npnormcll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
     .Call('_npfixedcomp2_npnormcll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }

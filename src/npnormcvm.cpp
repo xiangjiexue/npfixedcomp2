@@ -76,6 +76,10 @@ public:
 			Rcpp::Rcout<<"precompute: "<<this->precompute.transpose()<<std::endl;
 		}
 	}
+
+	double extrafun() const{
+		return 1 / 12 / this->len;
+	}
 };
 
 // [[Rcpp::export]]

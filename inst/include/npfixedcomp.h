@@ -308,6 +308,10 @@ public:
 			if (verbose){
 				Rcpp::Rcout<<"Iteration: "<<iter<<" with loss "<<nloss<<std::endl;
 				Rcpp::Rcout<<"new points: "<<newpoints.transpose()<<std::endl;
+				Eigen::VectorXd pointsval, pointsgrad;
+				this->gradfunvec(newpoints, dens, pointsval, pointsgrad);
+				Rcpp::Rcout<<"gradient: "<<pointsval.transpose()<<std::endl;
+				Rcpp::Rcout<<"gradient derivative: "<<pointsgrad.transpose()<<std::endl;
 				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
 				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
 			}
@@ -339,7 +343,7 @@ public:
 			Rcpp::Named("min.gradient") = maxgrad.minCoeff(),
 			Rcpp::Named("beta") = this->beta,
 			Rcpp::Named("mix") = Rcpp::List::create(Rcpp::Named("pt") = mu0new, Rcpp::Named("pr") = pi0new),
-			Rcpp::Named("ll") = closs,
+			Rcpp::Named("ll") = closs + this->extrafun(),
 			Rcpp::Named("flag") = flag,
 			Rcpp::Named("convergence") = convergence);
 
@@ -383,6 +387,10 @@ public:
 
 	virtual void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
 		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{}
+
+	virtual double extrafun() const{
+		return 0;
+	}
 
 };
 

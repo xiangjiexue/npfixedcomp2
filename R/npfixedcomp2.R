@@ -98,6 +98,20 @@ computemixdist.npnormcvm = function(v, mu0, pi0, beta, order, ...){
 
 #' @rdname computemixdist
 #' @export
+computemixdist.npnormad = function(v, mu0, pi0, beta, order, ...){
+  if (missing(mu0)) {mu0 = 0}
+  if (missing(pi0)) {pi0 = 0}
+  if (missing(beta)) {beta = 1}
+  v1 = npnorm(sort(v))
+  init = initial.npnorm(v1)
+  k = npnormad_(v1$v, mu0, pi0, beta, init$mix$pt, init$mix$pr, gridpoints.npnorm(v1, beta = beta), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname computemixdist
+#' @export
 computemixdist.npnormcll = function(v, mu0, pi0, beta, order, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
