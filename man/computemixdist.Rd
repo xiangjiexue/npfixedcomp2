@@ -11,15 +11,15 @@
 \usage{
 computemixdist(v, method = "npnormll", ...)
 
-computemixdist.npnormll(v, mu0, pi0, beta, order, ...)
+computemixdist.npnormll(v, mu0, pi0, beta, order, mix = NULL, ...)
 
-computemixdist.npnormcvm(v, mu0, pi0, beta, order, ...)
+computemixdist.npnormcvm(v, mu0, pi0, beta, order, mix = NULL, ...)
 
-computemixdist.npnormad(v, mu0, pi0, beta, order, ...)
+computemixdist.npnormad(v, mu0, pi0, beta, order, mix = NULL, ...)
 
-computemixdist.npnormcll(v, mu0, pi0, beta, order, ...)
+computemixdist.npnormcll(v, mu0, pi0, beta, order, mix = NULL, ...)
 
-computemixdist.nptll(v, mu0, pi0, beta, order, ...)
+computemixdist.nptll(v, mu0, pi0, beta, order, mix = NULL, ...)
 }
 \arguments{
 \item{v}{a vector of observations}
@@ -35,6 +35,8 @@ computemixdist.nptll(v, mu0, pi0, beta, order, ...)
 \item{beta}{structual parameter.}
 
 \item{order}{the parameter for the binned version.}
+
+\item{mix}{initial mixing distribution.}
 }
 \description{
 Computing non-parametric mixing distribution
@@ -72,4 +74,5 @@ pi0 = 0.5
 computemixdist(data, pi0 = pi0, method = "npnormll")
 computemixdist(data, pi0 = pi0, method = "npnormcvm")
 computemixdist(data, pi0 = pi0, method = "nptll")
+computemixdist(data, pi0 = pi0, method = "npnormad")
 }

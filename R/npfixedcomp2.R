@@ -54,6 +54,7 @@ gridpoints.npnorm = utils::getFromNamespace("gridpoints.npnorm", "nspmix")
 #' @param pi0 A vector of weights corresponding to the support points
 #' @param beta structual parameter.
 #' @param order the parameter for the binned version.
+#' @param mix initial mixing distribution.
 #' @param method An implemented family; see details
 #' @param ... parameters above passed to the specific method
 #' @examples
@@ -62,6 +63,7 @@ gridpoints.npnorm = utils::getFromNamespace("gridpoints.npnorm", "nspmix")
 #' computemixdist(data, pi0 = pi0, method = "npnormll")
 #' computemixdist(data, pi0 = pi0, method = "npnormcvm")
 #' computemixdist(data, pi0 = pi0, method = "nptll")
+#' computemixdist(data, pi0 = pi0, method = "npnormad")
 #' @export
 computemixdist = function(v, method = "npnormll", ...){
   f = match.fun(paste0("computemixdist.", method))
@@ -70,12 +72,12 @@ computemixdist = function(v, method = "npnormll", ...){
 
 #' @rdname computemixdist
 #' @export
-computemixdist.npnormll = function(v, mu0, pi0, beta, order, ...){
+computemixdist.npnormll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
   v1 = npnorm(v)
-  init = initial.npnorm(v1)
+  init = initial.npnorm(v1, beta = beta, mix = mix)
   k = npnormll_(v, mu0, pi0, beta, init$mix$pt, init$mix$pr, gridpoints.npnorm(v1, beta = beta), ...)
   attr(k, "class") = "nspmix"
   
@@ -84,12 +86,12 @@ computemixdist.npnormll = function(v, mu0, pi0, beta, order, ...){
 
 #' @rdname computemixdist
 #' @export
-computemixdist.npnormcvm = function(v, mu0, pi0, beta, order, ...){
+computemixdist.npnormcvm = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
   v1 = npnorm(sort(v))
-  init = initial.npnorm(v1)
+  init = initial.npnorm(v1, beta = beta, mix = mix)
   k = npnormcvm_(v1$v, mu0, pi0, beta, init$mix$pt, init$mix$pr, gridpoints.npnorm(v1, beta = beta), ...)
   attr(k, "class") = "nspmix"
   
@@ -98,12 +100,12 @@ computemixdist.npnormcvm = function(v, mu0, pi0, beta, order, ...){
 
 #' @rdname computemixdist
 #' @export
-computemixdist.npnormad = function(v, mu0, pi0, beta, order, ...){
+computemixdist.npnormad = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
   v1 = npnorm(sort(v))
-  init = initial.npnorm(v1)
+  init = initial.npnorm(v1, beta = beta, mix = mix)
   k = npnormad_(v1$v, mu0, pi0, beta, init$mix$pt, init$mix$pr, gridpoints.npnorm(v1, beta = beta), ...)
   attr(k, "class") = "nspmix"
   
@@ -112,11 +114,16 @@ computemixdist.npnormad = function(v, mu0, pi0, beta, order, ...){
 
 #' @rdname computemixdist
 #' @export
-computemixdist.npnormcll = function(v, mu0, pi0, beta, order, ...){
+computemixdist.npnormcll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   v1 = npnorm(atanh(v))
-  init = initial.npnorm(v1, beta = 1 / sqrt(beta - 3))
+  if (is.null(mix)){
+    init = initial.npnorm(v1, beta = 1 / sqrt(beta - 3))
+  }else{
+    init = initial.npnorm(v1, beta = 1 / sqrt(beta - 3),
+                          mix = list(pt = atanh(mix$pt), pr = mix$pr))
+  }
   k = npnormcll_(v, mu0, pi0, beta, tanh(init$mix$pt), init$mix$pr, 
                 tanh(gridpoints.npnorm(v1, beta = 1 / sqrt(beta - 3))), ...)
   attr(k, "class") = "nspmix"
@@ -126,12 +133,17 @@ computemixdist.npnormcll = function(v, mu0, pi0, beta, order, ...){
 
 #' @rdname computemixdist
 #' @export
-computemixdist.nptll = function(v, mu0, pi0, beta, order, ...){
+computemixdist.nptll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = Inf}
   v1 = npnorm(qnorm(pt(v, df = beta)))
-  init = initial.npnorm(v1)
+  if (is.null(mix)){
+    init = initial.npnorm(v1, beta = 1)
+  }else{
+    init = initial.npnorm(v1, beta = 1,
+                          mix = list(pt = qnorm(pt(mix$pt, df = beta)), pr = mix$pr))   
+  }
   k = nptll_(v, mu0, pi0, beta, qt(pnorm(init$mix$pt), df = beta), init$mix$pr, 
                  qt(pnorm(gridpoints.npnorm(v1, beta = 1)), df = beta), ...)
   attr(k, "class") = "nspmix"
