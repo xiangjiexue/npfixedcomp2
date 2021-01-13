@@ -41,7 +41,7 @@ public:
 		ansd1.resize(mu.size());
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
-		ansd0 = fullden.transpose() * (dens.rowwise().replicate(mu.size()) - dtarray(this->data, mu, this->beta) * scale);
+		ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden)) - dtarray(this->data, mu, this->beta).transpose() * fullden * scale;
 	}
 
 	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 

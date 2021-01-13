@@ -88,6 +88,8 @@ bin = function(data, order = -2){
 #' computemixdist(data, pi0 = pi0, method = "npnormcvm")
 #' computemixdist(data, pi0 = pi0, method = "nptll")
 #' computemixdist(data, pi0 = pi0, method = "npnormad")
+#' computemixdist(tanh(data), pi0 = pi0, method = "npnormcll", beta = 4)
+#' computemixdist(data, pi0 = pi0, method = "npnormllw", order = -3)
 #' @export
 computemixdist = function(v, method = "npnormll", ...){
   f = match.fun(paste0("computemixdist.", method))

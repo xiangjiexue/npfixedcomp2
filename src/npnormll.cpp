@@ -43,7 +43,7 @@ public:
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
 		Eigen::MatrixXd temp = dnormarray(this->data, mu, this->beta);
-		ansd0 = fullden.transpose() * (dens.rowwise().replicate(mu.size()) - temp * scale);
+		ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden)) - temp.transpose() * fullden * scale;
 		ansd1 = fullden.transpose() * (mu.transpose().colwise().replicate(this->len) - this->data.rowwise().replicate(mu.size())).cwiseProduct(temp)  / (this->beta * this->beta) * scale;
 	}
 

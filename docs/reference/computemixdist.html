@@ -122,7 +122,9 @@
 
 <span class='fu'>computemixdist.npnormcll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>computemixdist.nptll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>computemixdist.nptll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>computemixdist.npnormllw</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -253,27 +255,27 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"nptll"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 24
+#&gt; [1] 12
 #&gt; 
 #&gt; $family
 #&gt; [1] "npt"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -9.537013e-06
+#&gt; [1] -1.19461e-08
 #&gt; 
 #&gt; $beta
 #&gt; [1] Inf
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 1.789810 2.702893
+#&gt; [1] 0.000000 1.783071 2.685348
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.5000000 0.3761257 0.1238743
+#&gt; [1] 0.5000000 0.3711715 0.1288285
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 890.1905
+#&gt; [1] 890.1907
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d0"
@@ -308,6 +310,72 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Hyperbolic.html'>tanh</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcll"</span>, beta <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 12
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnormc"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] -4.547474e-13
+#&gt; 
+#&gt; $beta
+#&gt; [1] 4
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt;  [1] -0.9909631 -0.8956929 -0.8740533  0.0000000  0.7615942  0.9047392
+#&gt;  [7]  0.9673950  0.9703106  0.9889734  0.9950548  0.9955243  0.9975412
+#&gt; [13]  0.9995931
+#&gt; 
+#&gt; $mix$pr
+#&gt;  [1] 0.003373677 0.021405569 0.032252334 0.500000000 0.038304369 0.134268649
+#&gt;  [7] 0.055374295 0.090981150 0.016612012 0.033377175 0.012286514 0.047862083
+#&gt; [13] 0.013902173
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 50.80409
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d0"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormllw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 12
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnorm"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] -1.220826e-08
+#&gt; 
+#&gt; $beta
+#&gt; [1] 1
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] 0.000000 1.783065 2.685116
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.5000000 0.3711343 0.1288657
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 890.1931
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d0"
 #&gt; 
 #&gt; $convergence
 #&gt; [1] 0
