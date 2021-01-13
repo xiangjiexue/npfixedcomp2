@@ -65,30 +65,13 @@ inline void sortmix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0){
 	}
 }
 
-class comparedist
-{
-private:
-	Eigen::VectorXd mu0;
-	double target;
-public:
-	comparedist(const Eigen::VectorXd &mu0_, const double &target_) : mu0(mu0_), target(target_) {};
-
-	const bool operator()(const int & x, const int & y) const {return std::pow(mu0[x] - target, 2.) < std::pow(mu0[y] - target, 2.);};
-};
-
-inline double newmin(const Eigen::VectorXd &x, const Eigen::VectorXd &fx, double &rg){
-	Eigen::VectorXi ind = Eigen::VectorXi::LinSpaced(x.size(), 0, x.size() - 1);
-	std::sort(ind.data(), ind.data() + ind.size(), comparedist(x, x.tail(1)[0]));
-	Eigen::Vector3d x1;
-	x1<<x[ind[0]], x[ind[1]], x[ind[2]];
-	Eigen::Vector3d fx1;
-	fx1<<fx[ind[0]], fx[ind[1]], fx[ind[2]];
-	Eigen::MatrixXd A(3, 3);
-	A.col(0) = x1.array().square(); A.col(1) = x1; A.col(2).setOnes();
-	x1 = A.inverse() * fx1;
-	double ans = -x1[1] / x1[0] * 0.5;
-	rg = std::abs(ans - x.tail(1)[0]);
-	return ans;
+inline double newmin(const Eigen::Vector3d &x, const Eigen::Vector3d &fx){
+	// v is the best so far (v = x[2], fv = fx[2])
+	// u = x[0], fu = fx[0], w = x[1], fw = fx[1]
+	// page 272 of Scientific Computing: An Introductory Survey
+	double p = (x[2] - x[0]) * (x[2] - x[0]) * (fx[2] - fx[1]) - (x[2] - x[1]) * (x[2] - x[1]) * (fx[2] - fx[0]);
+	double q = 2 * ((x[2] - x[0]) * (fx[2] - fx[1]) - (x[2] - x[1]) * (fx[2] - fx[0]));
+	return x[2] - p / q;
 }
 
 
@@ -236,21 +219,31 @@ public:
     	return ans;
 	}
 
-	void Dfmin(double & x, double & fx, const Eigen::VectorXd &x1, const Eigen::VectorXd &fx1,
+	void Dfmin(double & x, double & fx, const Eigen::Vector3d &x1, const Eigen::Vector3d &fx1,
 		const Eigen::VectorXd &dens, const double &tol = 1e-6) const{
-		double rg = std::numeric_limits<double>::infinity();
 		double newpoint, fnewpoint, dummy;
-		Eigen::VectorXd xx(x1), fxx(fx1);
-		while (rg > tol){
-			newpoint = newmin(xx, fxx, rg);
+		Eigen::Vector3d xx(x1), fxx(fx1);
+		// ensure tail has the smallest fxx.
+		if (fxx[0] < fxx[2]){
+			std::swap(xx[0], xx[2]);
+			std::swap(fxx[0], fxx[2]);
+		}
+		if (fxx[1] < fxx[2]){
+			std::swap(xx[1], xx[2]);
+			std::swap(fxx[1], fxx[2]);
+		}		
+		while (fxx[1] - fxx[2] < tol){
+			newpoint = newmin(xx, fxx);
 			this->gradfun(newpoint, dens, fnewpoint, dummy);
-			xx.conservativeResize(xx.size() + 1);
-			fxx.conservativeResize(fxx.size() + 1);
-			xx.tail(1)[0] = newpoint;
-			fxx.tail(1)[0] = fnewpoint;
+			std::swap(xx[0], xx[1]);
+			std::swap(fxx[0], fxx[1]);
+			std::swap(xx[1], xx[2]);
+			std::swap(fxx[1], fxx[2]);
+			xx[2] = newpoint;
+			fxx[2] = fnewpoint;
 		}
 
-		x = xx.tail(1)[0]; fx = fxx.tail(1)[0];
+		x = xx[2]; fx = fxx[2];
 	}
 
 	Eigen::VectorXd solvegradd0(const Eigen::VectorXd &dens) const{
@@ -263,7 +256,7 @@ public:
     		ans[length] = gridpoints.head(1)[0];
     		length++;
     	}
-    	Eigen::VectorXd inputx(3), inputfx(3);
+    	Eigen::Vector3d inputx(3), inputfx(3);
     	for (auto i = 0; i < gridpoints.size() - 2; i++){
     		if ((pointsval[i + 1] - pointsval[i] < 0) & (pointsval[i + 2] - pointsval[i + 1] > 0)){
     			inputx << gridpoints[i], gridpoints[i + 2], gridpoints[i + 1];
