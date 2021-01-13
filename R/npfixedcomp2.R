@@ -14,6 +14,30 @@ NULL
 initial.npnorm = utils::getFromNamespace("initial.npnorm", "nspmix")
 gridpoints.npnorm = utils::getFromNamespace("gridpoints.npnorm", "nspmix")
 
+#' Bin the continuous data.
+#'
+#' This function bins the continuous data using the equal-width bin in order to
+#' speed up some functions in this package.
+#'
+#' h is taken as 10^(-order)
+#'
+#' the observations are rounded down to the bins ..., -h, 0, h, ...
+#'
+#' To further speed up the process, omit the bin that has 0 count.
+#'
+#' @title Bin the continuous data.
+#' @param data the observation to be binned.
+#' @param order see the details
+#' @return a list with v be the representative value of each bin and w be the count in the corresponding bin.
+#' @export
+bin = function(data, order = -2){
+  h = 10^order
+  data = floor(data / h) * h
+  t = table(data)
+  index = t != 0
+  list(v = as.numeric(names(t))[index], w = as.numeric(t)[index])
+}
+
 #' Computing non-parametric mixing distribution
 #' 
 #' These functions are used to make the object for computing the non-paramtric mixing
@@ -146,6 +170,21 @@ computemixdist.nptll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   }
   k = nptll_(v, mu0, pi0, beta, qt(pnorm(init$mix$pt), df = beta), init$mix$pr, 
                  qt(pnorm(gridpoints.npnorm(v1, beta = 1)), df = beta), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname computemixdist
+#' @export
+computemixdist.npnormllw = function(v, mu0, pi0, beta, order, mix = NULL, ...){
+  if (missing(mu0)) {mu0 = 0}
+  if (missing(pi0)) {pi0 = 0}
+  if (missing(beta)) {beta = 1}
+  v1 = bin(v, order)
+  v2 = npnorm(v = v1$v, w = v1$w)
+  init = initial.npnorm(v2, beta = beta, mix = mix)
+  k = npnormllw_(v1$v, v1$w, mu0, pi0, beta, 10^order, init$mix$pt, init$mix$pr, gridpoints.npnorm(v2, beta = beta), ...)
   attr(k, "class") = "nspmix"
   
   k

@@ -240,6 +240,36 @@ inline Eigen::VectorXd dnpnormc_(const Eigen::VectorXd &x,
 	}
 }
 
+// Simple implementaion of density of discete normal.
+inline Eigen::MatrixXd ddiscnormarray(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const double &stdev, const double &h, const double &lg = false){
+	Eigen::MatrixXd lx = pnormarray(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), stdev, true, true);
+	Eigen::MatrixXd ly = lx - pnormarray(x, mu0, stdev, true, true);
+	Eigen::MatrixXd ans(x.size(), mu0.size());
+	std::transform(ly.data(), ly.data() + ly.size(), ans.data(), 
+		[](const double &x){return (x <= M_LN2) ? std::log(-std::expm1(-x)) : std::log1p(-std::exp(-x));});
+	if (lg){
+		return lx + ans;
+	}else{
+		return (lx + ans).array().exp();
+	}
+}
+
+inline Eigen::VectorXd dnpdiscnormorigin(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, const double &stdev, const double &h){
+	return ddiscnormarray(x, mu0, stdev, h) * pi0;
+}
+
+inline Eigen::VectorXd dnpdiscnorm_(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
+	const double& stdev, const double &h, const bool& lg = false){
+	if (lg){
+		return dnpdiscnormorigin(x, mu0, pi0, stdev, h).array().log();
+	}else{
+		return dnpdiscnormorigin(x, mu0, pi0, stdev, h);
+	}
+}
+
 // Simple implementaion of density of t mixture.
 struct dtptr{
 	dtptr(const double &mu_, const double &n_) : mu(mu_), n(n_) {};

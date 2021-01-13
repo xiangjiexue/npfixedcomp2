@@ -300,10 +300,6 @@ public:
 
 		do{
 			newpoints.lazyAssign(this->solvegrad(dens));
-			this->computeweights(mu0, pi0, dens, newpoints); // return using mu0, pi0? remember to sort
-			iter++;
-			dens = this->mapping(mu0, pi0);
-			nloss = this->lossfunction(dens);
 
 			if (verbose){
 				Rcpp::Rcout<<"Iteration: "<<iter<<" with loss "<<nloss<<std::endl;
@@ -315,6 +311,11 @@ public:
 				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
 				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
 			}
+
+			this->computeweights(mu0, pi0, dens, newpoints); // return using mu0, pi0? remember to sort
+			iter++;
+			dens = this->mapping(mu0, pi0);
+			nloss = this->lossfunction(dens);
 
 			if (closs - nloss < tol){
 				convergence = 0;

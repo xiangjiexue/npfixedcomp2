@@ -76,6 +76,27 @@ dtarray_ <- function(x, mu0, df, lg = FALSE) {
     .Call('_npfixedcomp2_dtarray_', PACKAGE = 'npfixedcomp2', x, mu0, df, lg)
 }
 
+#' The density and the distribution function of non-parametric discrete normal distribution
+#'
+#' \code{dnpdiscnorm} gives the density.
+#'
+#' @title non-parametric discrete normal distribution
+#' @param x vector of observations, vector of quantiles
+#' @param mu0 the vector of support points
+#' @param pi0 the vector of weights correponding to the support points
+#' @param stdev standard deviation
+#' @param h the bin width
+#' @param lg logical; if TRUE, the result will be given in log scale.
+#' @rdname npdiscnorm
+#' @export
+dnpdiscnorm <- function(x, mu0, pi0, stdev, h, lg = FALSE) {
+    .Call('_npfixedcomp2_dnpdiscnorm', PACKAGE = 'npfixedcomp2', x, mu0, pi0, stdev, h, lg)
+}
+
+ddiscnormarray_ <- function(x, mu0, stdev, h, lg = FALSE) {
+    .Call('_npfixedcomp2_ddiscnormarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, h, lg)
+}
+
 npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
     .Call('_npfixedcomp2_npnormad_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
@@ -90,6 +111,10 @@ npnormcvm_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoint
 
 npnormll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
     .Call('_npfixedcomp2_npnormll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+npnormllw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+    .Call('_npfixedcomp2_npnormllw_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
 nptll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {

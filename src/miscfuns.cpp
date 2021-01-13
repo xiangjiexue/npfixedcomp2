@@ -104,3 +104,30 @@ Eigen::MatrixXd dtarray_(const Eigen::VectorXd &x,
 	const double &df, const bool &lg = false){
 	return dtarray(x, mu0, df, lg);
 }
+
+//' The density and the distribution function of non-parametric discrete normal distribution
+//'
+//' \code{dnpdiscnorm} gives the density.
+//'
+//' @title non-parametric discrete normal distribution
+//' @param x vector of observations, vector of quantiles
+//' @param mu0 the vector of support points
+//' @param pi0 the vector of weights correponding to the support points
+//' @param stdev standard deviation
+//' @param h the bin width
+//' @param lg logical; if TRUE, the result will be given in log scale.
+//' @rdname npdiscnorm
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd dnpdiscnorm(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &stdev, const double &h, const bool &lg = false){
+	return dnpdiscnorm_(x, mu0, pi0, stdev, h, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd ddiscnormarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &stdev, const double &h, const bool &lg = false){
+	return ddiscnormarray(x, mu0, stdev, h, lg);
+}

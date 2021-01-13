@@ -7,6 +7,7 @@
 \alias{computemixdist.npnormad}
 \alias{computemixdist.npnormcll}
 \alias{computemixdist.nptll}
+\alias{computemixdist.npnormllw}
 \title{Computing non-parametric mixing distribution}
 \usage{
 computemixdist(v, method = "npnormll", ...)
@@ -20,6 +21,8 @@ computemixdist.npnormad(v, mu0, pi0, beta, order, mix = NULL, ...)
 computemixdist.npnormcll(v, mu0, pi0, beta, order, mix = NULL, ...)
 
 computemixdist.nptll(v, mu0, pi0, beta, order, mix = NULL, ...)
+
+computemixdist.npnormllw(v, mu0, pi0, beta, order, mix = NULL, ...)
 }
 \arguments{
 \item{v}{a vector of observations}
