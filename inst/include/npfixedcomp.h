@@ -144,7 +144,7 @@ public:
 		this->gradfun(a, dens, duma, fa);
 		this->gradfun(b, dens, dumb, fb);
 
-		double s = a, fs = fb, dums, c, fc, dumc;
+		double s = a, fs = fa, dums, c, fc, dumc;
 
 		// this function will only be called if flb * fub < 0
 		while (std::abs(fb) > tol & std::abs(fs) > tol & std::abs(b - a) > tol){
@@ -171,16 +171,16 @@ public:
 				std::swap(dumc, dums);
 			}
 
-			// a < s < c < b
+			// a < c < s < b
 
 			if (fc * fs < 0){
-				a = s; fa = fs; duma = dums;
-				b = c; fb = fc; dumb = dumc;
+				a = c; fa = fc; duma = dumc;
+				b = s; fb = fs; dumb = dums;
 			}else{
 				if (fs * fb < 0){
-					a = c; fa = fc; duma = dumc;
+					a = s; fa = fs; duma = dums;
 				}else{
-					b = s; fb = fs; dumb = dums;
+					b = c; fb = fc; dumb = dumc;
 				}
 			}
 		}
@@ -221,19 +221,21 @@ public:
 
 	void Dfmin(double & x, double & fx, const Eigen::Vector3d &x1, const Eigen::Vector3d &fx1,
 		const Eigen::VectorXd &dens, const double &tol = 1e-6) const{
-		double newpoint, fnewpoint, dummy;
+		double newpoint, fnewpoint, dummy, lb = x1[0], ub = x1[1];
 		Eigen::Vector3d xx(x1), fxx(fx1);
 		// ensure tail has the smallest fxx.
-		if (fxx[0] < fxx[2]){
-			std::swap(xx[0], xx[2]);
-			std::swap(fxx[0], fxx[2]);
-		}
-		if (fxx[1] < fxx[2]){
-			std::swap(xx[1], xx[2]);
-			std::swap(fxx[1], fxx[2]);
-		}		
-		while (fxx[1] - fxx[2] < tol){
+		if (fxx[0] < fxx[1]){
+			std::swap(xx[0], xx[1]);
+			std::swap(fxx[0], fxx[1]);
+		}	
+		while ((xx.maxCoeff() - xx.minCoeff()) > tol){
 			newpoint = newmin(xx, fxx);
+			if (newpoint < lb & newpoint > ub){
+				Eigen::MatrixXd A(3, 3);
+				A.col(0) = xx.array().square(); A.col(1) = xx; A.col(2).setOnes();
+				Eigen::VectorXd x1 = A.inverse() * fxx;
+				newpoint = -x1[1] / x1[0] * 0.5;
+			}
 			this->gradfun(newpoint, dens, fnewpoint, dummy);
 			std::swap(xx[0], xx[1]);
 			std::swap(fxx[0], fxx[1]);

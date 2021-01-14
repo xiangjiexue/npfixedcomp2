@@ -31,9 +31,10 @@ public:
 		double &ansd0, double &ansd1) const{
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
-		Eigen::VectorXd temp = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta);
-		ansd0 = (dens - temp).dot(fullden);
-		ansd1 = (Eigen::VectorXd::Constant(this->len, mu) - this->data).cwiseProduct(temp).dot(fullden) / (this->beta * this->beta);
+		Eigen::VectorXd temp = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta).cwiseProduct(fullden);
+		ansd0 = dens.dot(fullden) - temp.sum(); // (dens - temp).dot(fullden);
+		// ansd1 = (Eigen::VectorXd::Constant(this->len, mu) - this->data).cwiseProduct(temp).dot(fullden) / (this->beta * this->beta);
+		ansd1 = (temp.sum() * mu - this->data.dot(temp)) / (this->beta * this->beta);
 	}
 
 	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
