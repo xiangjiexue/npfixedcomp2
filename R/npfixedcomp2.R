@@ -6,7 +6,7 @@
 #' @author Xiangjie Xue
 #' @import Rcpp RcppEigen nspmix
 #' @importFrom utils getFromNamespace
-#' @importFrom stats pnorm pt qnorm qt
+#' @importFrom stats pnorm pt qnorm qt cov cov2cor
 #' @useDynLib npfixedcomp2
 #' @name npfixedcomp2
 NULL
