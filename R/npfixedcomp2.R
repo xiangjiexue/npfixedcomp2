@@ -83,8 +83,8 @@ bin = function(data, order = -2){
 #' @param ... parameters above passed to the specific method
 #' @examples
 #' set.seed(123)
-#' data = rnorm(1000, c(0, 2))
-#' pi0 = 0.5
+#' pi0 = 0
+#' data = rnorm(1000, mean = c(0, 2))
 #' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormll"))
 #' r
 #' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvm"))

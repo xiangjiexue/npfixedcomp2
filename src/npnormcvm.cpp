@@ -18,7 +18,7 @@ public:
 		this->precompute = Eigen::VectorXd::LinSpaced(this->len, 1, 2 * this->len - 1) / 2 / this->len - 
 			pnpnorm_(this->data, this->mu0fixed, this->pi0fixed, this->beta);
 		family = "npnorm";
-		flag = "d1";
+		flag = "d0";
 	}
 
 	double lossfunction(const Eigen::VectorXd &maps) const{
@@ -34,7 +34,8 @@ public:
 		Eigen::VectorXd fullden = dens - this->precompute;
 		double scale = 1 - this->pi0fixed.sum();
 		ansd0 = (pnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta) - dens).dot(fullden) * 2;
-		ansd1 = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta).dot(fullden) * -2 * scale;
+		// ansd1 = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta).dot(fullden) * -2 * scale;
+		ansd1 = 0;
 	}
 
 	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
@@ -44,7 +45,7 @@ public:
 		Eigen::VectorXd fullden = dens - this->precompute;
 		double scale = 1 - this->pi0fixed.sum();
 		ansd0 = fullden.transpose() * (pnormarray(this->data, mu, this->beta) * scale - dens.rowwise().replicate(mu.size())) * 2;
-		ansd1 = fullden.transpose() * dnormarray(this->data, mu, this->beta) * -2 * scale;
+		// ansd1 = fullden.transpose() * dnormarray(this->data, mu, this->beta) * -2 * scale;
 	}
 
 	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
