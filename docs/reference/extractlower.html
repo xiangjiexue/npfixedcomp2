@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>non-parametric discrete normal distribution — dnpdiscnorm • npfixedcomp2</title>
+<title>Extract or returning the lower triangular part of the matrix — extractlower • npfixedcomp2</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,11 @@
 
 
 
-<meta property="og:title" content="non-parametric discrete normal distribution — dnpdiscnorm" />
-<meta property="og:description" content="The density and the distribution function of non-parametric discrete normal distribution" />
+<meta property="og:title" content="Extract or returning the lower triangular part of the matrix — extractlower" />
+<meta property="og:description" content="The function extractlower is to extract the strict
+lower triangular part of a squared matrix and the function
+returnlower is to return the vector value into a
+symmetric matrix with diagonal 1." />
 
 
 
@@ -103,56 +106,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>non-parametric discrete normal distribution</h1>
+    <h1>Extract or returning the lower triangular part of the matrix</h1>
     
-    <div class="hidden name"><code>npdiscnorm.Rd</code></div>
+    <div class="hidden name"><code>extractlower.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The density and the distribution function of non-parametric discrete normal distribution</p>
+    <p>The function <code>extractlower</code> is to extract the strict
+lower triangular part of a squared matrix and the function
+<code>returnlower</code> is to return the vector value into a
+symmetric matrix with diagonal 1.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dnpdiscnorm</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>stdev</span>, <span class='va'>h</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>extractlower</span><span class='op'>(</span><span class='va'>A</span><span class='op'>)</span>
 
-<span class='fu'>pnpdiscnorm</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>stdev</span>, <span class='va'>h</span>, lt <span class='op'>=</span> <span class='cn'>TRUE</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+<span class='fu'>returnlower</span><span class='op'>(</span><span class='va'>v</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>vector of observations, vector of quantiles</p></td>
+      <th>A</th>
+      <td><p>a matrix to be extracted the lower triangular part</p></td>
     </tr>
     <tr>
-      <th>mu0</th>
-      <td><p>the vector of support points</p></td>
-    </tr>
-    <tr>
-      <th>pi0</th>
-      <td><p>the vector of weights correponding to the support points</p></td>
-    </tr>
-    <tr>
-      <th>stdev</th>
-      <td><p>standard deviation</p></td>
-    </tr>
-    <tr>
-      <th>h</th>
-      <td><p>the bin width</p></td>
-    </tr>
-    <tr>
-      <th>lg</th>
-      <td><p>logical; if TRUE, the result will be given in log scale.</p></td>
-    </tr>
-    <tr>
-      <th>lt</th>
-      <td><p>logical; if TRUE, the result will be given in lower tail.</p></td>
+      <th>v</th>
+      <td><p>a vector to be returned to a symmetric matrix with diagonal 1.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>dnpdiscnorm</code> gives the density and <code>pnpdiscnorm</code> gives the CDF</p>
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>a</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>100</span>, <span class='fl'>10</span>, <span class='fl'>10</span><span class='op'>)</span>
+<span class='va'>b</span> <span class='op'>=</span> <span class='fu'>extractlower</span><span class='op'>(</span><span class='va'>a</span><span class='op'>)</span>
+<span class='va'>d</span> <span class='op'>=</span> <span class='fu'>returnlower</span><span class='op'>(</span><span class='va'>b</span><span class='op'>)</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

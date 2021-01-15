@@ -71,20 +71,6 @@ public:
 		pi0.lazyAssign(pi0new);
 	}
 
-	void print(const int &level = 0) const{
-		Rcpp::Rcout<<"mu0fixed: "<<this->mu0fixed.transpose()<<std::endl;
-		Rcpp::Rcout<<"pi0fixed: "<<this->pi0fixed.transpose()<<std::endl;
-		Rcpp::Rcout<<"beta: "<<this->beta<<std::endl;
-		Rcpp::Rcout<<"length: "<<this->len<<std::endl;
-		Rcpp::Rcout<<"gridpoints: "<<this->gridpoints.transpose()<<std::endl;
-		Rcpp::Rcout<<"initial loss: "<<this->lossfunction(this->mapping(initpt, initpr))<<std::endl;
-
-		if (level == 1){
-			Rcpp::Rcout<<"data: "<<this->data.transpose()<<std::endl;
-			Rcpp::Rcout<<"precompute: "<<this->precompute.transpose()<<std::endl;
-		}
-	}
-
 	double extrafun() const{
 		return this->weights.sum() * std::log(this->h);
 	}
@@ -93,7 +79,7 @@ public:
 // [[Rcpp::export]]
 Rcpp::List npnormllw_(const Eigen::VectorXd &data, const Eigen::VectorXd &weights, const Eigen::VectorXd &mu0fixed, const Eigen::VectorXd &pi0fixed,
 	const double &beta, const double &h, const Eigen::VectorXd &initpt, const Eigen::VectorXd &initpr, const Eigen::VectorXd &gridpoints,
-	const double &tol = 1e-6, const int &maxit = 100, const bool &verbose = false){
+	const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0){
 	npnormllw f(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints);
 	f.computemixdist(tol, maxit, verbose);
 	return f.result;

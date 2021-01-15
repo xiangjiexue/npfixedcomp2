@@ -1,5 +1,6 @@
 #ifndef miscfuns_h
 #define miscfuns_h
+#define EIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS
 
 // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
@@ -267,6 +268,26 @@ inline Eigen::VectorXd dnpdiscnorm_(const Eigen::VectorXd &x,
 		return dnpdiscnormorigin(x, mu0, pi0, stdev, h).array().log();
 	}else{
 		return dnpdiscnormorigin(x, mu0, pi0, stdev, h);
+	}
+}
+
+// Simple implementaion of CDF of discete normal.
+inline Eigen::MatrixXd pdiscnormarray(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const double &stdev, const double &h, const bool &lt = true, const bool &lg = false){
+	if (x.size() > mu0.size()){
+		return pnormarray(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), stdev, lt, lg);
+	}else{
+		return pnormarray(x + Eigen::VectorXd::Constant(x.size(), h), mu0, stdev, lt, lg);
+	}
+}
+
+inline Eigen::VectorXd pnpdiscnorm_(const Eigen::VectorXd &x,
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
+	const double& stdev, const double &h, const bool &lt = true, const bool& lg = false){
+	if (lg){
+		return pnpnormlog(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), pi0, stdev, lt);
+	}else{
+		return pnpnormorigin(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), pi0, stdev, lt);
 	}
 }
 

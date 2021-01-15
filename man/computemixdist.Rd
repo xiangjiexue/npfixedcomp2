@@ -8,6 +8,7 @@
 \alias{computemixdist.npnormcll}
 \alias{computemixdist.nptll}
 \alias{computemixdist.npnormllw}
+\alias{computemixdist.npnormcvmw}
 \title{Computing non-parametric mixing distribution}
 \usage{
 computemixdist(v, method = "npnormll", ...)
@@ -23,6 +24,8 @@ computemixdist.npnormcll(v, mu0, pi0, beta, order, mix = NULL, ...)
 computemixdist.nptll(v, mu0, pi0, beta, order, mix = NULL, ...)
 
 computemixdist.npnormllw(v, mu0, pi0, beta, order, mix = NULL, ...)
+
+computemixdist.npnormcvmw(v, mu0, pi0, beta, order, mix = NULL, ...)
 }
 \arguments{
 \item{v}{a vector of observations}
@@ -72,12 +75,23 @@ There is no default beta. The structure beta is the number of observations.
 The default method used is npnormll.
 }
 \examples{
-data = rnorm(500, c(0, 2))
+set.seed(123)
+data = rnorm(1000, c(0, 2))
 pi0 = 0.5
-computemixdist(data, pi0 = pi0, method = "npnormll")
-computemixdist(data, pi0 = pi0, method = "npnormcvm")
-computemixdist(data, pi0 = pi0, method = "nptll")
-computemixdist(data, pi0 = pi0, method = "npnormad")
-computemixdist(tanh(data), pi0 = pi0, method = "npnormcll", beta = 4)
-computemixdist(data, pi0 = pi0, method = "npnormllw", order = -3)
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormll"))
+r
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvm"))
+r
+system.time(r <- computemixdist(data, pi0 = pi0, method = "nptll"))
+r
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormad"))
+r
+system.time(r <- computemixdist(tanh(data), pi0 = pi0, method = "npnormcll", beta = 4))
+r
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormllw", order = -3))
+r
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -3))
+r
+system.time(r <- nspmix::cnm(nspmix::npnorm(data)))
+r
 }

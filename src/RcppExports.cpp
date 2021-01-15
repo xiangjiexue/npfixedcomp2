@@ -166,8 +166,41 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// pnpdiscnorm
+Eigen::VectorXd pnpdiscnorm(const Eigen::VectorXd& x, const Eigen::VectorXd& mu0, const Eigen::VectorXd& pi0, const double& stdev, const double& h, const bool& lt, const bool& lg);
+RcppExport SEXP _npfixedcomp2_pnpdiscnorm(SEXP xSEXP, SEXP mu0SEXP, SEXP pi0SEXP, SEXP stdevSEXP, SEXP hSEXP, SEXP ltSEXP, SEXP lgSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0(pi0SEXP);
+    Rcpp::traits::input_parameter< const double& >::type stdev(stdevSEXP);
+    Rcpp::traits::input_parameter< const double& >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lg(lgSEXP);
+    rcpp_result_gen = Rcpp::wrap(pnpdiscnorm(x, mu0, pi0, stdev, h, lt, lg));
+    return rcpp_result_gen;
+END_RCPP
+}
+// pdiscnormarray_
+Eigen::MatrixXd pdiscnormarray_(const Eigen::VectorXd& x, const Eigen::VectorXd& mu0, const double& stdev, const double& h, const bool& lt, const bool& lg);
+RcppExport SEXP _npfixedcomp2_pdiscnormarray_(SEXP xSEXP, SEXP mu0SEXP, SEXP stdevSEXP, SEXP hSEXP, SEXP ltSEXP, SEXP lgSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const double& >::type stdev(stdevSEXP);
+    Rcpp::traits::input_parameter< const double& >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lg(lgSEXP);
+    rcpp_result_gen = Rcpp::wrap(pdiscnormarray_(x, mu0, stdev, h, lt, lg));
+    return rcpp_result_gen;
+END_RCPP
+}
 // npnormad_
-Rcpp::List npnormad_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const bool& verbose);
+Rcpp::List npnormad_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormad_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -181,13 +214,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
-    Rcpp::traits::input_parameter< const bool& >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(npnormad_(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 // npnormcll_
-Rcpp::List npnormcll_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const bool& verbose);
+Rcpp::List npnormcll_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormcll_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -201,13 +234,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
-    Rcpp::traits::input_parameter< const bool& >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(npnormcll_(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 // npnormcvm_
-Rcpp::List npnormcvm_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const bool& verbose);
+Rcpp::List npnormcvm_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormcvm_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -221,13 +254,35 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
-    Rcpp::traits::input_parameter< const bool& >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(npnormcvm_(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
+// npnormcvmw_
+Rcpp::List npnormcvmw_(const Eigen::VectorXd& data, const Eigen::VectorXd& weights, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const double& h, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
+RcppExport SEXP _npfixedcomp2_npnormcvmw_(SEXP dataSEXP, SEXP weightsSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP hSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0fixed(mu0fixedSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0fixed(pi0fixedSEXP);
+    Rcpp::traits::input_parameter< const double& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const double& >::type h(hSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type initpt(initptSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type initpr(initprSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
+    Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(npnormcvmw_(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // npnormll_
-Rcpp::List npnormll_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const bool& verbose);
+Rcpp::List npnormll_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormll_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -241,13 +296,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
-    Rcpp::traits::input_parameter< const bool& >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(npnormll_(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 // npnormllw_
-Rcpp::List npnormllw_(const Eigen::VectorXd& data, const Eigen::VectorXd& weights, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const double& h, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const bool& verbose);
+Rcpp::List npnormllw_(const Eigen::VectorXd& data, const Eigen::VectorXd& weights, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const double& h, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormllw_(SEXP dataSEXP, SEXP weightsSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP hSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -263,13 +318,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
-    Rcpp::traits::input_parameter< const bool& >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(npnormllw_(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
 // nptll_
-Rcpp::List nptll_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const bool& verbose);
+Rcpp::List nptll_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_nptll_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -283,7 +338,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
-    Rcpp::traits::input_parameter< const bool& >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(nptll_(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose));
     return rcpp_result_gen;
 END_RCPP
@@ -301,9 +356,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_dtarray_", (DL_FUNC) &_npfixedcomp2_dtarray_, 4},
     {"_npfixedcomp2_dnpdiscnorm", (DL_FUNC) &_npfixedcomp2_dnpdiscnorm, 6},
     {"_npfixedcomp2_ddiscnormarray_", (DL_FUNC) &_npfixedcomp2_ddiscnormarray_, 5},
+    {"_npfixedcomp2_pnpdiscnorm", (DL_FUNC) &_npfixedcomp2_pnpdiscnorm, 7},
+    {"_npfixedcomp2_pdiscnormarray_", (DL_FUNC) &_npfixedcomp2_pdiscnormarray_, 6},
     {"_npfixedcomp2_npnormad_", (DL_FUNC) &_npfixedcomp2_npnormad_, 10},
     {"_npfixedcomp2_npnormcll_", (DL_FUNC) &_npfixedcomp2_npnormcll_, 10},
     {"_npfixedcomp2_npnormcvm_", (DL_FUNC) &_npfixedcomp2_npnormcvm_, 10},
+    {"_npfixedcomp2_npnormcvmw_", (DL_FUNC) &_npfixedcomp2_npnormcvmw_, 12},
     {"_npfixedcomp2_npnormll_", (DL_FUNC) &_npfixedcomp2_npnormll_, 10},
     {"_npfixedcomp2_npnormllw_", (DL_FUNC) &_npfixedcomp2_npnormllw_, 12},
     {"_npfixedcomp2_nptll_", (DL_FUNC) &_npfixedcomp2_nptll_, 10},

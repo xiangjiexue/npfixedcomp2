@@ -287,7 +287,7 @@ public:
 	}
 
 	// compute mixing distribution
-	void computemixdist(const double &tol = 1e-6, const int &maxit = 100, const bool &verbose = false) const{
+	void computemixdist(const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0) const{
 		Eigen::VectorXd mu0 = initpt, pi0 = initpr * (1. - pi0fixed.sum());
 		int iter = 0, convergence = 0;
 		Eigen::VectorXd newpoints, dens = this->mapping(mu0, pi0);
@@ -296,15 +296,18 @@ public:
 		do{
 			newpoints.lazyAssign(this->solvegrad(dens));
 
-			if (verbose){
+			if (verbose >= 1){
 				Rcpp::Rcout<<"Iteration: "<<iter<<" with loss "<<nloss<<std::endl;
+				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
+				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
+			}
+			
+			if (verbose >= 2){
 				Rcpp::Rcout<<"new points: "<<newpoints.transpose()<<std::endl;
 				Eigen::VectorXd pointsval, pointsgrad;
 				this->gradfunvec(newpoints, dens, pointsval, pointsgrad);
 				Rcpp::Rcout<<"gradient: "<<pointsval.transpose()<<std::endl;
 				Rcpp::Rcout<<"gradient derivative: "<<pointsgrad.transpose()<<std::endl;
-				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
-				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
 			}
 
 			this->computeweights(mu0, pi0, dens, newpoints); // return using mu0, pi0? remember to sort
@@ -347,18 +350,6 @@ public:
 	}
 
 	// functions to each specific type
-	virtual void print(const int & level = 0) const{
-		Rcpp::Rcout<<"mu0fixed: "<<this->mu0fixed.transpose()<<std::endl;
-		Rcpp::Rcout<<"pi0fixed: "<<this->pi0fixed.transpose()<<std::endl;
-		Rcpp::Rcout<<"beta: "<<this->beta<<std::endl;
-		Rcpp::Rcout<<"length: "<<this->len<<std::endl;
-		Rcpp::Rcout<<"gridpoints: "<<this->gridpoints.transpose()<<std::endl;
-		Rcpp::Rcout<<"initial loss: "<<this->lossfunction(this->mapping(initpt, initpr))<<std::endl;
-
-		if (level == 1){
-			Rcpp::Rcout<<"data: "<<this->data.transpose()<<std::endl;
-		}
-	}
 
 	virtual Eigen::VectorXd mapping(const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
 		return Eigen::VectorXd::Zero(1);

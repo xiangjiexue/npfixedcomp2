@@ -78,7 +78,7 @@ dtarray_ <- function(x, mu0, df, lg = FALSE) {
 
 #' The density and the distribution function of non-parametric discrete normal distribution
 #'
-#' \code{dnpdiscnorm} gives the density.
+#' \code{dnpdiscnorm} gives the density and \code{pnpdiscnorm} gives the CDF
 #'
 #' @title non-parametric discrete normal distribution
 #' @param x vector of observations, vector of quantiles
@@ -86,6 +86,7 @@ dtarray_ <- function(x, mu0, df, lg = FALSE) {
 #' @param pi0 the vector of weights correponding to the support points
 #' @param stdev standard deviation
 #' @param h the bin width
+#' @param lt logical; if TRUE, the result will be given in lower tail.
 #' @param lg logical; if TRUE, the result will be given in log scale.
 #' @rdname npdiscnorm
 #' @export
@@ -97,27 +98,41 @@ ddiscnormarray_ <- function(x, mu0, stdev, h, lg = FALSE) {
     .Call('_npfixedcomp2_ddiscnormarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, h, lg)
 }
 
-npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+#' @rdname npdiscnorm
+#' @export
+pnpdiscnorm <- function(x, mu0, pi0, stdev, h, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_pnpdiscnorm', PACKAGE = 'npfixedcomp2', x, mu0, pi0, stdev, h, lt, lg)
+}
+
+pdiscnormarray_ <- function(x, mu0, stdev, h, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_pdiscnormarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, h, lt, lg)
+}
+
+npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormad_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
-npnormcll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+npnormcll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormcll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
-npnormcvm_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+npnormcvm_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormcvm_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
-npnormll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+npnormcvmw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
+    .Call('_npfixedcomp2_npnormcvmw_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+npnormll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
-npnormllw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+npnormllw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormllw_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
-nptll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = FALSE) {
+nptll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_nptll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 

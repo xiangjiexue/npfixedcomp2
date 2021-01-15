@@ -82,14 +82,25 @@ bin = function(data, order = -2){
 #' @param method An implemented family; see details
 #' @param ... parameters above passed to the specific method
 #' @examples
-#' data = rnorm(500, c(0, 2))
+#' set.seed(123)
+#' data = rnorm(1000, c(0, 2))
 #' pi0 = 0.5
-#' computemixdist(data, pi0 = pi0, method = "npnormll")
-#' computemixdist(data, pi0 = pi0, method = "npnormcvm")
-#' computemixdist(data, pi0 = pi0, method = "nptll")
-#' computemixdist(data, pi0 = pi0, method = "npnormad")
-#' computemixdist(tanh(data), pi0 = pi0, method = "npnormcll", beta = 4)
-#' computemixdist(data, pi0 = pi0, method = "npnormllw", order = -3)
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormll"))
+#' r
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvm"))
+#' r
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "nptll"))
+#' r
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormad"))
+#' r
+#' system.time(r <- computemixdist(tanh(data), pi0 = pi0, method = "npnormcll", beta = 4))
+#' r
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormllw", order = -3))
+#' r
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -3))
+#' r
+#' system.time(r <- nspmix::cnm(nspmix::npnorm(data)))
+#' r
 #' @export
 computemixdist = function(v, method = "npnormll", ...){
   f = match.fun(paste0("computemixdist.", method))
@@ -187,6 +198,21 @@ computemixdist.npnormllw = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   v2 = npnorm(v = v1$v, w = v1$w)
   init = initial.npnorm(v2, beta = beta, mix = mix)
   k = npnormllw_(v1$v, v1$w, mu0, pi0, beta, 10^order, init$mix$pt, init$mix$pr, gridpoints.npnorm(v2, beta = beta), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname computemixdist
+#' @export
+computemixdist.npnormcvmw = function(v, mu0, pi0, beta, order, mix = NULL, ...){
+  if (missing(mu0)) {mu0 = 0}
+  if (missing(pi0)) {pi0 = 0}
+  if (missing(beta)) {beta = 1}
+  v1 = bin(v, order)
+  v2 = npnorm(v = v1$v, w = v1$w)
+  init = initial.npnorm(v2, beta = beta, mix = mix)
+  k = npnormcvmw_(v1$v, v1$w, mu0, pi0, beta, 10^order, init$mix$pt, init$mix$pr, gridpoints.npnorm(v2, beta = beta), ...)
   attr(k, "class") = "nspmix"
   
   k

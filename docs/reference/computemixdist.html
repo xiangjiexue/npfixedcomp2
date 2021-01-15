@@ -124,7 +124,9 @@
 
 <span class='fu'>computemixdist.nptll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>computemixdist.npnormllw</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>computemixdist.npnormllw</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>computemixdist.npnormcvmw</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>beta</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -189,31 +191,34 @@ There is no default beta. The structure beta is the number of observations.</p><
 <p>The default method used is npnormll.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>data</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>500</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='va'>data</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>pi0</span> <span class='op'>=</span> <span class='fl'>0.5</span>
-<span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.038   0.001   0.040 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 24
+#&gt; [1] 12
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -9.53398e-06
+#&gt; [1] -1.028824e-05
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 1.789810 2.702893
+#&gt; [1] 0.000000 1.876396 2.897672
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.5000000 0.3761256 0.1238744
+#&gt; [1] 0.50000000 0.47436438 0.02563562
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 890.1905
+#&gt; [1] 1724.3
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -222,29 +227,31 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] 0
 #&gt; 
 #&gt; attr(,"class")
-#&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcvm"</span><span class='op'>)</span>
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcvm"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.059   0.001   0.060 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 11
+#&gt; [1] 10
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -6.969439e-06
+#&gt; [1] -7.460567e-17
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 1.987501 4.670460
+#&gt; [1] 0.000000 1.968208
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.50000000 0.48592565 0.01407435
+#&gt; [1] 0.5 0.5
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 0.0481505
+#&gt; [1] 0.1189124
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -253,7 +260,9 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] 0
 #&gt; 
 #&gt; attr(,"class")
-#&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"nptll"</span><span class='op'>)</span>
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"nptll"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.043   0.001   0.044 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 12
 #&gt; 
@@ -261,21 +270,21 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npt"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -1.19461e-08
+#&gt; [1] -1.028863e-05
 #&gt; 
 #&gt; $beta
 #&gt; [1] Inf
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 1.783071 2.685348
+#&gt; [1] 0.000000 1.876396 2.897672
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.5000000 0.3711715 0.1288285
+#&gt; [1] 0.50000000 0.47436438 0.02563562
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 890.1907
+#&gt; [1] 1724.3
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d0"
@@ -284,7 +293,78 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] 0
 #&gt; 
 #&gt; attr(,"class")
-#&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormad"</span><span class='op'>)</span>
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormad"</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.086   0.000   0.087 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 16
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnorm"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] -5.007241e-05
+#&gt; 
+#&gt; $beta
+#&gt; [1] 1
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] 0.000000 1.963003 5.843548
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.5000000000 0.4992857671 0.0007142329
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 0.844832
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d0"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Hyperbolic.html'>tanh</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcll"</span>, beta <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.079   0.001   0.080 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 16
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnormc"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] -1.509107e-06
+#&gt; 
+#&gt; $beta
+#&gt; [1] 4
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt;  [1] -0.9762393 -0.9009333 -0.9008614  0.0000000  0.8283179  0.9530171
+#&gt;  [7]  0.9783660  0.9866527  0.9961041  0.9981708  0.9992127  0.9995904
+#&gt; 
+#&gt; $mix$pr
+#&gt;  [1] 0.0002654015 0.0256539909 0.0140466380 0.5000000000 0.1451303866
+#&gt;  [6] 0.1194070762 0.0570314438 0.0726581294 0.0371463752 0.0150746845
+#&gt; [11] 0.0128631066 0.0007227673
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 153.9953
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d0"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormllw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.153   0.001   0.155 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 12
 #&gt; 
@@ -292,21 +372,54 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -5.098118e-06
+#&gt; [1] -1.385459e-05
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 1.967743 3.615251
+#&gt; [1] 0.000000 1.876433 2.898217
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.50000000 0.47423614 0.02576386
+#&gt; [1] 0.50000000 0.47438789 0.02561211
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 0.300554
+#&gt; [1] 1724.298
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d0"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcvmw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;    0.12    0.00    0.12 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 9
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnorm"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] 0
+#&gt; 
+#&gt; $beta
+#&gt; [1] 1
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] 0.000000 1.969233
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.5 0.5
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 0.1200339
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -315,70 +428,32 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] 0
 #&gt; 
 #&gt; attr(,"class")
-#&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Hyperbolic.html'>tanh</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcll"</span>, beta <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $iter
-#&gt; [1] 12
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>nspmix</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nspmix/man/cnm.html'>cnm</a></span><span class='op'>(</span><span class='fu'>nspmix</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nspmix/man/npnorm.html'>npnorm</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.100   0.028   0.129 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $family
+#&gt; [1] "npnorm"
 #&gt; 
-#&gt; $family
-#&gt; [1] "npnormc"
+#&gt; $num.iterations
+#&gt; [1] 14
 #&gt; 
-#&gt; $min.gradient
-#&gt; [1] -4.547474e-13
-#&gt; 
-#&gt; $beta
-#&gt; [1] 4
-#&gt; 
-#&gt; $mix
-#&gt; $mix$pt
-#&gt;  [1] -0.9909631 -0.8956929 -0.8740533  0.0000000  0.7615942  0.9047392
-#&gt;  [7]  0.9673950  0.9703106  0.9889734  0.9950548  0.9955243  0.9975412
-#&gt; [13]  0.9995931
-#&gt; 
-#&gt; $mix$pr
-#&gt;  [1] 0.003373677 0.021405569 0.032252334 0.500000000 0.038304369 0.134268649
-#&gt;  [7] 0.055374295 0.090981150 0.016612012 0.033377175 0.012286514 0.047862083
-#&gt; [13] 0.013902173
-#&gt; 
-#&gt; 
-#&gt; $ll
-#&gt; [1] 50.80409
-#&gt; 
-#&gt; $flag
-#&gt; [1] "d0"
+#&gt; $max.gradient
+#&gt; [1] 9.135504e-07
 #&gt; 
 #&gt; $convergence
 #&gt; [1] 0
 #&gt; 
-#&gt; attr(,"class")
-#&gt; [1] "nspmix"</div><div class='input'><span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormllw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $iter
-#&gt; [1] 12
+#&gt; $ll
+#&gt; [1] -1722.52
 #&gt; 
-#&gt; $family
-#&gt; [1] "npnorm"
-#&gt; 
-#&gt; $min.gradient
-#&gt; [1] -1.220826e-08
+#&gt; $mix
+#&gt;             pt         pr
+#&gt; [1,] 0.1470637 0.53022704
+#&gt; [2,] 1.9708652 0.45769630
+#&gt; [3,] 2.9886660 0.01207665
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
-#&gt; 
-#&gt; $mix
-#&gt; $mix$pt
-#&gt; [1] 0.000000 1.783065 2.685116
-#&gt; 
-#&gt; $mix$pr
-#&gt; [1] 0.5000000 0.3711343 0.1288657
-#&gt; 
-#&gt; 
-#&gt; $ll
-#&gt; [1] 890.1931
-#&gt; 
-#&gt; $flag
-#&gt; [1] "d0"
-#&gt; 
-#&gt; $convergence
-#&gt; [1] 0
 #&gt; 
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div></pre>
