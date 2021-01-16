@@ -8,13 +8,11 @@
 class npnormcll : public npfixedcomp
 {
 public:
-	Eigen::VectorXd precompute;
 
 	npnormcll(const Eigen::VectorXd &data_, const Eigen::VectorXd &mu0fixed_, const Eigen::VectorXd &pi0fixed_,
 		const double &beta_, const Eigen::VectorXd &initpt_, const Eigen::VectorXd &initpr_, 
 		const Eigen::VectorXd &gridpoints_) : npfixedcomp(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
-		this->precompute.resize(this->len);
-		this->precompute = dnpnormc_(this->data, this->mu0fixed, this->pi0fixed, this->beta);
+		this->setprecompute();
 		family = "npnormc";
 		flag = "d0";
 	}
@@ -28,24 +26,32 @@ public:
 	}
 
 	void gradfun(const double &mu, const Eigen::VectorXd &dens,
-		double &ansd0, double &ansd1) const{
+		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
-		ansd0 = (dens - dnpnormc_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta)).dot(fullden);
+		if (d0){
+			ansd0 = (dens - dnpnormc_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta)).dot(fullden);
+		}
+
+		if (d1){
+			ansd1 = 0;
+		}
+		
 		// Eigen::VectorXd temp2 = ((this->beta + 4) * std::pow(mu, 3.) -  3 * this->beta * mu * mu * this->data.array() +
 		// 	mu * (2 * this->beta * this->data.array().square() + this->beta - 2) - this->beta * this->data.array() - 
 		// 	2 * std::pow(mu, 5.)) / std::pow(1 - mu * mu, 3.0);
 		// ansd1 = temp2.cwiseProduct(temp).dot(fullden) * scale;
-		ansd1 = 0; // not reference if flag = "d0".
 	}
 
 	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
-		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1) const{
+		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1, const bool &d0, const bool &d1) const{
 		ansd0.resize(mu.size());
 		ansd1.resize(mu.size());
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
-		ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden)) - dnormcarray(this->data, mu, this->beta).transpose() * fullden * scale;
+		if (d0){
+			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden)) - dnormcarray(this->data, mu, this->beta).transpose() * fullden * scale;
+		}
 	}
 
 	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 

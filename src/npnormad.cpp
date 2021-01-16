@@ -8,40 +8,43 @@
 class npnormad : public npfixedcomp
 {
 public:
-	Eigen::VectorXd precompute;
 	Eigen::VectorXd w1, w2;
 
 	npnormad(const Eigen::VectorXd &data_, const Eigen::VectorXd &mu0fixed_, const Eigen::VectorXd &pi0fixed_,
 		const double &beta_, const Eigen::VectorXd &initpt_, const Eigen::VectorXd &initpr_, 
 		const Eigen::VectorXd &gridpoints_) : npfixedcomp(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
 		// data should be sorted beforehand
-		this->precompute.resize(this->len);
-		this->precompute = pnpnorm_(this->data, this->mu0fixed, this->pi0fixed, this->beta);
 		this->w1.resize(this->len);
 		this->w1 = Eigen::VectorXd::LinSpaced(this->len, 1., 2. * this->len - 1.);
 		this->w2.resize(this->len);
 		this->w2 = this->w1.reverse();
+		this->setprecompute();
 		family = "npnorm";
-		flag = "d0";
+		flag = "d1";
 	}
 
 	double lossfunction(const Eigen::VectorXd &maps) const{
-		return (w1.array() * maps.array().log() + w2.array() * (maps.array() * -1.).log1p()).mean() * -1.; 
+		Eigen::VectorXd temp = maps + this->precompute;
+		return (w1.array() * temp.array().log() + w2.array() * (temp.array() * -1.).log1p()).mean() * -1.; 
 	}
 
 	Eigen::VectorXd mapping(const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
-		return pnpnorm_(this->data, mu0, pi0, this->beta) + this->precompute;
+		return pnpnorm_(this->data, mu0, pi0, this->beta);
 	}
 
 	void gradfun(const double &mu, const Eigen::VectorXd &dens,
-		double &ansd0, double &ansd1) const{
+		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
 		double scale = 1 - this->pi0fixed.sum();
+		Eigen::VectorXd fullden = dens + this->precompute;
 		Eigen::VectorXd one = Eigen::VectorXd::Ones(this->len);
-		Eigen::VectorXd temp = pnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta) + this->precompute;
-		ansd0 = (temp.cwiseQuotient(dens).cwiseProduct(this->w1) + (one - temp).cwiseQuotient(one - dens).cwiseProduct(this->w2)).mean() * -1 + 2 * this->len;
-		// temp = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta);
-		// ansd1 = temp.cwiseProduct(this->w1.cwiseQuotient(dens) - this->w2.cwiseQuotient(one - dens)).mean() * scale;
-		ansd1 = 0;
+		if (d0){
+			Eigen::VectorXd temp = pnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta) + this->precompute;
+			ansd0 = (temp.cwiseQuotient(fullden).cwiseProduct(this->w1) + (one - temp).cwiseQuotient(one - fullden).cwiseProduct(this->w2)).mean() * -1 + 2 * this->len;
+		}
+
+		if (d1){
+			ansd1 = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta).cwiseProduct(this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(one - fullden)).mean() * scale;
+		}
 	}
 
 	// void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
@@ -64,7 +67,7 @@ public:
 		sortmix(mu0new, pi0new);
 
 		Eigen::MatrixXd sf = (pnormarray(this->data, mu0new, this->beta) * (1. - this->pi0fixed.sum())).array().colwise() + this->precompute.array();
-		Eigen::VectorXd sp = dens;
+		Eigen::VectorXd sp = dens + this->precompute;
 		Eigen::MatrixXd S = sf.array().colwise() / sp.array();
 		Eigen::MatrixXd U = (Eigen::MatrixXd::Ones(this->len, mu0new.size()) - sf).array().colwise() / (Eigen::VectorXd::Ones(this->len) - sp).array();
 		Eigen::VectorXd S2 = S.transpose() * this->w1 + U.transpose() * this->w2;

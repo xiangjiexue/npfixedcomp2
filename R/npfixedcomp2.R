@@ -107,6 +107,42 @@ computemixdist = function(v, method = "npnormll", ...){
   f(v = v, ...)
 }
 
+#' computing non-parametric mixing distribution with estimated proportion at 0
+#'
+#' This is a function for computing non-parametric mixing
+#' distribution with estimated proportion at 0. Different families will
+#' have different threshold values.
+#'
+#' The parameters are listed as follows:
+#'
+#' - tol: tolerance to stop the code.
+#'
+#' - verbose: logical; Whether to print the intermediate results.
+#'
+#' It is not shown in the parameter section since various method have different
+#' default threshold values and this function essentially calls the class method
+#' in the object.
+#'
+#' The full list of implemented families is in \code{\link{computemixdist}}.
+#'
+#' @title Computing non-parametric mixing distribution with estimated proportion at 0
+#' @param v observations
+#' @param beta structural parameter
+#' @param val thresholding function
+#' @param order the parameter for the binned version.
+#' @param mix initial mixing distribution.
+#' @param method An implemented family; see details
+#' @param ... parameters above passed to the specific method.
+#' @examples
+#' data = rnorm(500, c(0, 2))
+#' system.time(r <- estpi0(data, method = "npnormll", val = 2, verbose = TRUE))
+#' r
+#' @export
+estpi0 = function(v, method = "npnormll", ...){
+  f = match.fun(paste0("estpi0.", method))
+  f(v = v, ...)
+}
+
 #' @rdname computemixdist
 #' @export
 computemixdist.npnormll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
@@ -116,6 +152,18 @@ computemixdist.npnormll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   v1 = npnorm(v)
   init = initial.npnorm(v1, beta = beta, mix = mix)
   k = npnormll_(v, mu0, pi0, beta, init$mix$pt, init$mix$pr, gridpoints.npnorm(v1, beta = beta), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname estpi0
+#' @export
+estpi0.npnormll = function(v, beta, val, order, mix = NULL, ...){
+  if (missing(beta)) {beta = 1}
+  v1 = npnorm(v)
+  init = initial.npnorm(v1, beta = beta, mix = mix)
+  k = estpi0npnormll_(v, beta, val, init$mix$pt, init$mix$pr, gridpoints.npnorm(v1, beta = beta), ...)
   attr(k, "class") = "nspmix"
   
   k

@@ -301,6 +301,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// estpi0npnormll_
+Rcpp::List estpi0npnormll_(const Eigen::VectorXd& data, const double& beta, const double& val, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& verbose);
+RcppExport SEXP _npfixedcomp2_estpi0npnormll_(SEXP dataSEXP, SEXP betaSEXP, SEXP valSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const double& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const double& >::type val(valSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type initpt(initptSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type initpr(initprSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
+    Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(estpi0npnormll_(data, beta, val, initpt, initpr, gridpoints, tol, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // npnormllw_
 Rcpp::List npnormllw_(const Eigen::VectorXd& data, const Eigen::VectorXd& weights, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const double& h, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormllw_(SEXP dataSEXP, SEXP weightsSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP hSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
@@ -363,6 +381,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_npnormcvm_", (DL_FUNC) &_npfixedcomp2_npnormcvm_, 10},
     {"_npfixedcomp2_npnormcvmw_", (DL_FUNC) &_npfixedcomp2_npnormcvmw_, 12},
     {"_npfixedcomp2_npnormll_", (DL_FUNC) &_npfixedcomp2_npnormll_, 10},
+    {"_npfixedcomp2_estpi0npnormll_", (DL_FUNC) &_npfixedcomp2_estpi0npnormll_, 8},
     {"_npfixedcomp2_npnormllw_", (DL_FUNC) &_npfixedcomp2_npnormllw_, 12},
     {"_npfixedcomp2_nptll_", (DL_FUNC) &_npfixedcomp2_nptll_, 10},
     {NULL, NULL, 0}

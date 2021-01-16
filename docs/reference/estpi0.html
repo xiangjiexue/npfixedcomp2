@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimating Covariance Matrix using Empirical Bayes — covestEB • npfixedcomp2</title>
+<title>Computing non-parametric mixing distribution with estimated proportion at 0 — estpi0 • npfixedcomp2</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Estimating Covariance Matrix using Empirical Bayes — covestEB" />
-<meta property="og:description" content="Estimating covariance matrix using Empirical Bayes" />
+<meta property="og:title" content="Computing non-parametric mixing distribution with estimated proportion at 0 — estpi0" />
+<meta property="og:description" content="computing non-parametric mixing distribution with estimated proportion at 0" />
 
 
 
@@ -103,66 +103,110 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Estimating Covariance Matrix using Empirical Bayes</h1>
+    <h1>Computing non-parametric mixing distribution with estimated proportion at 0</h1>
     
-    <div class="hidden name"><code>covestEB.Rd</code></div>
+    <div class="hidden name"><code>estpi0.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Estimating covariance matrix using Empirical Bayes</p>
+    <p>computing non-parametric mixing distribution with estimated proportion at 0</p>
     </div>
 
-    <pre class="usage"><span class='fu'>covestEB</span><span class='op'>(</span><span class='va'>X</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span>, force.nonbin <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>v</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+<span class='fu'>estpi0.npnormll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>beta</span>, <span class='va'>val</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>X</th>
-      <td><p>a matrix of size n * p, where n is the number of observations and
-p is the number of variables</p></td>
+      <th>v</th>
+      <td><p>observations</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>An implemented family; see details</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>parameters above passed to the specific method.</p></td>
+    </tr>
+    <tr>
+      <th>beta</th>
+      <td><p>structural parameter</p></td>
+    </tr>
+    <tr>
+      <th>val</th>
+      <td><p>thresholding function</p></td>
     </tr>
     <tr>
       <th>order</th>
-      <td><p>the level of binning to use when the number of observations
-passed to the computation is greater than 5000.</p></td>
+      <td><p>the parameter for the binned version.</p></td>
     </tr>
     <tr>
-      <th>verbose</th>
-      <td><p>logical; If TRUE, the intermediate results will be shown.</p></td>
-    </tr>
-    <tr>
-      <th>force.nonbin</th>
-      <td><p>logical; If TRUE, no binning is performce by force.</p></td>
+      <th>mix</th>
+      <td><p>initial mixing distribution.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>a list. a covariance matrix estimate of size p * p is given in mat,
-whether correction is done is given in correction, and the method for
-computing the density of sample correlation coefficients is given in method.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The function <code>covestEB</code> performs covariance matrix estimation using
-Fisher transformation, while the function <code>covestEB.cor</code> performs
-covariance estimation directly on sample correlation coefficients using
-one-parameter normal approximation.</p>
-<p>Covariance matrix estimation using Fisher transformation supports estimation
-sparsity as well as large-scale computation, while estimation on the original
-scale supports neither and it is for comparison only. It is recommended to
-perform estimation on Fisher-transformed sample correlation coefficients.</p>
+    <p>This is a function for computing non-parametric mixing
+distribution with estimated proportion at 0. Different families will
+have different threshold values.</p>
+<p>The parameters are listed as follows:</p><ul>
+<li><p>tol: tolerance to stop the code.</p></li>
+<li><p>verbose: logical; Whether to print the intermediate results.</p></li>
+</ul>
+
+<p>It is not shown in the parameter section since various method have different
+default threshold values and this function essentially calls the class method
+in the object.</p>
+<p>The full list of implemented families is in <code><a href='computemixdist.html'>computemixdist</a></code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>n</span> <span class='op'>=</span> <span class='fl'>100</span>; <span class='va'>p</span> <span class='op'>=</span> <span class='fl'>50</span>
-<span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>p</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span>, ncol <span class='op'>=</span> <span class='va'>p</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.051   0.001   0.052 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans1</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.044   0.000   0.045 </div></pre>
+    <pre class="examples"><div class='input'><span class='va'>data</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>500</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span>, val <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
+#&gt; current val: 0.519666 fval: 884.567
+#&gt; Iter: 3 lower: 0.519666 upper: 0.759833
+#&gt; current val: 0.69535 fval: 903.146
+#&gt; Iter: 5 lower: 0.519666 upper: 0.607508
+#&gt; current val: 0.530424 fval: 884.909
+#&gt; Iter: 7 lower: 0.525045 upper: 0.530424
+#&gt; current val: 0.527959 fval: 884.824</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.119   0.000   0.120 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 7
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnorm"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] -1.553542e-05
+#&gt; 
+#&gt; $beta
+#&gt; [1] 1
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] -1.872467  0.000000  2.029319
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.004690674 0.527961530 0.467347796
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 884.8242
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d1"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

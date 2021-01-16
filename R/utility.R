@@ -103,10 +103,10 @@ returnlower = function(v){
 #' computing the density of sample correlation coefficients is given in method.
 #' @rdname covestEB
 #' @examples
-#' n = 100; p = 10
+#' n = 100; p = 50
 #' X = matrix(rnorm(n * p), nrow = n, ncol = p)
-#' covestEB(X)
-#' covestEB.cor(X)
+#' system.time(ans <- covestEB(X))
+#' system.time(ans1 <- covestEB.cor(X))
 #' @export
 covestEB = function(X, order = -3, verbose = FALSE, force.nonbin = FALSE){
   p = dim(X)[2]

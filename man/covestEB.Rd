@@ -40,8 +40,8 @@ scale supports neither and it is for comparison only. It is recommended to
 perform estimation on Fisher-transformed sample correlation coefficients.
 }
 \examples{
-n = 100; p = 10
+n = 100; p = 50
 X = matrix(rnorm(n * p), nrow = n, ncol = p)
-covestEB(X)
-covestEB.cor(X)
+system.time(ans <- covestEB(X))
+system.time(ans1 <- covestEB.cor(X))
 }

@@ -8,7 +8,6 @@
 class npnormcvmw : public npfixedcomp
 {
 public:
-	Eigen::VectorXd precompute;
 	Eigen::VectorXd weights;
 	double h;
 
@@ -19,13 +18,17 @@ public:
 		this->weights.resize(this->len);
 		this->weights = weights_;
 		this->h = h_;
+		this->setprecompute();
+		family = "npnorm";
+		flag = "d1";
+	}
+
+	void setprecompute() const{
 		this->precompute.resize(this->len);
 		Eigen::VectorXd ecdf(weights);
 		std::partial_sum(ecdf.data(), ecdf.data() + ecdf.size(), ecdf.data(), std::plus<double>());
 		this->precompute = (ecdf - this->weights / 2) / this->weights.sum() - 
-			pnpdiscnorm_(this->data, this->mu0fixed, this->pi0fixed, this->beta, this->h);
-		family = "npnorm";
-		flag = "d1";
+			mapping(this->mu0fixed, this->pi0fixed);
 	}
 
 	double lossfunction(const Eigen::VectorXd &maps) const{
@@ -37,21 +40,30 @@ public:
 	}
 
 	void gradfun(const double &mu, const Eigen::VectorXd &dens,
-		double &ansd0, double &ansd1) const{
+		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
 		Eigen::VectorXd fullden = (dens - this->precompute).cwiseProduct(weights);
 		double scale = 1 - this->pi0fixed.sum();
-		ansd0 = (pnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta, this->h) - dens).dot(fullden) * 2;
-		ansd1 = dnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta, this->h).dot(fullden) * -2 * scale;
+		if (d0){
+			ansd0 = (pnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta, this->h) - dens).dot(fullden) * 2;
+		}
+
+		if (d1){
+			ansd1 = dnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta, this->h).dot(fullden) * -2 * scale;
+		}
 	}
 
 	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
-		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1) const{
+		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1, const bool &d0, const bool &d1) const{
 		ansd0.resize(mu.size());
 		ansd1.resize(mu.size());
 		Eigen::VectorXd fullden = (dens - this->precompute).cwiseProduct(this->weights);
 		double scale = 1 - this->pi0fixed.sum();
-		ansd0 = fullden.transpose() * (pdiscnormarray(this->data, mu, this->beta, this->h) * scale - dens.rowwise().replicate(mu.size())) * 2;
-		ansd1 = fullden.transpose() * ddiscnormarray(this->data, mu, this->beta, this->h) * -2 * scale;
+		if (d0){
+			ansd0 = fullden.transpose() * (pdiscnormarray(this->data, mu, this->beta, this->h) * scale - dens.rowwise().replicate(mu.size())) * 2;
+		}
+		if (d1){
+			ansd1 = fullden.transpose() * ddiscnormarray(this->data, mu, this->beta, this->h) * -2 * scale;
+		}
 	}
 
 	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
