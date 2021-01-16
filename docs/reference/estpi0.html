@@ -114,7 +114,15 @@
 
     <pre class="usage"><span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>v</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>estpi0.npnormll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>beta</span>, <span class='va'>val</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+<span class='fu'>estpi0.npnormll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>beta</span>, <span class='va'>val</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>estpi0.npnormcvm</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>beta</span>, <span class='va'>val</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>estpi0.nptll</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>beta</span>, <span class='va'>val</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>estpi0.npnormllw</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>beta</span>, <span class='va'>val</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='fu'>estpi0.npnormcvmw</span><span class='op'>(</span><span class='va'>v</span>, <span class='va'>beta</span>, <span class='va'>val</span>, <span class='va'>order</span>, mix <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -169,13 +177,13 @@ in the object.</p>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span>, val <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
 #&gt; current val: 0.519666 fval: 884.567
-#&gt; Iter: 3 lower: 0.519666 upper: 0.759833
+#&gt; Iter: 2 lower: 0.519666 upper: 0.759833
 #&gt; current val: 0.69535 fval: 903.146
-#&gt; Iter: 5 lower: 0.519666 upper: 0.607508
+#&gt; Iter: 3 lower: 0.519666 upper: 0.607508
 #&gt; current val: 0.530424 fval: 884.909
-#&gt; Iter: 7 lower: 0.525045 upper: 0.530424
+#&gt; Iter: 4 lower: 0.525045 upper: 0.530424
 #&gt; current val: 0.527959 fval: 884.824</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.119   0.000   0.120 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.113   0.001   0.114 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 7
 #&gt; 
@@ -201,6 +209,170 @@ in the object.</p>
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormllw"</span>, val <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
+#&gt; current val: 0.519865 fval: 884.596
+#&gt; Iter: 2 lower: 0.519865 upper: 0.759933
+#&gt; current val: 0.695316 fval: 903.177
+#&gt; Iter: 3 lower: 0.519865 upper: 0.60759
+#&gt; current val: 0.529792 fval: 884.912
+#&gt; Iter: 4 lower: 0.524829 upper: 0.529792
+#&gt; current val: 0.527456 fval: 884.832</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.504   0.006   0.516 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 7
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnorm"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] -1.45245e-05
+#&gt; 
+#&gt; $beta
+#&gt; [1] 1
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] -1.856874  0.000000  2.028579
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.004809146 0.527458346 0.467732508
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 884.832
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d0"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormcvm"</span>, val <span class='op'>=</span> <span class='fl'>0.1</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
+#&gt; current val: 0.511595 fval: 0.0547401
+#&gt; Iter: 2 lower: 0.511595 upper: 0.755797
+#&gt; current val: 0.653472 fval: 1.13416
+#&gt; Iter: 3 lower: 0.511595 upper: 0.582534
+#&gt; current val: 0.54777 fval: 0.11833
+#&gt; Iter: 4 lower: 0.529682 upper: 0.54777
+#&gt; current val: 0.541128 fval: 0.0991584</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.086   0.000   0.087 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 7
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnorm"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] 0
+#&gt; 
+#&gt; $beta
+#&gt; [1] 1
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] 0.00000 2.14288
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.5414529 0.4585471
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 0.1000002
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d1"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormcvmw"</span>, val <span class='op'>=</span> <span class='fl'>0.1</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
+#&gt; current val: 0.510792 fval: 0.0551438
+#&gt; Iter: 2 lower: 0.510792 upper: 0.755396
+#&gt; current val: 0.652139 fval: 1.14195
+#&gt; Iter: 3 lower: 0.510792 upper: 0.581466
+#&gt; current val: 0.545998 fval: 0.117921
+#&gt; Iter: 4 lower: 0.528395 upper: 0.545998
+#&gt; current val: 0.539599 fval: 0.0992993
+#&gt; Iter: 5 lower: 0.539599 upper: 0.542799
+#&gt; current val: 0.539866 fval: 0.100002
+#&gt; Iter: 6 lower: 0.539733 upper: 0.539866
+#&gt; current val: 0.539865 fval: 0.0999984</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.332   0.001   0.336 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 2
+#&gt; 
+#&gt; $family
+#&gt; [1] "npnorm"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] 0
+#&gt; 
+#&gt; $beta
+#&gt; [1] 1
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] 0.000000 2.144194
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.539866 0.460134
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 0.09999971
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d1"
+#&gt; 
+#&gt; $convergence
+#&gt; [1] 0
+#&gt; 
+#&gt; attr(,"class")
+#&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"nptll"</span>, val <span class='op'>=</span> <span class='fl'>2</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
+#&gt; current val: 0.519666 fval: 884.567
+#&gt; Iter: 2 lower: 0.519666 upper: 0.759833
+#&gt; current val: 0.69535 fval: 903.146
+#&gt; Iter: 3 lower: 0.519666 upper: 0.607508
+#&gt; current val: 0.530424 fval: 884.909
+#&gt; Iter: 4 lower: 0.525045 upper: 0.530424
+#&gt; current val: 0.527959 fval: 884.824</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.127   0.000   0.127 </div><div class='input'><span class='va'>r</span>
+</div><div class='output co'>#&gt; $iter
+#&gt; [1] 7
+#&gt; 
+#&gt; $family
+#&gt; [1] "npt"
+#&gt; 
+#&gt; $min.gradient
+#&gt; [1] -1.553532e-05
+#&gt; 
+#&gt; $beta
+#&gt; [1] Inf
+#&gt; 
+#&gt; $mix
+#&gt; $mix$pt
+#&gt; [1] -1.872467  0.000000  2.029319
+#&gt; 
+#&gt; $mix$pr
+#&gt; [1] 0.004690674 0.527961530 0.467347796
+#&gt; 
+#&gt; 
+#&gt; $ll
+#&gt; [1] 884.8242
+#&gt; 
+#&gt; $flag
+#&gt; [1] "d0"
 #&gt; 
 #&gt; $convergence
 #&gt; [1] 0

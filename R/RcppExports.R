@@ -120,8 +120,16 @@ npnormcvm_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoint
     .Call('_npfixedcomp2_npnormcvm_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
+estpi0npnormcvm_ <- function(data, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
+    .Call('_npfixedcomp2_estpi0npnormcvm_', PACKAGE = 'npfixedcomp2', data, beta, val, initpt, initpr, gridpoints, tol, verbose)
+}
+
 npnormcvmw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormcvmw_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+estpi0npnormcvmw_ <- function(data, weights, beta, h, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
+    .Call('_npfixedcomp2_estpi0npnormcvmw_', PACKAGE = 'npfixedcomp2', data, weights, beta, h, val, initpt, initpr, gridpoints, tol, verbose)
 }
 
 npnormll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
@@ -136,7 +144,15 @@ npnormllw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initp
     .Call('_npfixedcomp2_npnormllw_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
+estpi0npnormllw_ <- function(data, weights, beta, h, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
+    .Call('_npfixedcomp2_estpi0npnormllw_', PACKAGE = 'npfixedcomp2', data, weights, beta, h, val, initpt, initpr, gridpoints, tol, verbose)
+}
+
 nptll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_nptll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+estpi0nptll_ <- function(data, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
+    .Call('_npfixedcomp2_estpi0nptll_', PACKAGE = 'npfixedcomp2', data, beta, val, initpt, initpr, gridpoints, tol, verbose)
 }
 

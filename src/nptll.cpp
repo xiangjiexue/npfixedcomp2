@@ -64,6 +64,14 @@ public:
 		mu0.lazyAssign(mu0new);
 		pi0.lazyAssign(pi0new);
 	}
+
+	double hypofun(const double &ll, const double &minloss) const{
+		return ll - minloss;
+	}
+
+	double familydensity(const double &x, const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
+		return dnpt_(Eigen::VectorXd::Constant(1, x), mu0, pi0, this->beta)[0];
+	}
 };
 
 // [[Rcpp::export]]
@@ -72,5 +80,14 @@ Rcpp::List nptll_(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fixed, 
 	const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0){
 	nptll f(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints);
 	f.computemixdist(tol, maxit, verbose);
+	return f.result;
+}
+
+// [[Rcpp::export]]
+Rcpp::List estpi0nptll_(const Eigen::VectorXd &data,
+	const double &beta, const double &val, const Eigen::VectorXd &initpt, const Eigen::VectorXd &initpr, const Eigen::VectorXd &gridpoints,
+	const double &tol = 1e-6, const int &verbose = 0){
+	nptll f(data, Eigen::VectorXd::Zero(1), Eigen::VectorXd::Ones(1), beta, initpt, initpr, gridpoints);
+	f.estpi0(val, tol, verbose);
 	return f.result;
 }

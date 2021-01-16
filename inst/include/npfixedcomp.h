@@ -97,7 +97,7 @@ public:
 		this->len = this->data.size();
 	}
 
-	void setprecompute() const{
+	virtual void setprecompute() const{
 		this->precompute.resize(this->len);
 		this->precompute = mapping(this->mu0fixed, this->pi0fixed);
 	}
@@ -365,10 +365,11 @@ public:
 		this->pi0fixed.resize(1);
 		this->pi0fixed.setZero();
 		this->setprecompute();
-		this->computemixdist();
-		double minloss = result["ll"], ll, maxgrad, maxgrad2;;
+		this->computemixdist(tol);
+		double minloss = result["ll"], ll;
 		Eigen::VectorXd dens = this->mapping(Eigen::VectorXd::Zero(1), Eigen::VectorXd::Ones(1));
-		if (this->lossfunction(dens) - minloss < val){
+		if (this->hypofun(this->lossfunction(dens) + this->extrafun(), minloss) < val){
+			double maxgrad, maxgrad2;
 			this->gradfun(0, dens, maxgrad, maxgrad2, true, false);
 			Rcpp::List r = Rcpp::List::create(Rcpp::Named("iter") = 0,
 				Rcpp::Named("family") = family,
@@ -381,27 +382,27 @@ public:
 
 			this->result = Rcpp::clone(r);
 		}else{
-			double lb = 0, ub = 1, flb = minloss, fub = this->lossfunction(dens);
+			double lb = 0, ub = 1, flb = minloss, fub = this->lossfunction(dens) + this->extrafun();
 			Rcpp::List mix = this->result["mix"];
 			Rcpp::NumericVector tmu0 = mix["pt"], tpi0 = mix["pr"];
 			Eigen::Map<Eigen::VectorXd> mu1(tmu0.begin(), tmu0.length());
 			Eigen::Map<Eigen::VectorXd> pi1(tpi0.begin(), tpi0.length());	
-			double sp = dnpnorm_(Eigen::VectorXd::Zero(1), mu1, pi1, this->beta)[0] * M_SQRT2 * M_SQRT_PI * this->beta;
+			double sp = this->familydensity(0, mu1, pi1) / this->familydensity(0, Eigen::VectorXd::Zero(1), Eigen::VectorXd::Ones(1));
 			this->pi0fixed = Eigen::VectorXd::Constant(1, sp);
 			this->setprecompute();
 			this->computemixdist();
 			ll = this->result["ll"];
 			int iter = 1;
-			while (std::abs(ll - minloss - val) > tol & std::abs(ub - lb) > tol){
+			while (std::abs(this->hypofun(ll, minloss) - val) > tol & std::abs(ub - lb) > tol){
 				if (verbose >= 1){
 					Rcpp::Rcout<<"Iter: "<<iter<<" lower: "<<lb<<" upper: "<<ub<<std::endl;
 					Rcpp::Rcout<<"current val: "<<sp<<" fval: "<<ll<<std::endl;
 				}
 
-				if (ll - minloss - val < 0 & sp > lb){
+				if (this->hypofun(ll, minloss) - val < 0 & sp > lb){
 					lb = sp; flb = ll;
 				}
-				if (ll - minloss - val > 0 & sp < ub){
+				if (this->hypofun(ll, minloss) - val > 0 & sp < ub){
 					ub = sp; fub = ll;
 				}
 				sp = (lb + ub) / 2;
@@ -422,15 +423,15 @@ public:
 				Eigen::MatrixXd A(3, 3);
 				A << lb * lb, lb, 1, 
 					 sp * sp, sp, 1, 
-					 ub * ub, ub,  1;
+					 ub * ub, ub, 1;
 				Eigen::Vector3d b;
-				b<<flb - minloss - val, ll - minloss - val, fub - minloss - val;
+				b<<this->hypofun(flb, minloss) - val, this->hypofun(ll, minloss) - val, this->hypofun(fub, minloss) - val;
 				Eigen::Vector3d x1 = A.inverse() * b;
 
-				if (ll - minloss - val < 0){
+				if (this->hypofun(ll, minloss) - val < 0){
 					lb = sp; flb = ll;
 				}
-				if (ll - minloss - val > 0){
+				if (this->hypofun(ll, minloss) - val > 0){
 					ub = sp; fub = ll;
 				}
 				;
@@ -448,7 +449,7 @@ public:
 				this->setprecompute();
 				this->computemixdist();
 				ll = this->result["ll"];
-				iter+=2;
+				iter+=1;
 			}
 		}
 	}
@@ -481,6 +482,16 @@ public:
 		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{}
 
 	virtual double extrafun() const{
+		return 0;
+	}
+
+	virtual double hypofun(const double &ll, const double &minloss) const{
+		// likelihood methods use ll - minloss
+		// distance methods use ll.
+		return 0;
+	}
+
+	virtual double familydensity(const double &x, const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
 		return 0;
 	}
 
