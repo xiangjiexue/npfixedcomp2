@@ -160,9 +160,9 @@ perform estimation on Fisher-transformed sample correlation coefficients.</p>
 <span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>p</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span>, ncol <span class='op'>=</span> <span class='va'>p</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.052   0.001   0.053 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans1</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
+#&gt;   0.060   0.003   0.063 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans1</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.045   0.000   0.044 </div></pre>
+#&gt;   0.045   0.000   0.046 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

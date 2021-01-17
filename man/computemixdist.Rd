@@ -9,6 +9,7 @@
 \alias{computemixdist.nptll}
 \alias{computemixdist.npnormllw}
 \alias{computemixdist.npnormcvmw}
+\alias{computemixdist.npnormadw}
 \title{Computing non-parametric mixing distribution}
 \usage{
 computemixdist(v, method = "npnormll", ...)
@@ -26,6 +27,8 @@ computemixdist.nptll(v, mu0, pi0, beta, order, mix = NULL, ...)
 computemixdist.npnormllw(v, mu0, pi0, beta, order, mix = NULL, ...)
 
 computemixdist.npnormcvmw(v, mu0, pi0, beta, order, mix = NULL, ...)
+
+computemixdist.npnormadw(v, mu0, pi0, beta, order, mix = NULL, ...)
 }
 \arguments{
 \item{v}{a vector of observations}
@@ -88,9 +91,11 @@ system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormad"))
 r
 system.time(r <- computemixdist(tanh(data), pi0 = pi0, method = "npnormcll", beta = 4))
 r
-system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormllw", order = -3))
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormllw", order = -2))
 r
-system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -3))
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -2))
+r
+system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormadw", order = -2))
 r
 system.time(r <- nspmix::cnm(nspmix::npnorm(data)))
 r

@@ -95,9 +95,11 @@ bin = function(data, order = -2){
 #' r
 #' system.time(r <- computemixdist(tanh(data), pi0 = pi0, method = "npnormcll", beta = 4))
 #' r
-#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormllw", order = -3))
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormllw", order = -2))
 #' r
-#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -3))
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -2))
+#' r
+#' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormadw", order = -2))
 #' r
 #' system.time(r <- nspmix::cnm(nspmix::npnorm(data)))
 #' r
@@ -124,6 +126,9 @@ computemixdist = function(v, method = "npnormll", ...){
 #' in the object.
 #'
 #' The full list of implemented families is in \code{\link{computemixdist}}.
+#' 
+#' IMPORTANT: although estpi0 is implemented for nptll and npnormcll, the theory
+#' is not yet done, and hence it is recommand to use with precaution.
 #'
 #' @title Computing non-parametric mixing distribution with estimated proportion at 0
 #' @param v observations
@@ -143,7 +148,13 @@ computemixdist = function(v, method = "npnormll", ...){
 #' r
 #' system.time(r <- estpi0(data, method = "npnormcvmw", val = 0.1, verbose = TRUE, order = -2))
 #' r
+#' system.time(r <- estpi0(data, method = "npnormad", val = 1, verbose = TRUE))
+#' r
+#' system.time(r <- estpi0(data, method = "npnormadw", val = 1, verbose = TRUE, order = -2))
+#' r
 #' system.time(r <- estpi0(data, method = "nptll", val = 2, verbose = TRUE))
+#' r
+#' system.time(r <- estpi0(tanh(data), method = "npnormcll", val = 2, beta = 4, verbose = TRUE))
 #' r
 #' @export
 estpi0 = function(v, method = "npnormll", ...){
@@ -217,6 +228,18 @@ computemixdist.npnormad = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   k
 }
 
+#' @rdname estpi0
+#' @export
+estpi0.npnormad = function(v, beta, val, order, mix = NULL, ...){
+  if (missing(beta)) {beta = 1}
+  v1 = npnorm(sort(v))
+  init = initial.npnorm(v1, beta = beta, mix = mix)
+  k = estpi0npnormad_(v1$v, beta, val, init$mix$pt, init$mix$pr, sort(gridpoints.npnorm(v1, beta = beta)), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
 #' @rdname computemixdist
 #' @export
 computemixdist.npnormcll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
@@ -231,6 +254,23 @@ computemixdist.npnormcll = function(v, mu0, pi0, beta, order, mix = NULL, ...){
   }
   k = npnormcll_(v, mu0, pi0, beta, tanh(init$mix$pt), init$mix$pr, 
                 tanh(sort(gridpoints.npnorm(v1, beta = 1 / sqrt(beta - 3)))), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname estpi0
+#' @export
+estpi0.npnormcll = function(v, beta, val, order, mix = NULL, ...){
+  v1 = npnorm(atanh(v))
+  if (is.null(mix)){
+    init = initial.npnorm(v1, beta = 1 / sqrt(beta - 3))
+  }else{
+    init = initial.npnorm(v1, beta = 1 / sqrt(beta - 3),
+                          mix = list(pt = atanh(mix$pt), pr = mix$pr))
+  }
+  k = estpi0npnormcll_(v, beta, val, tanh(init$mix$pt), init$mix$pr, 
+                 tanh(sort(gridpoints.npnorm(v1, beta = 1 / sqrt(beta - 3)))), ...)
   attr(k, "class") = "nspmix"
   
   k
@@ -325,6 +365,34 @@ estpi0.npnormcvmw = function(v, beta, val, order, mix = NULL, ...){
   v2 = npnorm(v = v1$v, w = v1$w)
   init = initial.npnorm(v2, beta = beta, mix = mix)
   k = estpi0npnormcvmw_(v1$v, v1$w, beta, 10^order, val, init$mix$pt, init$mix$pr, sort(gridpoints.npnorm(v2, beta = beta)), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname computemixdist
+#' @export
+computemixdist.npnormadw = function(v, mu0, pi0, beta, order, mix = NULL, ...){
+  if (missing(mu0)) {mu0 = 0}
+  if (missing(pi0)) {pi0 = 0}
+  if (missing(beta)) {beta = 1}
+  v1 = bin(v, order)
+  v2 = npnorm(v = v1$v, w = v1$w)
+  init = initial.npnorm(v2, beta = beta, mix = mix)
+  k = npnormadw_(v1$v, v1$w, mu0, pi0, beta, 10^order, init$mix$pt, init$mix$pr, sort(gridpoints.npnorm(v2, beta = beta)), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname estpi0
+#' @export
+estpi0.npnormadw = function(v, beta, val, order, mix = NULL, ...){
+  if (missing(beta)) {beta = 1}
+  v1 = bin(v, order)
+  v2 = npnorm(v = v1$v, w = v1$w)
+  init = initial.npnorm(v2, beta = beta, mix = mix)
+  k = estpi0npnormadw_(v1$v, v1$w, beta, 10^order, val, init$mix$pt, init$mix$pr, sort(gridpoints.npnorm(v2, beta = beta)), ...)
   attr(k, "class") = "nspmix"
   
   k

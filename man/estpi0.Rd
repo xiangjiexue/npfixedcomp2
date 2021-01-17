@@ -4,9 +4,12 @@
 \alias{estpi0}
 \alias{estpi0.npnormll}
 \alias{estpi0.npnormcvm}
+\alias{estpi0.npnormad}
+\alias{estpi0.npnormcll}
 \alias{estpi0.nptll}
 \alias{estpi0.npnormllw}
 \alias{estpi0.npnormcvmw}
+\alias{estpi0.npnormadw}
 \title{Computing non-parametric mixing distribution with estimated proportion at 0}
 \usage{
 estpi0(v, method = "npnormll", ...)
@@ -15,11 +18,17 @@ estpi0.npnormll(v, beta, val, order, mix = NULL, ...)
 
 estpi0.npnormcvm(v, beta, val, order, mix = NULL, ...)
 
+estpi0.npnormad(v, beta, val, order, mix = NULL, ...)
+
+estpi0.npnormcll(v, beta, val, order, mix = NULL, ...)
+
 estpi0.nptll(v, beta, val, order, mix = NULL, ...)
 
 estpi0.npnormllw(v, beta, val, order, mix = NULL, ...)
 
 estpi0.npnormcvmw(v, beta, val, order, mix = NULL, ...)
+
+estpi0.npnormadw(v, beta, val, order, mix = NULL, ...)
 }
 \arguments{
 \item{v}{observations}
@@ -55,6 +64,9 @@ default threshold values and this function essentially calls the class method
 in the object.
 
 The full list of implemented families is in \code{\link{computemixdist}}.
+
+IMPORTANT: although estpi0 is implemented for nptll and npnormcll, the theory
+is not yet done, and hence it is recommand to use with precaution.
 }
 \examples{
 data = rnorm(500, c(0, 2))
@@ -66,6 +78,12 @@ system.time(r <- estpi0(data, method = "npnormcvm", val = 0.1, verbose = TRUE))
 r
 system.time(r <- estpi0(data, method = "npnormcvmw", val = 0.1, verbose = TRUE, order = -2))
 r
+system.time(r <- estpi0(data, method = "npnormad", val = 1, verbose = TRUE))
+r
+system.time(r <- estpi0(data, method = "npnormadw", val = 1, verbose = TRUE, order = -2))
+r
 system.time(r <- estpi0(data, method = "nptll", val = 2, verbose = TRUE))
+r
+system.time(r <- estpi0(tanh(data), method = "npnormcll", val = 2, beta = 4, verbose = TRUE))
 r
 }
