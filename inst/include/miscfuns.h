@@ -48,28 +48,14 @@ inline Eigen::VectorXd log1pexp(const Eigen::VectorXd &x){
 
 
 // Simple implementaion of density of normal mixture.
-struct dnormptr{
-	dnormptr(const double &mu_, const double &stdev_) : mu(mu_), stdev(stdev_) {};
-
-	const double operator()(const double & x) const {
-		return R::dnorm4(x, mu, stdev, false);
-	}
-
-	double mu, stdev;
-};
-
-inline Eigen::MatrixXd dnormarrayorigin(const Eigen::VectorXd &x,
-	const Eigen::VectorXd &mu0, const double& stdev){
-	Eigen::MatrixXd ans(x.size(), mu0.size());
-	for (auto i = mu0.size() - 1; i >= 0; i--){
-		std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), dnormptr(mu0[i], stdev));
-	}
-	return ans;
+// if mu0 a scalar
+inline Eigen::VectorXd dnormarraylogs(const Eigen::VectorXd &x, const double &mu0, const double &stdev){
+	return (x.array() - mu0).square() / (-2 * stdev * stdev) - M_LN_SQRT_2PI - std::log(stdev);
 }
 
 inline Eigen::MatrixXd dnormarraylog(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0, const double& stdev){
-	return (x * Eigen::RowVectorXd::Ones(mu0.size()) - Eigen::VectorXd::Ones(x.size()) * mu0.transpose()).array().square() / (-2 * stdev * stdev) - M_LN_SQRT_2PI - std::log(stdev);
+	return (x.rowwise().replicate(mu0.size()) - mu0.transpose().colwise().replicate(x.size())).array().square() / (-2 * stdev * stdev) - M_LN_SQRT_2PI - std::log(stdev);
 }
 
 inline Eigen::MatrixXd dnormarray(const Eigen::VectorXd &x,
@@ -77,46 +63,25 @@ inline Eigen::MatrixXd dnormarray(const Eigen::VectorXd &x,
 	if (lg){
 		return dnormarraylog(x, mu0, stdev);
 	}else{
-		return dnormarrayorigin(x, mu0, stdev);
+		return dnormarraylog(x, mu0, stdev).array().exp();
 	}
 }
 
 inline Eigen::VectorXd dnpnormorigin(const Eigen::VectorXd &x, 
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, const double &stdev = 1){
 	if (mu0.size() == 1){
-		Eigen::VectorXd ans(x.size());
-		std::transform(x.data(), x.data() + x.size(), ans.data(), dnormptr(mu0[0], stdev));
+		Eigen::VectorXd ans = dnormarraylogs(x, mu0[0], stdev).array().exp();
 		if (pi0[0] == 1) {return ans;} else {return ans * pi0[0];}
 	}else{
-		Eigen::MatrixXd ans(x.size(), mu0.size());
-		for (auto i = mu0.size() - 1; i >= 0; i--){
-			std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), dnormptr(mu0[i], stdev));
-		}
-		return ans * pi0;	
+		return dnormarray(x, mu0, stdev) * pi0;	
 	}
-}
-
-inline Eigen::VectorXd dnpnormlog(const Eigen::VectorXd &x, 
-	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, const double &stdev = 1){
-	Eigen::VectorXd ans(x.size());
-	if (mu0.size() == 1){
-		ans = (x.array() - mu0[0]).square() / (-2 * stdev * stdev) - M_LN_SQRT_2PI - std::log(stdev);
-		if (pi0[0] != 1) ans = ans + Eigen::VectorXd::Constant(x.size(), std::log(pi0[0]));
-	}else{
-		Eigen::MatrixXd temp = dnormarraylog(x, mu0, stdev);
-		ans = temp.col(0) + Eigen::VectorXd::Constant(x.size(), std::log(pi0[0]));
-		for (int i = 1; i < mu0.size(); i++){
-			ans = (ans + log1pexp(temp.col(i) + Eigen::VectorXd::Constant(x.size(), std::log(pi0[i])) - ans)).eval();
-		}
-	}
-	return ans;
 }
 
 inline Eigen::VectorXd dnpnorm_(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
 	const double& stdev, const bool& lg = false){
 	if (lg){
-		return dnpnormlog(x, mu0, pi0, stdev);
+		return dnpnormorigin(x, mu0, pi0, stdev).array().log();
 	}else{
 		return dnpnormorigin(x, mu0, pi0, stdev);
 	}

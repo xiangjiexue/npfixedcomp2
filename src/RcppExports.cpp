@@ -77,6 +77,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// pnormarray_
+Eigen::MatrixXd pnormarray_(const Eigen::VectorXd& x, const Eigen::VectorXd& mu0, const double& stdev, const bool& lt, const bool& lg);
+RcppExport SEXP _npfixedcomp2_pnormarray_(SEXP xSEXP, SEXP mu0SEXP, SEXP stdevSEXP, SEXP ltSEXP, SEXP lgSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const double& >::type stdev(stdevSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lt(ltSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lg(lgSEXP);
+    rcpp_result_gen = Rcpp::wrap(pnormarray_(x, mu0, stdev, lt, lg));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dnpnormc
 Eigen::VectorXd dnpnormc(const Eigen::VectorXd& x, const Eigen::VectorXd& mu0, const Eigen::VectorXd& pi0, const double& n, const bool& lg);
 RcppExport SEXP _npfixedcomp2_dnpnormc(SEXP xSEXP, SEXP mu0SEXP, SEXP pi0SEXP, SEXP nSEXP, SEXP lgSEXP) {
@@ -522,6 +537,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_dnpnorm", (DL_FUNC) &_npfixedcomp2_dnpnorm, 5},
     {"_npfixedcomp2_dnormarray_", (DL_FUNC) &_npfixedcomp2_dnormarray_, 4},
     {"_npfixedcomp2_pnpnorm", (DL_FUNC) &_npfixedcomp2_pnpnorm, 6},
+    {"_npfixedcomp2_pnormarray_", (DL_FUNC) &_npfixedcomp2_pnormarray_, 5},
     {"_npfixedcomp2_dnpnormc", (DL_FUNC) &_npfixedcomp2_dnpnormc, 5},
     {"_npfixedcomp2_dnormcarray_", (DL_FUNC) &_npfixedcomp2_dnormcarray_, 4},
     {"_npfixedcomp2_dnpt", (DL_FUNC) &_npfixedcomp2_dnpt, 5},

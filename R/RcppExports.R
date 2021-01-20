@@ -36,6 +36,10 @@ pnpnorm <- function(x, mu0, pi0, stdev = 1, lt = TRUE, lg = FALSE) {
     .Call('_npfixedcomp2_pnpnorm', PACKAGE = 'npfixedcomp2', x, mu0, pi0, stdev, lt, lg)
 }
 
+pnormarray_ <- function(x, mu0, stdev = 1, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_pnormarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, lt, lg)
+}
+
 #' The density and the distribution function of non-parametric one-parameter normal distribution
 #'
 #' \code{dnpnormc} gives the density

@@ -2,6 +2,7 @@
 
 // we only include RcppEigen.h which pulls Rcpp.h in for us
 #include "../inst/include/miscfuns.h"
+#include <unsupported/Eigen/SpecialFunctions>
 
 // [[Rcpp::depends(RcppEigen)]]
 
@@ -51,6 +52,13 @@ Eigen::VectorXd pnpnorm(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
 	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
 	return pnpnorm_(x, mu0, pi0, stdev, lt, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd pnormarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
+	return pnormarray(x, mu0, stdev, lt, lg);
 }
 
 //' The density and the distribution function of non-parametric one-parameter normal distribution
@@ -148,3 +156,4 @@ Eigen::MatrixXd pdiscnormarray_(const Eigen::VectorXd &x,
 	const double &stdev, const double &h, const bool &lt = true, const bool &lg = false){
 	return pdiscnormarray(x, mu0, stdev, h, lt, lg);
 }
+
