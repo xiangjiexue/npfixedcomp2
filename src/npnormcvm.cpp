@@ -51,7 +51,7 @@ public:
 		Eigen::VectorXd fullden = dens - this->precompute;
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = fullden.transpose() * (pnormarray(this->data, mu, this->beta) * scale - dens.rowwise().replicate(mu.size())) * 2;
+			ansd0 = (pnormarray(this->data, mu, this->beta).transpose() * fullden * scale - Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens))) * 2;
 		}
 		if (d1){
 			ansd1 = fullden.transpose() * dnormarray(this->data, mu, this->beta) * -2 * scale;
