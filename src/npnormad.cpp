@@ -47,15 +47,21 @@ public:
 		}
 	}
 
-	// void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
-	// 	Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1) const{
-	// 	ansd0.resize(mu.size());
-	// 	ansd1.resize(mu.size());
-	// 	Eigen::VectorXd fullden = dens + this->precompute;
-	// 	double scale = 1 - this->pi0fixed.sum();
-	// 	ansd0 = fullden.transpose() * (pnormarray(this->data, mu, this->beta) * scale - dens.rowwise().replicate(mu.size())) * 2;
-	// 	ansd1 = fullden.transpose() * dnormarray(this->data, mu, this->beta) * -2 * scale;
-	// }
+	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
+		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1, const bool & d0, const bool &d1) const{
+		ansd0.resize(mu.size());
+		ansd1.resize(mu.size());
+		Eigen::VectorXd fullden = dens + this->precompute;
+		double scale = 1 - this->pi0fixed.sum();
+		if (d0){
+			Eigen::ArrayXXd temp = (pnormarray(this->data, mu, this->beta) * scale).colwise() + this->precompute;
+			ansd0 = (temp.colwise() * this->w1.cwiseQuotient(fullden).array() + (1 - temp).colwise() * (this->w2.array() / (1 - fullden.array()))).colwise().mean() * -1 + 2 * this->len; 
+		} 
+
+		if (d1){
+			ansd1 = dnormarray(this->data, mu, this->beta).transpose() * (this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(Eigen::VectorXd::Ones(this->len) - fullden)) * scale / this->len;
+		}
+	}
 
 	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
 		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{
@@ -163,19 +169,21 @@ public:
 		} 
 	}
 
-	// void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
-	// 	Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1, const bool &d0, const bool &d1) const{
-	// 	ansd0.resize(mu.size());
-	// 	ansd1.resize(mu.size());
-	// 	Eigen::VectorXd fullden = (dens - this->precompute).cwiseProduct(this->weights);
-	// 	double scale = 1 - this->pi0fixed.sum();
-	// 	if (d0){
-	// 		ansd0 = fullden.transpose() * (pdiscnormarray(this->data, mu, this->beta, this->h) * scale - dens.rowwise().replicate(mu.size())) * 2;
-	// 	}
-	// 	if (d1){
-	// 		ansd1 = fullden.transpose() * ddiscnormarray(this->data, mu, this->beta, this->h) * -2 * scale;
-	// 	}
-	// }
+	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
+		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1, const bool &d0, const bool &d1) const{
+		ansd0.resize(mu.size());
+		ansd1.resize(mu.size());
+		Eigen::VectorXd fullden = dens + this->precompute;
+		double scale = 1 - this->pi0fixed.sum();
+		if (d0){
+			Eigen::ArrayXXd temp = (pdiscnormarray(this->data, mu, this->beta, this->h) * scale).colwise() + this->precompute;
+			ansd0 = (temp.colwise() * this->w1.cwiseQuotient(fullden).array() + (1 - temp).colwise() * (this->w2.array() / (1 - fullden.array()))).colwise().sum() / this->weights.sum() * -1 + 2 * this->weights.sum(); 
+		} 
+
+		if (d1){
+			ansd1 = dnormarray(this->data, mu - Eigen::VectorXd::Constant(mu.size(), h), this->beta).transpose() * (this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(Eigen::VectorXd::Ones(this->len) - fullden)) * scale / this->weights.sum();
+		}
+	}
 
 	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
 		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{

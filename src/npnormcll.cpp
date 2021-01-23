@@ -50,7 +50,8 @@ public:
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden)) - dnormcarray(this->data, mu, this->beta).transpose() * fullden * scale;
+			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden));
+			ansd0.noalias() -= dnormcarray(this->data, mu, this->beta).transpose() * fullden * scale;
 		}
 	}
 
@@ -63,9 +64,8 @@ public:
 
 		sortmix(mu0new, pi0new);
 
-		Eigen::MatrixXd sp = dnormcarray(this->data, mu0new, this->beta);
 		Eigen::VectorXd fp = dens + this->precompute;
-		sp = sp.array().colwise() / fp.array();
+		Eigen::MatrixXd sp = dnormcarray(this->data, mu0new, this->beta).array().colwise() / fp.array();
 		Eigen::VectorXd nw = pnnlssum_(sp, Eigen::VectorXd::Constant(this->len, 2.) - this->precompute.cwiseQuotient(fp), 1. - this->pi0fixed.sum());
 		this->checklossfun(mu0new, pi0new, nw - pi0new, sp.colwise().sum());
 		this->collapse(mu0new, pi0new);

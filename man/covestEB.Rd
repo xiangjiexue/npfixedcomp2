@@ -18,7 +18,8 @@ passed to the computation is greater than 5000.}
 
 \item{verbose}{logical; If TRUE, the intermediate results will be shown.}
 
-\item{force.nonbin}{logical; If TRUE, no binning is performce by force.}
+\item{force.nonbin}{logical; If TRUE, overwrites the default setting for
+large-scale computation.}
 }
 \value{
 a list. a covariance matrix estimate of size p * p is given in mat,

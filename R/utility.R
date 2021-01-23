@@ -97,7 +97,8 @@ returnlower = function(v){
 #' @param order the level of binning to use when the number of observations
 #' passed to the computation is greater than 5000.
 #' @param verbose logical; If TRUE, the intermediate results will be shown.
-#' @param force.nonbin logical; If TRUE, no binning is performce by force.
+#' @param force.nonbin logical; If TRUE, overwrites the default setting for
+#' large-scale computation.
 #' @return a list. a covariance matrix estimate of size p * p is given in mat,
 #' whether correction is done is given in correction, and the method for
 #' computing the density of sample correlation coefficients is given in method.

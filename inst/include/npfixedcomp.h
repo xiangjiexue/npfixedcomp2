@@ -114,7 +114,8 @@ public:
 		Eigen::VectorXd pi0new(pi0.size());
 		do{
 			u++;
-			pi0new = (pi0 + std::pow(sigma, u) * eta).eval();
+			pi0new = pi0;
+			pi0new.noalias() += std::pow(sigma, u) * eta;
 			lhs = this->lossfunction(this->mapping(mu0, pi0new));
 			rhs = llorigin + alpha * std::pow(sigma, u) * con;
 			if (lhs < rhs){

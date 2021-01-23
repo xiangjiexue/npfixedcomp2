@@ -2,7 +2,6 @@
 
 // we only include RcppEigen.h which pulls Rcpp.h in for us
 #include "../inst/include/miscfuns.h"
-#include <unsupported/Eigen/SpecialFunctions>
 
 // [[Rcpp::depends(RcppEigen)]]
 

@@ -51,7 +51,9 @@ public:
 		Eigen::VectorXd fullden = dens - this->precompute;
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = (pnormarray(this->data, mu, this->beta).transpose() * fullden * scale - Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens))) * 2;
+			// ansd0 = (pnormarray(this->data, mu, this->beta).transpose() * fullden * scale - Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens))) * 2;
+			ansd0 = Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens)) * -2;
+			ansd0.noalias() += pnormarray(this->data, mu, this->beta).transpose() * fullden * (scale * 2);
 		}
 		if (d1){
 			ansd1 = fullden.transpose() * dnormarray(this->data, mu, this->beta) * -2 * scale;
@@ -63,8 +65,7 @@ public:
 		Eigen::VectorXd mu0new(mu0.size() + newpoints.size());
 		mu0new.head(mu0.size()) = mu0; mu0new.tail(newpoints.size()) = newpoints;
 
-		Eigen::MatrixXd sp = pnormarray(this->data, mu0new, this->beta);
-		Eigen::VectorXd pi0new = pnnlssum_(sp, this->precompute, 1. - this->pi0fixed.sum());
+		Eigen::VectorXd pi0new = pnnlssum_(pnormarray(this->data, mu0new, this->beta), this->precompute, 1. - this->pi0fixed.sum());
 
 		sortmix(mu0new, pi0new);
 
@@ -173,8 +174,8 @@ public:
 		Eigen::VectorXd mu0new(mu0.size() + newpoints.size());
 		mu0new.head(mu0.size()) = mu0; mu0new.tail(newpoints.size()) = newpoints;
 
-		Eigen::MatrixXd sp = pdiscnormarray(this->data, mu0new, this->beta, this->h).array().colwise() * this->weights.array().sqrt();
-		Eigen::VectorXd pi0new = pnnlssum_(sp, this->precompute.array() * this->weights.array().sqrt(), 1. - this->pi0fixed.sum());
+		Eigen::VectorXd pi0new = pnnlssum_(pdiscnormarray(this->data, mu0new, this->beta, this->h).array().colwise() * this->weights.array().sqrt(),
+			this->precompute.array() * this->weights.array().sqrt(), 1. - this->pi0fixed.sum());
 
 		sortmix(mu0new, pi0new);
 

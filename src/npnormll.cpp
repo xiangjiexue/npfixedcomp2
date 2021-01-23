@@ -48,11 +48,12 @@ public:
 		double scale = 1 - this->pi0fixed.sum();
 		Eigen::MatrixXd temp = dnormarray(this->data, mu, this->beta);
 		if (d0){
-			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden)) - temp.transpose() * fullden * scale;
+			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden));
+			ansd0.noalias() -= temp.transpose() * fullden * scale;
 		}
 
 		if (d1){
-			ansd1 = fullden.transpose() * (mu.transpose().colwise().replicate(this->len).colwise() - this->data).cwiseProduct(temp)  / (this->beta * this->beta) * scale;
+			ansd1 = (mu.transpose().colwise().replicate(this->len).colwise() - this->data).cwiseProduct(temp).transpose() * fullden  / (this->beta * this->beta) * scale;
 		}
 	}
 
@@ -65,9 +66,8 @@ public:
 
 		sortmix(mu0new, pi0new);
 
-		Eigen::MatrixXd sp = dnormarray(this->data, mu0new, this->beta);
 		Eigen::VectorXd fp = dens + this->precompute;
-		sp = sp.array().colwise() / fp.array();
+		Eigen::MatrixXd sp = dnormarray(this->data, mu0new, this->beta).array().colwise() / fp.array();
 		Eigen::VectorXd nw = pnnlssum_(sp, Eigen::VectorXd::Constant(this->len, 2.) - this->precompute.cwiseQuotient(fp), 1. - this->pi0fixed.sum());
 		this->checklossfun(mu0new, pi0new, nw - pi0new, sp.colwise().sum());
 		this->collapse(mu0new, pi0new);
@@ -147,7 +147,8 @@ public:
 		Eigen::VectorXd fullden = this->weights.cwiseQuotient(dens + this->precompute);
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden)) - ddiscnormarray(this->data, mu, this->beta, this->h).transpose() * fullden * scale;
+			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden));
+			ansd0.noalias() -= ddiscnormarray(this->data, mu, this->beta, this->h).transpose() * fullden * scale;
 		}
 	}
 
@@ -160,9 +161,8 @@ public:
 
 		sortmix(mu0new, pi0new);
 
-		Eigen::MatrixXd sp = ddiscnormarray(this->data, mu0new, this->beta, this->h);
 		Eigen::VectorXd fp = dens + this->precompute;
-		sp = sp.array().colwise() / fp.array();
+		Eigen::MatrixXd sp = ddiscnormarray(this->data, mu0new, this->beta, this->h).array().colwise() / fp.array();
 		Eigen::VectorXd nw = pnnlssum_(sp.array().colwise() * this->weights.array().sqrt(), 
 			(2. - this->precompute.array() / fp.array()) * this->weights.array().sqrt(), 1. - this->pi0fixed.sum());
 		this->checklossfun(mu0new, pi0new, nw - pi0new, sp.transpose() * this->weights);

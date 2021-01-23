@@ -6,6 +6,7 @@
 
 // we only include RcppEigen.h which pulls Rcpp.h in for us
 #include <RcppEigen.h>
+#include <unsupported/Eigen/SpecialFunctions>
 
 extern "C" void pnnls_(double* A, int* MDA, int* M, int* N, double* B, double* X, double* RNORM, double* W, double* ZZ, int* INDEX, int* MODE, int* K);
 
@@ -107,47 +108,35 @@ inline Eigen::VectorXd pnpnormorigin(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
 	const double &stdev = 1, const bool &lt = true){
 	if (mu0.size() == 1){
-		Eigen::VectorXd ans(x.size());
-		std::transform(x.data(), x.data() + x.size(), ans.data(), pnormptr(mu0[0], stdev, lt));
-		if (pi0[0] == 1) {return ans;} else {return ans * pi0[0];}
-	}else{
-		Eigen::MatrixXd ans(x.size(), mu0.size());
-		for (auto i = mu0.size() - 1; i >= 0; i--){
-			std::transform(x.data(), x.data() + x.size(), ans.col(i).data(), pnormptr(mu0[i], stdev, lt));
+		Eigen::ArrayXd temp = (x.array() - mu0[0]) / stdev / std::sqrt(2);
+		if (pi0[0] == 1) {
+			if (lt){
+				return 0.5 * (1 + temp.erf());
+			}else{
+				return 0.5 * temp.erfc();
+			}
+		} else {
+			if (lt){
+				return 0.5 * (1 + temp.erf()) * pi0[0];
+			}else{
+				return 0.5 * temp.erfc() * pi0[0];
+			}
 		}
-		return ans * pi0;
-	}
-}
-
-inline Eigen::VectorXd logspace_addvec(const Eigen::VectorXd &lx, const Eigen::VectorXd &ly){
-	Eigen::VectorXd ans(lx.size());
-	std::transform(lx.data(), lx.data() + lx.size(), ly.data(), ans.data(), 
-		[](const double &x, const double &y){return R::logspace_add(x, y);});
-	return ans;
-}
-
-inline Eigen::VectorXd pnpnormlog(const Eigen::VectorXd &x, 
-	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
-	const double &stdev = 1, const bool &lt = true){
-	Eigen::VectorXd ans(x.size());
-	if (mu0.size() == 1){
-		std::transform(x.data(), x.data() + x.size(), ans.data(), pnormptr(mu0[0], stdev, lt, true));
-		if (pi0[0] != 1) {ans = ans + Eigen::VectorXd::Constant(x.size(), std::log1p(pi0[0] - 1));}
 	}else{
-		Eigen::MatrixXd temp = pnormarray(x, mu0, stdev, lt, true);
-		ans = temp.col(0) + Eigen::VectorXd::Constant(x.size(), std::log1p(pi0[0] - 1));
-		for (int i = 1; i < mu0.size(); i++){
-			ans = logspace_addvec(ans, temp.col(i) + Eigen::VectorXd::Constant(x.size(), std::log1p(pi0[i] - 1)));
+		Eigen::ArrayXXd temp = (mu0.transpose().colwise().replicate(x.size()).colwise() - x) / stdev / -std::sqrt(2); 
+		if (lt){
+			return (0.5 * (1 + temp.erf())).matrix() * pi0;
+		}else{
+			return (0.5 * temp.erfc()).matrix() * pi0;
 		}
 	}
-	return ans;
 }
 
 inline Eigen::VectorXd pnpnorm_(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
 	const double& stdev, const bool &lt = true, const bool& lg = false){
 	if (lg){
-		return pnpnormlog(x, mu0, pi0, stdev, lt);
+		return pnpnormorigin(x, mu0, pi0, stdev, lt).array().log();
 	}else{
 		return pnpnormorigin(x, mu0, pi0, stdev, lt);
 	}
@@ -194,17 +183,35 @@ inline Eigen::VectorXd dnpnormc_(const Eigen::VectorXd &x,
 }
 
 // Simple implementaion of density of discete normal.
-inline Eigen::MatrixXd ddiscnormarray(const Eigen::VectorXd &x,
-	const Eigen::VectorXd &mu0, const double &stdev, const double &h, const double &lg = false){
-	Eigen::MatrixXd lx = pnormarray(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), stdev, true, true);
-	Eigen::MatrixXd ly = pnormarray(x, mu0, stdev, true, true);
+// inline Eigen::MatrixXd ddiscnormarray(const Eigen::VectorXd &x,
+// 	const Eigen::VectorXd &mu0, const double &stdev, const double &h, const double &lg = false){
+// 	Eigen::MatrixXd lx = pnormarray(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), stdev, true, true);
+// 	Eigen::MatrixXd ly = pnormarray(x, mu0, stdev, true, true);
+// 	Eigen::MatrixXd ans(x.size(), mu0.size());
+// 	std::transform(lx.data(), lx.data() + lx.size(), ly.data(), ans.data(), 
+// 		[](const double &x, const double &y){return R::logspace_sub(x, y);});
+// 	if (lg){
+// 		return ans;
+// 	}else{
+// 		return ans.array().exp();
+// 	}
+// }
+
+inline Eigen::MatrixXd ddiscnormarray(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &stdev, const double &h, const bool &lg = false){
+	// Trapezoid rule. Relative error <= 1e-6 / 12;
+	int N = std::max(std::ceil(std::max(x.maxCoeff() - mu0.minCoeff(), mu0.maxCoeff() - x.minCoeff()) * 1e3 * std::pow(h, 1.5)), 5.);
+	double delta = h / N;
 	Eigen::MatrixXd ans(x.size(), mu0.size());
-	std::transform(lx.data(), lx.data() + lx.size(), ly.data(), ans.data(), 
-		[](const double &x, const double &y){return R::logspace_sub(x, y);});
+	ans.noalias() = (dnormarray(x, mu0, stdev) + dnormarray(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), stdev)) * 0.5;
+	for (int i = 1; i < N; i++){
+		ans.noalias() += dnormarray(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), delta * i), stdev);
+	}
 	if (lg){
-		return ans;
+		return (ans * delta).array().log();
 	}else{
-		return ans.array().exp();
+		return ans * delta;
 	}
 }
 
@@ -237,7 +244,7 @@ inline Eigen::VectorXd pnpdiscnorm_(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0,
 	const double& stdev, const double &h, const bool &lt = true, const bool& lg = false){
 	if (lg){
-		return pnpnormlog(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), pi0, stdev, lt);
+		return pnpnormorigin(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), pi0, stdev, lt).array().log();
 	}else{
 		return pnpnormorigin(x, mu0 - Eigen::VectorXd::Constant(mu0.size(), h), pi0, stdev, lt);
 	}
