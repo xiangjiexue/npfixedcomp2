@@ -37,10 +37,10 @@ public:
 		Eigen::VectorXd fullden = dens - this->precompute;
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = (pnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta) - dens).dot(fullden) * 2;	
+			ansd0 = (pnpnorm_(this->data, mu, scale, this->beta) - dens).dot(fullden) * 2;	
 		}
 		if (d1){
-			ansd1 = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta).dot(fullden) * -2 * scale;
+			ansd1 = dnpnorm_(this->data, mu, 1., this->beta).dot(fullden) * -2 * scale;
 		}
 	}
 
@@ -147,11 +147,11 @@ public:
 		Eigen::VectorXd fullden = (dens - this->precompute).cwiseProduct(weights);
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = (pnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta, this->h) - dens).dot(fullden) * 2;
+			ansd0 = (pnpdiscnorm_(this->data, mu, scale, this->beta, this->h) - dens).dot(fullden) * 2;
 		}
 
 		if (d1){
-			ansd1 = dnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta, this->h).dot(fullden) * -2 * scale;
+			ansd1 = ddiscnormarray(this->data, mu, this->beta, this->h).dot(fullden) * -2 * scale;
 		}
 	}
 

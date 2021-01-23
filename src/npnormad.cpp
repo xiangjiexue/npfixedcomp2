@@ -38,12 +38,12 @@ public:
 		Eigen::VectorXd fullden = dens + this->precompute;
 		Eigen::VectorXd one = Eigen::VectorXd::Ones(this->len);
 		if (d0){
-			Eigen::VectorXd temp = pnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta) + this->precompute;
+			Eigen::VectorXd temp = pnpnorm_(this->data, mu, scale, this->beta) + this->precompute;
 			ansd0 = (temp.cwiseQuotient(fullden).cwiseProduct(this->w1) + (one - temp).cwiseQuotient(one - fullden).cwiseProduct(this->w2)).mean() * -1 + 2 * this->len;
 		}
 
 		if (d1){
-			ansd1 = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Ones(1), this->beta).cwiseProduct(this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(one - fullden)).mean() * scale;
+			ansd1 = dnpnorm_(this->data, mu, 1., this->beta).cwiseProduct(this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(one - fullden)).mean() * scale;
 		}
 	}
 
@@ -160,12 +160,12 @@ public:
 		Eigen::VectorXd fullden = dens + this->precompute;
 		Eigen::VectorXd one = Eigen::VectorXd::Ones(this->len);
 		if (d0){
-			Eigen::VectorXd temp = pnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta, this->h) + this->precompute;
+			Eigen::VectorXd temp = pnpdiscnorm_(this->data, mu, scale, this->beta, this->h) + this->precompute;
 			ansd0 = (temp.cwiseQuotient(fullden).cwiseProduct(this->w1) + (one - temp).cwiseQuotient(one - fullden).cwiseProduct(this->w2)).sum() / this->weights.sum() * -1 + 2 * this->weights.sum();
 		}
 
 		if (d1){
-			ansd1 = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu - h), Eigen::VectorXd::Ones(1), this->beta).cwiseProduct(this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(one - fullden)).sum() / this->weights.sum() * scale;
+			ansd1 = dnormarray(this->data, mu - h, this->beta).cwiseProduct(this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(one - fullden)).sum() / this->weights.sum() * scale;
 		} 
 	}
 

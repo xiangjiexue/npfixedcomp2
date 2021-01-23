@@ -29,7 +29,7 @@ public:
 		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
-		Eigen::VectorXd temp = dnpnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta).cwiseProduct(fullden);
+		Eigen::VectorXd temp = dnpnorm_(this->data, mu, scale, this->beta).cwiseProduct(fullden);
 		if (d0){
 			ansd0 = dens.dot(fullden) - temp.sum(); // (dens - temp).dot(fullden);
 		}
@@ -134,7 +134,7 @@ public:
 		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
-		Eigen::VectorXd temp = dnpdiscnorm_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta, this->h);
+		Eigen::VectorXd temp = dnpdiscnorm_(this->data, mu, scale, this->beta, this->h);
 		if (d0){
 			ansd0 = (dens - temp).cwiseProduct(this->weights).dot(fullden);
 		}

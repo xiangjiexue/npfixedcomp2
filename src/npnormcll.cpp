@@ -30,7 +30,7 @@ public:
 		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = (dens - dnpnormc_(this->data, Eigen::VectorXd::Constant(1, mu), Eigen::VectorXd::Constant(1, scale), this->beta)).dot(fullden);
+			ansd0 = (dens - dnpnormc_(this->data, mu, scale, this->beta)).dot(fullden);
 		}
 
 		if (d1){
