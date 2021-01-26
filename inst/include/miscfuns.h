@@ -8,20 +8,13 @@
 #include <RcppEigen.h>
 #include <unsupported/Eigen/SpecialFunctions>
 
-extern "C" void pnnls_(double* A, int* MDA, int* M, int* N, double* B, double* X, double* RNORM, double* W, double* ZZ, int* INDEX, int* MODE, int* K);
-
+Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &tol = 1e-6);
 // The program NNLS
-inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, 
-	const Eigen::VectorXd &b, const double &sum){
+inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
 	int m = A.rows(), n = A.cols();
 	Eigen::MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
-	Eigen::VectorXd x(n), bb(m + 1), w(n), zz(m + 1);
-	double rnorm;
-	bb = Eigen::VectorXd::Zero(m).homogeneous();
-	Eigen::VectorXi index(n);
-	int mode, k = 0;
-	m++;
-	pnnls_(AA.data(), &m, &m, &n, bb.data(), x.data(), &rnorm, w.data(), zz.data(), index.data(), &mode, &k);
+	Eigen::VectorXd x(n), bb = Eigen::VectorXd::Zero(m).homogeneous();
+	x = nnls(AA, bb);
 	x = x / x.sum() * sum;
 	return x;
 }

@@ -6,8 +6,87 @@
 // [[Rcpp::depends(RcppEigen)]]
 
 // [[Rcpp::export]]
-Eigen::VectorXd pnnlssum(const Eigen::MatrixXd &A, 
-	const Eigen::VectorXd &b, const double &sum){
+Eigen::MatrixXd matsubset(const Eigen::MatrixXd &A, const Eigen::VectorXi &index){
+	// This function should only be used before Eigen 3.4.
+	// In Eigen 3.4 there is a built-in function for slicing.
+	int L = (index.array() > 0).count();
+	Eigen::MatrixXd temp(index.size(), L);
+	int j = 0;
+	for (int i = 0; i < index.size(); i++){
+		if (index[i] > 0){
+			temp.col(j) = A.col(i);
+			j++;
+		} 
+	}
+	Eigen::MatrixXd ans(L, L);
+	j = 0;
+	for (auto i = 0; i < index.size(); i++){
+		if (index[i] > 0){
+			ans.row(j) = temp.row(i);
+			j++;
+		}
+	}
+	return ans;
+}
+
+// [[Rcpp::export]]
+Eigen::VectorXd vecsubset(const Eigen::VectorXd &b, const Eigen::VectorXi &index){
+	// This function should only be used before Eigen 3.4.
+	// In Eigen 3.4 there is a built-in function for slicing.
+	int L = (index.array() > 0).count();
+	Eigen::VectorXd ans(L);
+	int j = 0;
+	for (int i = 0; i < index.size(); i++){
+		if (index[i] > 0){
+			ans[j] = b[i];
+			j++;
+		} 
+	}
+	return ans;
+}
+
+void vecsubassign(Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::VectorXi &index){
+	// This function should only be used before Eigen 3.4.
+	// In Eigen 3.4 there is a built-in function for slicing.
+	// y is of size index.sum();
+	int j = 0;
+	for (int i = 0; i < x.size(); i++){
+		if (index[i] > 0){
+			x[i] = y[j];
+			j++;
+		}
+	}
+}
+
+// [[Rcpp::export]]
+Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &tol){
+	// fnnls by Bros and Jong (1997)
+	int n = A.cols();
+	Eigen::VectorXi p = Eigen::VectorXi::Zero(n), tempind(n), one = Eigen::VectorXi::Ones(n), zero = Eigen::VectorXi::Zero(n);
+	Eigen::VectorXd x = Eigen::VectorXd::Zero(n), ZX = A.transpose() * b, s(n);
+	Eigen::MatrixXd ZZ = A.transpose() * A;
+	Eigen::VectorXd w = ZX - ZZ * x;
+	int maxind;
+	double alpha;
+	while ((p.array() > 0).count() < n & (p.array() == 0).select(w, zero).maxCoeff(&maxind) > tol){
+		p[maxind] = 1;
+		s.setZero();
+		vecsubassign(s, matsubset(ZZ, p).inverse() * vecsubset(ZX, p), p);
+		while ((p.array() > 0).select(s, one).minCoeff() <= 0){
+			alpha = vecsubset(x.cwiseQuotient(x - s), ((p.array() > 0).select(s, one).array() <= 0).cast<int>()).minCoeff();
+			x.noalias() += alpha * (s - x);
+			p.array() *= (x.array() > 0).cast<int>();
+			s.setZero();
+			vecsubassign(s, matsubset(ZZ, p).inverse() * vecsubset(ZX, p), p);
+		}
+		x = s;
+		w = ZX - ZZ * x;
+	}
+	return x;
+}
+
+// [[Rcpp::export]]
+Eigen::VectorXd pnnlssum(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
 	return pnnlssum_(A, b, sum);
 }
 
