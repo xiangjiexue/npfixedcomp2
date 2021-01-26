@@ -30,19 +30,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// nnls
-Eigen::VectorXd nnls(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const double& tol);
-RcppExport SEXP _npfixedcomp2_nnls(SEXP ASEXP, SEXP bSEXP, SEXP tolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type A(ASEXP);
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type b(bSEXP);
-    Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(nnls(A, b, tol));
-    return rcpp_result_gen;
-END_RCPP
-}
 // pnnlssum
 Eigen::VectorXd pnnlssum(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const double& sum);
 RcppExport SEXP _npfixedcomp2_pnnlssum(SEXP ASEXP, SEXP bSEXP, SEXP sumSEXP) {
@@ -571,7 +558,6 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_matsubset", (DL_FUNC) &_npfixedcomp2_matsubset, 2},
     {"_npfixedcomp2_vecsubset", (DL_FUNC) &_npfixedcomp2_vecsubset, 2},
-    {"_npfixedcomp2_nnls", (DL_FUNC) &_npfixedcomp2_nnls, 3},
     {"_npfixedcomp2_pnnlssum", (DL_FUNC) &_npfixedcomp2_pnnlssum, 3},
     {"_npfixedcomp2_pnnqp", (DL_FUNC) &_npfixedcomp2_pnnqp, 3},
     {"_npfixedcomp2_dnpnorm", (DL_FUNC) &_npfixedcomp2_dnpnorm, 5},

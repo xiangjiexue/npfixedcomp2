@@ -46,9 +46,9 @@ Eigen::VectorXd vecsubset(const Eigen::VectorXd &b, const Eigen::VectorXi &index
 }
 
 void vecsubassign(Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::VectorXi &index){
+	// y is of size index.sum();
 	// This function should only be used before Eigen 3.4.
 	// In Eigen 3.4 there is a built-in function for slicing.
-	// y is of size index.sum();
 	int j = 0;
 	for (int i = 0; i < x.size(); i++){
 		if (index[i] > 0){
@@ -58,29 +58,29 @@ void vecsubassign(Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::Vec
 	}
 }
 
-// [[Rcpp::export]]
-Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &tol){
+Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b){
 	// fnnls by Bros and Jong (1997)
 	int n = A.cols();
-	Eigen::VectorXi p = Eigen::VectorXi::Zero(n), tempind(n), one = Eigen::VectorXi::Ones(n), zero = Eigen::VectorXi::Zero(n);
-	Eigen::VectorXd x = Eigen::VectorXd::Zero(n), ZX = A.transpose() * b, s(n);
+	Eigen::VectorXi p = Eigen::VectorXi::Zero(n);
+	Eigen::VectorXd x = Eigen::VectorXd::Zero(n), ZX = A.transpose() * b, s(n), one = Eigen::VectorXd::Ones(n);
 	Eigen::MatrixXd ZZ = A.transpose() * A;
 	Eigen::VectorXd w = ZX - ZZ * x;
-	int maxind;
-	double alpha;
-	while ((p.array() > 0).count() < n & (p.array() == 0).select(w, zero).maxCoeff(&maxind) > tol){
+	int maxind, iter = 0;
+	double alpha, tol = std::max(ZX.array().abs().maxCoeff(), ZZ.array().abs().maxCoeff()) * 10 * std::numeric_limits<double>::epsilon();
+	while ((p.array() == 0).count() > 0 & (p.array() == 0).select(w, -1 * one).maxCoeff(&maxind) > tol & iter < 3 * n){
 		p[maxind] = 1;
 		s.setZero();
-		vecsubassign(s, matsubset(ZZ, p).inverse() * vecsubset(ZX, p), p);
+		vecsubassign(s, matsubset(ZZ, p).llt().solve(vecsubset(ZX, p)), p);
 		while ((p.array() > 0).select(s, one).minCoeff() <= 0){
 			alpha = vecsubset(x.cwiseQuotient(x - s), ((p.array() > 0).select(s, one).array() <= 0).cast<int>()).minCoeff();
 			x.noalias() += alpha * (s - x);
 			p.array() *= (x.array() > 0).cast<int>();
 			s.setZero();
-			vecsubassign(s, matsubset(ZZ, p).inverse() * vecsubset(ZX, p), p);
+			vecsubassign(s, matsubset(ZZ, p).llt().solve(vecsubset(ZX, p)), p);
 		}
 		x = s;
 		w = ZX - ZZ * x;
+		iter++;
 	}
 	return x;
 }

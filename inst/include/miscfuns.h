@@ -8,7 +8,8 @@
 #include <RcppEigen.h>
 #include <unsupported/Eigen/SpecialFunctions>
 
-Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &tol = 1e-6);
+Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b);
+
 // The program NNLS
 inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
 	int m = A.rows(), n = A.cols();

@@ -9,10 +9,6 @@ vecsubset <- function(b, index) {
     .Call('_npfixedcomp2_vecsubset', PACKAGE = 'npfixedcomp2', b, index)
 }
 
-nnls <- function(A, b, tol) {
-    .Call('_npfixedcomp2_nnls', PACKAGE = 'npfixedcomp2', A, b, tol)
-}
-
 pnnlssum <- function(A, b, sum) {
     .Call('_npfixedcomp2_pnnlssum', PACKAGE = 'npfixedcomp2', A, b, sum)
 }
