@@ -8,25 +8,6 @@
 #include <RcppEigen.h>
 #include <unsupported/Eigen/SpecialFunctions>
 
-Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b);
-
-// The program NNLS
-inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
-	int m = A.rows(), n = A.cols();
-	Eigen::MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
-	Eigen::VectorXd x(n), bb = Eigen::VectorXd::Zero(m).homogeneous();
-	x = nnls(AA, bb);
-	x = x / x.sum() * sum;
-	return x;
-}
-
-// The program pnnqp using LLT
-inline Eigen::VectorXd pnnqp_(const Eigen::MatrixXd &q, const Eigen::VectorXd &p, const double &sum){
-	Eigen::LLT<Eigen::MatrixXd> llt;
-	llt.compute(q);
-	return pnnlssum_(llt.matrixU(), llt.matrixL().solve(-p), sum);
-}
-
 // diff function
 inline Eigen::VectorXd diff_(const Eigen::VectorXd & x){
 	return x.tail(x.size() - 1) - x.head(x.size() - 1);
@@ -36,14 +17,14 @@ inline Eigen::VectorXd diff_(const Eigen::VectorXd & x){
 // Simple implementaion of density of normal mixture.
 // if mu0 a scalar
 inline Eigen::VectorXd dnormarraylog(const Eigen::VectorXd &x, const double &mu0, const double &stdev){
-	return (x.array() - mu0).square() / (-2 * stdev * stdev) - M_LN_SQRT_2PI - std::log(stdev);
+	return (x.array() - mu0).square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
 }
 
 inline Eigen::MatrixXd dnormarraylog(const Eigen::VectorXd &x, const Eigen::VectorXd &mu0, const double& stdev){
 	if (mu0.size() == 1){
 		return dnormarraylog(x, mu0[0], stdev);
 	}else{
-		return (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - M_LN_SQRT_2PI - std::log(stdev);
+		return (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
 	}
 }
 
@@ -82,9 +63,9 @@ inline Eigen::VectorXd pnormarray(const Eigen::VectorXd &x, const double &mu0, c
 		return x.unaryExpr(pnormptr(mu0, stdev, lt, lg));
 	}else{
 		if (lt){
-			return 0.5 * (1 + ((x.array() - mu0) / stdev / std::sqrt(2)).erf());
+			return 0.5 * (1 + ((x.array() - mu0) / (stdev * std::sqrt(2))).erf());
 		}else{
-			return 0.5 * ((x.array() - mu0) / stdev / std::sqrt(2)).erfc();
+			return 0.5 * ((x.array() - mu0) / (stdev * std::sqrt(2))).erfc();
 		}
 	}
 }
@@ -101,9 +82,9 @@ inline Eigen::MatrixXd pnormarray(const Eigen::VectorXd &x, const Eigen::VectorX
 			}
 		}else{
 			if (lt){
-				ans = 0.5 * (1 + ((mu0.transpose().colwise().replicate(x.size()).colwise() - x) / stdev / -std::sqrt(2)).array().erf());
+				ans = 0.5 * (1 + ((mu0.transpose().colwise().replicate(x.size()).colwise() - x) / (stdev * -std::sqrt(2))).array().erf());
 			}else{
-				ans = 0.5 * ((mu0.transpose().colwise().replicate(x.size()).colwise() - x) / stdev / -std::sqrt(2)).array().erfc();
+				ans = 0.5 * ((mu0.transpose().colwise().replicate(x.size()).colwise() - x) / (stdev * -std::sqrt(2))).array().erfc();
 			}
 		}
 		return ans;
@@ -272,6 +253,40 @@ inline Eigen::VectorXd dnpt_(const Eigen::VectorXd &x, const T &mu0, const T &pi
 
 // class for comparison
 // sort mixing distribution
+namespace Eigen {
+	template<class ArgType, class RowIndexType, class ColIndexType>
+	class indexing_functor {
+	  const ArgType &m_arg;
+	  const RowIndexType &m_rowIndices;
+	  const ColIndexType &m_colIndices;
+	public:
+	  typedef Matrix<typename ArgType::Scalar,
+	                 RowIndexType::SizeAtCompileTime,
+	                 ColIndexType::SizeAtCompileTime,
+	                 ArgType::Flags&RowMajorBit?RowMajor:ColMajor,
+	                 RowIndexType::MaxSizeAtCompileTime,
+	                 ColIndexType::MaxSizeAtCompileTime> MatrixType;
+	 
+	  indexing_functor(const ArgType& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
+	    : m_arg(arg), m_rowIndices(row_indices), m_colIndices(col_indices)
+	  {}
+	 
+	  const typename ArgType::Scalar& operator() (Index row, Index col) const {
+	    return m_arg(m_rowIndices[row], m_colIndices[col]);
+	  }
+	};
+
+
+	template <class ArgType, class RowIndexType, class ColIndexType>
+	CwiseNullaryOp<indexing_functor<ArgType,RowIndexType,ColIndexType>, typename indexing_functor<ArgType,RowIndexType,ColIndexType>::MatrixType>
+	indexing(const Eigen::MatrixBase<ArgType>& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
+	{
+	  typedef indexing_functor<ArgType,RowIndexType,ColIndexType> Func;
+	  typedef typename Func::MatrixType MatrixType;
+	  return MatrixType::NullaryExpr(row_indices.size(), col_indices.size(), Func(arg.derived(), row_indices, col_indices));
+	}
+}
+
 class comparemu0
 {
 private:
@@ -288,6 +303,80 @@ inline void sort1(Eigen::VectorXd &x){
 
 inline void sort2(Eigen::VectorXd &x){
 	std::sort(x.data(), x.data() + x.size(), std::greater<double>());
+}
+
+// The program NNLS
+inline Eigen::VectorXi index2num(const Eigen::VectorXi &index){
+	// This function should only be used before Eigen 3.4.
+	// In Eigen 3.4 there is a built-in function for slicing.
+	Eigen::VectorXi ans(index.sum());
+	int *ansptr = ans.data();
+	for (int i = 0; i < index.size(); ++i){
+		if (index[i]){
+			*ansptr = i;
+			ansptr++;
+		}
+	}
+	return ans;
+}
+
+
+inline void vecsubassign(Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::VectorXi &index){
+	// y is of size index.sum();
+	// This function should only be used before Eigen 3.4.
+	// In Eigen 3.4 there is a built-in function for slicing.
+	int j = 0;
+	for (int i = 0; i < x.size(); i++){
+		if (index[i] > 0){
+			x[i] = y[j];
+			j++;
+		}
+	}
+}
+
+inline Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b){
+	// fnnls by Bros and Jong (1997)
+	int n = A.cols();
+	Eigen::VectorXi p = Eigen::VectorXi::Zero(n), index;
+	Eigen::VectorXd x = Eigen::VectorXd::Zero(n), ZX = A.transpose() * b, s(n), one = Eigen::VectorXd::Ones(n);
+	Eigen::MatrixXd ZZ = A.transpose() * A;
+	Eigen::VectorXd w = ZX - ZZ * x;
+	int maxind, iter = 0;
+	double alpha, tol = std::max(ZX.array().abs().maxCoeff(), ZZ.array().abs().maxCoeff()) * 10 * std::numeric_limits<double>::epsilon();
+	while ((p.array() == 0).count() > 0 & (p.array() == 0).select(w, -1 * one).maxCoeff(&maxind) > tol & iter < 3 * n){
+		p[maxind] = 1;
+		index.lazyAssign(index2num(p));
+		s.setZero();
+		vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index, Eigen::VectorXi::Zero(1))), p);
+		while ((p.array() > 0).select(s, one).minCoeff() <= 0){
+			alpha = indexing(x.cwiseQuotient(x - s).eval(), index2num(((p.array() > 0).select(s, one).array() <= 0).cast<int>()), Eigen::VectorXi::Zero(1)).minCoeff();
+			x.noalias() += alpha * (s - x);
+			p.array() *= (x.array() > 0).cast<int>();
+			index.lazyAssign(index2num(p));
+			s.setZero();
+			vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index, Eigen::VectorXi::Zero(1))), p);
+		}
+		x = s;
+		w = ZX - ZZ * x;
+		iter++;
+	}
+	return x;
+}
+
+inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
+	int m = A.rows(), n = A.cols();
+	Eigen::MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
+	Eigen::VectorXd x(n), bb = Eigen::VectorXd::Zero(m).homogeneous();
+	x = nnls(AA, bb);
+	x = x / x.sum() * sum;
+	return x;
+}
+
+// The program pnnqp using LLT
+inline Eigen::VectorXd pnnqp_(const Eigen::MatrixXd &q, const Eigen::VectorXd &p, const double &sum){
+	Eigen::LLT<Eigen::MatrixXd> llt;
+	llt.compute(q);
+	return pnnlssum_(llt.matrixU(), llt.matrixL().solve(-p), sum);
 }
 
 #endif

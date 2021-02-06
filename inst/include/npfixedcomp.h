@@ -8,15 +8,18 @@
 
 inline void simplifymix(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0){
 	if (mu0.size() != 1) {
-		int count = pi0.size() - pi0.cwiseEqual(0).count(), index = 0;
-		Eigen::VectorXd mu0new(count), pi0new(count);
-		for (int i = 0; i < mu0.size(); i++){
-			if (pi0[i] != 0){
-				mu0new[index] = mu0[i];
-				pi0new[index] = pi0[i];
-				index++;
-			}
-		}
+		Eigen::VectorXi index = index2num((pi0.array() == 0).select(Eigen::VectorXi::Zero(pi0.size()), Eigen::VectorXi::Ones(pi0.size())));
+		Eigen::VectorXd mu0new = indexing(mu0, index, Eigen::VectorXi::Zero(1));
+		Eigen::VectorXd pi0new = indexing(pi0, index, Eigen::VectorXi::Zero(1));
+		// int count = pi0.size() - pi0.cwiseEqual(0).count(), index = 0;
+		// Eigen::VectorXd mu0new(count), pi0new(count);
+		// for (int i = 0; i < mu0.size(); i++){
+		// 	if (pi0[i] != 0){
+		// 		mu0new[index] = mu0[i];
+		// 		pi0new[index] = pi0[i];
+		// 		index++;
+		// 	}
+		// }
 		pi0.lazyAssign(pi0new);
 		mu0.lazyAssign(mu0new);
 	}
@@ -59,10 +62,12 @@ inline void sortmix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0){
 	Eigen::VectorXd mu0new = mu0, pi0new = pi0;
 	Eigen::VectorXi index = Eigen::VectorXi::LinSpaced(pi0.size(), 0, pi0.size() - 1);
 	std::sort(index.data(), index.data() + index.size(), comparemu0(mu0));
-	for (int i = 0; i < mu0.size(); i++){
-		mu0[i] = mu0new[index[i]];
-		pi0[i] = pi0new[index[i]];
-	}
+	// for (int i = 0; i < mu0.size(); i++){
+	// 	mu0[i] = mu0new[index[i]];
+	// 	pi0[i] = pi0new[index[i]];
+	// }
+	mu0 = indexing(mu0new, index, Eigen::VectorXi::Zero(1));
+	pi0 = indexing(pi0new, index, Eigen::VectorXi::Zero(1));
 }
 
 inline double newmin(const Eigen::Vector3d &x, const Eigen::Vector3d &fx){
@@ -265,9 +270,9 @@ public:
     	double x, fx;
     	Eigen::VectorXd ans(this->len);
     	if (pointsval.head(1)[0] < 0){
-    		ans[length] = gridpoints.head(1)[0];
-    		length++;
-    	}
+			ans[length] = gridpoints.head(1)[0];
+			length++;
+		}
     	Eigen::Vector3d inputx(3), inputfx(3);
     	for (auto i = 0; i < gridpoints.size() - 2; i++){
     		if ((pointsval[i + 1] - pointsval[i] < 0) & (pointsval[i + 2] - pointsval[i + 1] > 0)){

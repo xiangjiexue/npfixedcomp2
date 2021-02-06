@@ -6,30 +6,6 @@
 
 using namespace Rcpp;
 
-// matsubset
-Eigen::MatrixXd matsubset(const Eigen::MatrixXd& A, const Eigen::VectorXi& index);
-RcppExport SEXP _npfixedcomp2_matsubset(SEXP ASEXP, SEXP indexSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type A(ASEXP);
-    Rcpp::traits::input_parameter< const Eigen::VectorXi& >::type index(indexSEXP);
-    rcpp_result_gen = Rcpp::wrap(matsubset(A, index));
-    return rcpp_result_gen;
-END_RCPP
-}
-// vecsubset
-Eigen::VectorXd vecsubset(const Eigen::VectorXd& b, const Eigen::VectorXi& index);
-RcppExport SEXP _npfixedcomp2_vecsubset(SEXP bSEXP, SEXP indexSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type b(bSEXP);
-    Rcpp::traits::input_parameter< const Eigen::VectorXi& >::type index(indexSEXP);
-    rcpp_result_gen = Rcpp::wrap(vecsubset(b, index));
-    return rcpp_result_gen;
-END_RCPP
-}
 // pnnlssum
 Eigen::VectorXd pnnlssum(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const double& sum);
 RcppExport SEXP _npfixedcomp2_pnnlssum(SEXP ASEXP, SEXP bSEXP, SEXP sumSEXP) {
@@ -556,8 +532,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_npfixedcomp2_matsubset", (DL_FUNC) &_npfixedcomp2_matsubset, 2},
-    {"_npfixedcomp2_vecsubset", (DL_FUNC) &_npfixedcomp2_vecsubset, 2},
     {"_npfixedcomp2_pnnlssum", (DL_FUNC) &_npfixedcomp2_pnnlssum, 3},
     {"_npfixedcomp2_pnnqp", (DL_FUNC) &_npfixedcomp2_pnnqp, 3},
     {"_npfixedcomp2_dnpnorm", (DL_FUNC) &_npfixedcomp2_dnpnorm, 5},
