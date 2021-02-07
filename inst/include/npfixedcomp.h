@@ -150,7 +150,7 @@ public:
 		} while(true);
 	}
 
-	void Brmin(double & x, double & fx, const double &lb, const double &ub, 
+	void Brmin(double & x, const double &lb, const double &ub, 
 		const Eigen::VectorXd &dens, const double & tol = 1e-6) const{
 		double fa, fb, a = lb, b = ub, duma, dumb;
 		this->gradfun(a, dens, duma, fa, false, true);
@@ -197,100 +197,155 @@ public:
 		}
 
 		if (std::abs(fc) < tol){
-			this->gradfun(c, dens, dumc, fc, true, false);
-			x = c; fx = dumc;
+			// this->gradfun(c, dens, dumc, fc, true, false);
+			x = c; // fx = dumc;
 		}else{
-			this->gradfun(s, dens, dums, fs, true, false);
-			x = s; fx = dums;
+			// this->gradfun(s, dens, dums, fs, true, false);
+			x = s; // fx = dums;
 		}
 	}
 
+	// Eigen::VectorXd solvegradd1(const Eigen::VectorXd &dens) const{
+	// 	Eigen::VectorXd pointsval, pointsgrad;
+	// 	this->gradfunvec(gridpoints, dens, pointsval, pointsgrad, false, true);
+	// 	int length = 0;
+ //    	double x, fx;
+ //    	Eigen::VectorXd ans(this->len);
+ //    	this->gradfun(gridpoints.head(1)[0], dens, pointsval[0], pointsgrad[0], true, false);
+ //    	if (pointsval.head(1)[0] < 0){
+ //    		ans[length] = gridpoints.head(1)[0];
+ //    		length++;
+ //    	}
+ //    	for (auto i = 0; i < gridpoints.size() - 1; i++){
+ //    		if (pointsgrad[i] < 0 & pointsgrad[i + 1] > 0){
+ //    			this->Brmin(x, fx, gridpoints[i], gridpoints[i + 1], dens);
+ //    			if (fx < 0){
+ //    				ans[length] = x;
+ //    				length++;
+ //    			}
+ //    		}
+ //    	}
+ //    	this->gradfun(gridpoints.tail(1)[0], dens, pointsval[pointsval.size() - 1], pointsgrad[pointsgrad.size() - 1], true, false);
+ //    	if (pointsval.tail(1)[0] < 0){
+ //    		ans[length] = gridpoints.tail(1)[0];
+ //    		length++;
+ //    	}
+ //    	ans.conservativeResize(length);
+ //    	return ans;
+	// }
 	Eigen::VectorXd solvegradd1(const Eigen::VectorXd &dens) const{
 		Eigen::VectorXd pointsval, pointsgrad;
 		this->gradfunvec(gridpoints, dens, pointsval, pointsgrad, false, true);
-		int length = 0;
-    	double x, fx;
-    	Eigen::VectorXd ans(this->len);
-    	this->gradfun(gridpoints.head(1)[0], dens, pointsval[0], pointsgrad[0], true, false);
-    	if (pointsval.head(1)[0] < 0){
-    		ans[length] = gridpoints.head(1)[0];
-    		length++;
-    	}
-    	for (auto i = 0; i < gridpoints.size() - 1; i++){
-    		if (pointsgrad[i] < 0 & pointsgrad[i + 1] > 0){
-    			this->Brmin(x, fx, gridpoints[i], gridpoints[i + 1], dens);
-    			if (fx < 0){
-    				ans[length] = x;
-    				length++;
-    			}
-    		}
-    	}
-    	this->gradfun(gridpoints.tail(1)[0], dens, pointsval[pointsval.size() - 1], pointsgrad[pointsgrad.size() - 1], true, false);
-    	if (pointsval.tail(1)[0] < 0){
-    		ans[length] = gridpoints.tail(1)[0];
-    		length++;
-    	}
-    	ans.conservativeResize(length);
-    	return ans;
+		const int L = gridpoints.size();
+		Eigen::VectorXi index = index2num((pointsgrad.head(L - 1).array() < 0).cast<int>() * (pointsgrad.tail(L - 1).array() > 0).cast<int>());
+		Eigen::VectorXd ans(index.size());
+		if (index.size() > 0){
+			double x;
+			for (auto i = 0; i < ans.size(); ++i){
+				this->Brmin(x, gridpoints[index[i]], gridpoints[index[i] + 1], dens);
+				ans[i] = x;
+			}
+			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
+			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()), Eigen::VectorXd::Zero(1));
+		}else{
+			return ans;
+		}
 	}
 
 	void Dfmin(double & x, double & fx, const Eigen::Vector3d &x1, const Eigen::Vector3d &fx1,
 		const Eigen::VectorXd &dens, const double &tol = 1e-6) const{
-		double newpoint, fnewpoint, dummy, lb = x1[0], ub = x1[1];
+		double lb = x1[0], ub = x1[1];
 		Eigen::Vector3d xx(x1), fxx(fx1);
+		Eigen::VectorXd newpoint(3), fnewpoint(3), dummy(3);
 		// ensure tail has the smallest fxx.
 		if (fxx[0] < fxx[1]){
 			std::swap(xx[0], xx[1]);
 			std::swap(fxx[0], fxx[1]);
 		}	
-		while ((xx.maxCoeff() - xx.minCoeff()) > tol){
-			newpoint = newmin(xx, fxx);
-			if (newpoint < lb & newpoint > ub){
-				Eigen::MatrixXd A(3, 3);
-				A.col(0) = xx.array().square(); A.col(1) = xx; A.col(2).setOnes();
-				Eigen::VectorXd x1 = A.inverse() * fxx;
-				newpoint = -x1[1] / x1[0] * 0.5;
+		double ra = (std::sqrt(5) - 1) / 2;
+		while ((xx.maxCoeff() - xx.minCoeff()) > tol & ub - lb > tol){
+			newpoint << newmin(xx, fxx), lb + (1 - ra) * (ub - lb), lb + ra * (ub - lb);
+			this->gradfunvec(newpoint, dens, fnewpoint, dummy, true, false);
+
+			if (fnewpoint[1] > fnewpoint[2]){
+				lb = newpoint[1];
+			}else{
+				ub = newpoint[2];
 			}
-			this->gradfun(newpoint, dens, fnewpoint, dummy, true, false);
-			std::swap(xx[0], xx[1]);
-			std::swap(fxx[0], fxx[1]);
-			std::swap(xx[1], xx[2]);
-			std::swap(fxx[1], fxx[2]);
-			xx[2] = newpoint;
-			fxx[2] = fnewpoint;
+
+			for (int i = 0; i < 3; ++i){
+				if (fnewpoint[i] < fxx[0]){
+					xx[0] = newpoint[i];
+					fxx[0] = fnewpoint[i];
+					if (fxx[0] < fxx[1]){
+						std::swap(xx[0], xx[1]);
+						std::swap(fxx[0], fxx[1]);
+					}
+					if (fxx[1] < fxx[2]){
+						std::swap(xx[1], xx[2]);
+						std::swap(fxx[1], fxx[2]);
+					}
+				}
+			}
+
 		}
 
 		x = xx[2]; fx = fxx[2];
 	}
 
+	// Eigen::VectorXd solvegradd0(const Eigen::VectorXd &dens) const{
+	// 	Eigen::VectorXd pointsval, pointsgrad; // pointsgrad not referenced.
+	// 	this->gradfunvec(gridpoints, dens, pointsval, pointsgrad, true, false);
+	// 	int length = 0;
+ //    	double x, fx;
+ //    	Eigen::VectorXd ans(this->len);
+ //    	if (pointsval.head(1)[0] < 0){
+	// 		ans[length] = gridpoints.head(1)[0];
+	// 		length++;
+	// 	}
+ //    	Eigen::Vector3d inputx(3), inputfx(3);
+ //    	for (auto i = 0; i < gridpoints.size() - 2; i++){
+ //    		if ((pointsval[i + 1] - pointsval[i] < 0) & (pointsval[i + 2] - pointsval[i + 1] > 0)){
+ //    			inputx << gridpoints[i], gridpoints[i + 2], gridpoints[i + 1];
+ //    			inputfx << pointsval[i], pointsval[i + 2], pointsval[i + 1];
+ //    			this->Dfmin(x, fx, inputx, inputfx, dens);
+ //    			if (fx < 0){
+ //    				ans[length] = x;
+ //    				length++;
+ //    			}
+ //    		}
+ //    	}
+ //    	if (pointsval.tail(1)[0] < 0){
+ //    		ans[length] = gridpoints.tail(1)[0];
+ //    		length++;
+ //    	}
+ //    	ans.conservativeResize(length);
+ //    	return ans;
+	// }
+
 	Eigen::VectorXd solvegradd0(const Eigen::VectorXd &dens) const{
 		Eigen::VectorXd pointsval, pointsgrad; // pointsgrad not referenced.
 		this->gradfunvec(gridpoints, dens, pointsval, pointsgrad, true, false);
+		Eigen::VectorXd temp = diff_(pointsval);
+		const int L = temp.size();
 		int length = 0;
-    	double x, fx;
-    	Eigen::VectorXd ans(this->len);
-    	if (pointsval.head(1)[0] < 0){
-			ans[length] = gridpoints.head(1)[0];
-			length++;
-		}
-    	Eigen::Vector3d inputx(3), inputfx(3);
-    	for (auto i = 0; i < gridpoints.size() - 2; i++){
-    		if ((pointsval[i + 1] - pointsval[i] < 0) & (pointsval[i + 2] - pointsval[i + 1] > 0)){
-    			inputx << gridpoints[i], gridpoints[i + 2], gridpoints[i + 1];
-    			inputfx << pointsval[i], pointsval[i + 2], pointsval[i + 1];
+		Eigen::VectorXi index = index2num((temp.head(L - 1).array() < 0).cast<int>() * (temp.tail(L - 1).array() > 0).cast<int>());
+		Eigen::VectorXd ans(index.size());
+		if (index.size() > 0){
+			double x, fx;
+			Eigen::Vector3d inputx(3), inputfx(3);
+			for (auto i = 0; i < ans.size(); ++i){
+				inputx << gridpoints[index[i]], gridpoints[index[i] + 2], gridpoints[index[i] + 1];
+    			inputfx << pointsval[index[i]], pointsval[index[i] + 2], pointsval[index[i] + 1];
     			this->Dfmin(x, fx, inputx, inputfx, dens);
-    			if (fx < 0){
+				if (fx < 0){
     				ans[length] = x;
     				length++;
     			}
-    		}
-    	}
-    	if (pointsval.tail(1)[0] < 0){
-    		ans[length] = gridpoints.tail(1)[0];
-    		length++;
-    	}
-    	ans.conservativeResize(length);
-    	return ans;
+			}
+			ans.conservativeResize(length);
+		}
+		return ans;
 	}
 
 	Eigen::VectorXd solvegrad(const Eigen::VectorXd &dens) const{
