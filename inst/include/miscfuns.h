@@ -13,92 +13,289 @@ inline Eigen::VectorXd diff_(const Eigen::VectorXd & x){
 	return x.tail(x.size() - 1) - x.head(x.size() - 1);
 }
 
+namespace Eigen{
 
-// Simple implementaion of density of normal mixture.
-// if mu0 a scalar
-inline Eigen::VectorXd dnormarraylog(const Eigen::VectorXd &x, const double &mu0, const double &stdev){
-	return (x.array() - mu0).square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
-}
-
-inline Eigen::MatrixXd dnormarraylog(const Eigen::VectorXd &x, const Eigen::VectorXd &mu0, const double& stdev){
-	if (mu0.size() == 1){
-		return dnormarraylog(x, mu0[0], stdev);
-	}else{
-		return (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
-	}
-}
-
-template<typename T>
-inline Eigen::MatrixXd dnormarray(const Eigen::VectorXd &x, const T &mu0, const double& stdev, const bool& lg = false){
-	if (lg){
-		return dnormarraylog(x, mu0, stdev);
-	}else{
-		return dnormarraylog(x, mu0, stdev).array().exp();
-	}
-}
-
-template<typename T>
-inline Eigen::VectorXd dnpnorm_(const Eigen::VectorXd &x, const T &mu0, const T &pi0, const double& stdev, const bool& lg = false){
-	if (lg){
-		return (dnormarray(x, mu0, stdev) * pi0).array().log();
-	}else{
-		return dnormarray(x, mu0, stdev) * pi0;
-	}
-}
-
-// Simple implementaion of CDF of normal mixture.
-struct pnormptr{
-	pnormptr(const double &mu_, const double &stdev_, const bool& lt_, const bool& lg_ = false) : mu(mu_), stdev(stdev_), lt(lt_), lg(lg_) {};
-
-	const double operator()(const double & x) const {
-		return R::pnorm5(x, mu, stdev, lt, lg);
-	}
-
-	double mu, stdev;
-	bool lt, lg;
+template<class ArgType>
+struct densityarrayscale {
+  typedef Matrix<typename ArgType::Scalar,
+                 ArgType::SizeAtCompileTime,
+                 1,
+                 ColMajor,
+                 ArgType::MaxSizeAtCompileTime,
+                 1> MatrixType;
 };
 
-inline Eigen::VectorXd pnormarray(const Eigen::VectorXd &x, const double &mu0, const double& stdev, const bool &lt = true, const bool &lg = false){
+template<class ArgType, class ArgType2>
+struct densityarray {
+  typedef Matrix<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType,
+                 ArgType::SizeAtCompileTime,
+                 ArgType2::SizeAtCompileTime,
+                 ColMajor,
+                 ArgType::MaxSizeAtCompileTime,
+                 ArgType2::MaxSizeAtCompileTime> MatrixType;
+};
+
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnormarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
+	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+	MatrixType ans(x.size(), 1);
+	ans = (x.array() - mu0).square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
 	if (lg){
-		return x.unaryExpr(pnormptr(mu0, stdev, lt, lg));
+		return ans;
 	}else{
-		if (lt){
-			return 0.5 * (1 + ((x.array() - mu0) / (stdev * std::sqrt(2))).erf());
-		}else{
-			return 0.5 * ((x.array() - mu0) / (stdev * std::sqrt(2))).erfc();
-		}
+		return ans.array().exp();
 	}
 }
 
-inline Eigen::MatrixXd pnormarray(const Eigen::VectorXd &x, const Eigen::VectorXd &mu0, const double& stdev, const bool &lt = true, const bool &lg = false){
+template <class ArgType, class ArgType2>
+inline typename densityarray<ArgType, ArgType2>::MatrixType
+dnormarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
+	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	MatrixType ans(x.size(), mu0.size());
 	if (mu0.size() == 1){
-		return pnormarray(x, mu0[0], stdev, lt, lg);
+		ans = dnormarray<ArgType>(x, mu0.coeff(0), stdev, true);
 	}else{
-		Eigen::MatrixXd ans(x.size(), mu0.size());
-		if (lg){
-			const double *mu0ptr = mu0.data();
-			for (auto i = 0; i < mu0.size(); i++, mu0ptr++){
-				ans.col(i) = pnormarray(x, *mu0ptr, stdev, lt, lg);
-			}
-		}else{
-			if (lt){
-				ans = 0.5 * (1 + ((mu0.transpose().colwise().replicate(x.size()).colwise() - x) / (stdev * -std::sqrt(2))).array().erf());
-			}else{
-				ans = 0.5 * ((mu0.transpose().colwise().replicate(x.size()).colwise() - x) / (stdev * -std::sqrt(2))).array().erfc();
-			}
-		}
+		ans = (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
+	}
+	if (lg){
+		return ans;
+	}else{
+		return ans.array().exp();
+	}
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnpnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool& lg = false){
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	ans = dnormarray(x, mu0, stdev) * pi0;
+	if (lg){
+		return ans.array().log();
+	}else{
 		return ans;
 	}
 }
 
-template<typename T>
-inline Eigen::VectorXd pnpnorm_(const Eigen::VectorXd &x, const T &mu0, const T &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
-	if (lg){
-		return (pnormarray(x, mu0, stdev, lt, false) * pi0).array().log();
+template <class ArgType, class ArgType2, class ArgType3>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnpnorm_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& stdev, const bool& lg = false){
+	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (mu0.size() == 1){
+		ans = dnormarray(x, mu0.coeff(0), stdev) * pi0.coeff(0);
 	}else{
-		return pnormarray(x, mu0, stdev, lt, false) * pi0;
+		ans = dnormarray(x, mu0, stdev) * pi0;
+	}
+	if (lg){
+		return ans.array().log();
+	}else{
+		return ans;
 	}
 }
+
+
+
+template<class ArgType, class ArgType2>
+class pnormlog_functor {
+	const ArgType &x;
+	const ArgType2 &mu;
+	const double stdev;
+	const bool lt;
+public:
+	pnormlog_functor(const ArgType& x_, const ArgType2 &mu_, const double &stdev_, const bool &lt_) : x(x_), mu(mu_), stdev(stdev_), lt(lt_) {}
+
+	const double operator() (Index row, Index col) const {
+		return R::pnorm5(x.coeff(row), mu.coeff(col), stdev, lt, true);
+	}
+};
+
+
+template <class ArgType, class ArgType2>
+CwiseNullaryOp<pnormlog_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
+pnormarraylog(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> &mu0, const double &stdev, const bool &lt = true)
+{
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(x.size(), mu0.size(), pnormlog_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lt));
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnormarraylog(const Eigen::MatrixBase<ArgType>& x, const double &mu0, const double &stdev, const bool &lt = true)
+{
+ 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+ 	return pnormarraylog(x, MatrixType::Constant(1, mu0), stdev, lt);
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnormarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
+	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+	MatrixType ans(x.size(), 1);
+	if (lg){
+		ans = pnormarraylog(x, mu0, stdev, lt);
+	}else{
+		if (lt){
+			ans = 0.5 * (1 + ((x.array() - mu0) / (stdev * std::sqrt(2))).erf());
+		}else{
+			ans = 0.5 * ((x.array() - mu0) / (stdev * std::sqrt(2))).erfc();
+		}
+	}
+
+	return ans;
+}
+
+template <class ArgType, class ArgType2>
+inline typename densityarray<ArgType, ArgType2>::MatrixType
+pnormarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
+	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	MatrixType ans(x.size(), mu0.size());
+	if (lg){
+		ans = pnormarraylog(x, mu0, stdev, lt);
+	}else{
+		if (mu0.size() == 1){
+			ans = pnormarray(x, mu0.coeff(0), stdev, lt, false);
+		}else{
+			if (lt){
+				ans = 0.5 * (1 + ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erf());
+			}else{
+				ans = 0.5 * ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erfc();
+			}		
+		}
+	
+	}
+
+	return ans;
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnpnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	ans = pnormarray(x, mu0, stdev, lt, false) * pi0;
+	if (lg){
+		return ans.array().log();
+	}else{
+		return ans;
+	}
+}
+
+template <class ArgType, class ArgType2, class ArgType3>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnpnorm_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
+	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (mu0.size() == 1){
+		ans = pnormarray(x, mu0.coeff(0), stdev) * pi0.coeff(0);
+	}else{
+		ans = pnormarray(x, mu0, stdev) * pi0;
+	}
+	if (lg){
+		return ans.array().log();
+	}else{
+		return ans;
+	}
+}
+
+}
+
+
+// Simple implementaion of density of normal mixture.
+// if mu0 a scalar
+// inline Eigen::VectorXd dnormarraylog(const Eigen::VectorXd &x, const double &mu0, const double &stdev){
+// 	return (x.array() - mu0).square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
+// }
+
+// inline Eigen::MatrixXd dnormarraylog(const Eigen::VectorXd &x, const Eigen::VectorXd &mu0, const double& stdev){
+// 	if (mu0.size() == 1){
+// 		return dnormarraylog(x, mu0[0], stdev);
+// 	}else{
+// 		return (mu0.transpose().replicate(x.size(), 1).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
+// 	}
+// }
+
+// template<typename T>
+// inline Eigen::MatrixXd dnormarray(const Eigen::VectorXd &x, const T &mu0, const double& stdev, const bool& lg = false){
+// 	if (lg){
+// 		return dnormarraylog(x, mu0, stdev);
+// 	}else{
+// 		return dnormarraylog(x, mu0, stdev).array().exp();
+// 	}
+// }
+
+// template<typename T>
+// inline Eigen::VectorXd dnpnorm_(const Eigen::VectorXd &x, const T &mu0, const T &pi0, const double& stdev, const bool& lg = false){
+// 	if (lg){
+// 		return (dnormarray(x, mu0, stdev) * pi0).array().log();
+// 	}else{
+// 		return dnormarray(x, mu0, stdev) * pi0;
+// 	}
+// }
+
+// Simple implementaion of CDF of normal mixture.
+// struct pnormptr{
+// 	pnormptr(const double &mu_, const double &stdev_, const bool& lt_, const bool& lg_ = false) : mu(mu_), stdev(stdev_), lt(lt_), lg(lg_) {};
+
+// 	const double operator()(const double & x) const {
+// 		return R::pnorm5(x, mu, stdev, lt, lg);
+// 	}
+
+// 	double mu, stdev;
+// 	bool lt, lg;
+// };
+
+// inline Eigen::VectorXd pnormarray(const Eigen::VectorXd &x, const double &mu0, const double& stdev, const bool &lt = true, const bool &lg = false){
+// 	if (lg){
+// 		return x.unaryExpr(pnormptr(mu0, stdev, lt, lg));
+// 	}else{
+// 		if (lt){
+// 			return 0.5 * (1 + ((x.array() - mu0) / (stdev * std::sqrt(2))).erf());
+// 		}else{
+// 			return 0.5 * ((x.array() - mu0) / (stdev * std::sqrt(2))).erfc();
+// 		}
+// 	}
+// }
+
+// inline Eigen::MatrixXd pnormarray(const Eigen::VectorXd &x, const Eigen::VectorXd &mu0, const double& stdev, const bool &lt = true, const bool &lg = false){
+// 	if (mu0.size() == 1){
+// 		return pnormarray(x, mu0[0], stdev, lt, lg);
+// 	}else{
+// 		Eigen::MatrixXd ans(x.size(), mu0.size());
+// 		if (lg){
+// 			const double *mu0ptr = mu0.data();
+// 			for (auto i = 0; i < mu0.size(); i++, mu0ptr++){
+// 				ans.col(i) = pnormarray(x, *mu0ptr, stdev, lt, lg);
+// 			}
+// 		}else{
+// 			if (lt){
+// 				ans = 0.5 * (1 + ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erf());
+// 			}else{
+// 				ans = 0.5 * ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erfc();
+// 			}
+// 		}
+// 		return ans;
+// 	}
+// }
+
+// template<typename T>
+// inline Eigen::VectorXd pnpnorm_(const Eigen::VectorXd &x, const T &mu0, const T &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
+// 	if (lg){
+// 		return (pnormarray(x, mu0, stdev, lt, false) * pi0).array().log();
+// 	}else{
+// 		return pnormarray(x, mu0, stdev, lt, false) * pi0;
+// 	}
+// }
 
 // Simple implementaion of density of one-parameter normal mixture.
 inline Eigen::VectorXd dnormcarraylog(const Eigen::VectorXd &x, const double &mu0, const double &n){
@@ -109,7 +306,7 @@ inline Eigen::MatrixXd dnormcarraylog(const Eigen::VectorXd &x, const Eigen::Vec
 	if (mu0.size() == 1){
 		return dnormcarraylog(x, mu0[0], n);
 	}else{
-		Eigen::MatrixXd temp = mu0.transpose().colwise().replicate(x.size());
+		Eigen::MatrixXd temp = mu0.transpose().replicate(x.size(), 1);
 		Eigen::MatrixXd stdev = (1 - temp.array().square()) / std::sqrt(n);
 		return ((temp.colwise() - x).array() / stdev.array()).square() * -.5 - M_LN_SQRT_2PI - stdev.array().log();
 	}

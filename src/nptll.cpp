@@ -70,7 +70,7 @@ public:
 	}
 
 	double familydensity(const double &x, const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
-		return dnpt_(Eigen::VectorXd::Constant(1, x), mu0, pi0, this->beta)[0];
+		return dnpt_(Eigen::VectorXd::Constant(1, x), mu0, pi0, this->beta).coeff(0);
 	}
 };
 
