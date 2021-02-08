@@ -9,11 +9,30 @@
 #include <unsupported/Eigen/SpecialFunctions>
 
 // diff function
-inline Eigen::VectorXd diff_(const Eigen::VectorXd & x){
-	return x.tail(x.size() - 1) - x.head(x.size() - 1);
-}
+// inline Eigen::VectorXd diff_(const Eigen::VectorXd & x){
+// 	return x.tail(x.size() - 1) - x.head(x.size() - 1);
+// }
 
 namespace Eigen{
+
+template<class ArgType>
+struct diffstruct {
+  typedef Matrix<typename ArgType::Scalar,
+                 (ArgType::SizeAtCompileTime > 0) ? ArgType::SizeAtCompileTime - 1 : -1,
+                 1,
+                 ColMajor,
+                 (ArgType::MaxSizeAtCompileTime > 0) ? ArgType::MaxSizeAtCompileTime - 1 : -1,
+                 1> MatrixType;
+};
+
+template <class ArgType>
+inline typename diffstruct<ArgType>::MatrixType
+diff_(const MatrixBase<ArgType>& x)
+{
+	const int L = x.size() - 1;
+	return x.tail(L) - x.head(L);
+}
+
 
 template<class ArgType>
 struct densityarrayscale {
@@ -38,7 +57,7 @@ struct densityarray {
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnormarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lg = false)
+dnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
@@ -53,7 +72,7 @@ dnormarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const double
 
 template <class ArgType, class ArgType2>
 inline typename densityarray<ArgType, ArgType2>::MatrixType
-dnormarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
+dnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
@@ -73,7 +92,7 @@ dnormarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool& lg = false){
+dnpnorm_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool& lg = false){
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	ans = dnormarray(x, mu0, stdev) * pi0;
 	if (lg){
@@ -85,7 +104,7 @@ dnpnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &p
 
 template <class ArgType, class ArgType2, class ArgType3>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpnorm_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& stdev, const bool& lg = false){
+dnpnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& stdev, const bool& lg = false){
 	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	if (mu0.size() == 1){
@@ -119,7 +138,7 @@ public:
 
 template <class ArgType, class ArgType2>
 CwiseNullaryOp<pnormlog_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
-pnormarraylog(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> &mu0, const double &stdev, const bool &lt = true)
+pnormarraylog(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> &mu0, const double &stdev, const bool &lt = true)
 {
 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
 	return MatrixType::NullaryExpr(x.size(), mu0.size(), pnormlog_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lt));
@@ -127,7 +146,7 @@ pnormarraylog(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgTy
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-pnormarraylog(const Eigen::MatrixBase<ArgType>& x, const double &mu0, const double &stdev, const bool &lt = true)
+pnormarraylog(const MatrixBase<ArgType>& x, const double &mu0, const double &stdev, const bool &lt = true)
 {
  	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
  	return pnormarraylog(x, MatrixType::Constant(1, mu0), stdev, lt);
@@ -135,7 +154,7 @@ pnormarraylog(const Eigen::MatrixBase<ArgType>& x, const double &mu0, const doub
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-pnormarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
+pnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
@@ -155,7 +174,7 @@ pnormarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const double
 
 template <class ArgType, class ArgType2>
 inline typename densityarray<ArgType, ArgType2>::MatrixType
-pnormarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
+pnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
@@ -181,7 +200,7 @@ pnormarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-pnpnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
+pnpnorm_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	ans = pnormarray(x, mu0, stdev, lt, false) * pi0;
 	if (lg){
@@ -193,7 +212,7 @@ pnpnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &p
 
 template <class ArgType, class ArgType2, class ArgType3>
 inline typename densityarrayscale<ArgType>::MatrixType
-pnpnorm_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
+pnpnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
 	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	if (mu0.size() == 1){
@@ -224,7 +243,7 @@ public:
 
 template <class ArgType, class ArgType2>
 CwiseNullaryOp<dnt_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
-dtarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> &mu0, const double &n, const bool &lg = false)
+dtarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> &mu0, const double &n, const bool &lg = false)
 {
 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
 	return MatrixType::NullaryExpr(x.size(), mu0.size(), dnt_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), n, lg));
@@ -232,7 +251,7 @@ dtarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> &
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-dtarray(const Eigen::MatrixBase<ArgType>& x, const double &mu0, const double &n, const bool &lg = false)
+dtarray(const MatrixBase<ArgType>& x, const double &mu0, const double &n, const bool &lg = false)
 {
  	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
  	return dtarray(x, MatrixType::Constant(1, mu0), n, lg);
@@ -240,7 +259,7 @@ dtarray(const Eigen::MatrixBase<ArgType>& x, const double &mu0, const double &n,
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpt_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& n, const bool& lg = false){
+dnpt_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& n, const bool& lg = false){
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	ans = dtarray(x, mu0, n) * pi0;
 	if (lg){
@@ -252,7 +271,7 @@ dnpt_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0,
 
 template <class ArgType, class ArgType2, class ArgType3>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpt_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& n, const bool& lg = false){
+dnpt_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& n, const bool& lg = false){
 	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	ans = dtarray(x, mu0, n) * pi0;
@@ -266,7 +285,7 @@ dnpt_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnormcarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const double &n, const bool &lg = false)
+dnormcarray(const MatrixBase<ArgType>& x, const double & mu0, const double &n, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
@@ -281,7 +300,7 @@ dnormcarray(const Eigen::MatrixBase<ArgType>& x, const double & mu0, const doubl
 
 template <class ArgType, class ArgType2>
 inline typename densityarray<ArgType, ArgType2>::MatrixType
-dnormcarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType2> & mu0, const double &n, const bool &lg = false)
+dnormcarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &n, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
@@ -290,8 +309,8 @@ dnormcarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType
 	if (mu0.size() == 1){
 		ans = dnormcarray<ArgType>(x, mu0.coeff(0), n, true);
 	}else{
-		Eigen::MatrixXd temp = mu0.transpose().colwise().replicate(x.size());
-		Eigen::MatrixXd stdev = (1 - temp.array().square()) / std::sqrt(n);
+		MatrixType temp = mu0.transpose().colwise().replicate(x.size());
+		MatrixType stdev = (1 - temp.array().square()) / std::sqrt(n);
 		ans = ((temp.colwise() - x).array() / stdev.array()).square() * -.5 - M_LN_SQRT_2PI - stdev.array().log();	
 	}
 	if (lg){
@@ -303,7 +322,7 @@ dnormcarray(const Eigen::MatrixBase<ArgType>& x, const Eigen::MatrixBase<ArgType
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpnormc_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& n, const bool& lg = false){
+dnpnormc_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& n, const bool& lg = false){
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	ans = dnormcarray(x, mu0, n) * pi0;
 	if (lg){
@@ -315,7 +334,7 @@ dnpnormc_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &
 
 template <class ArgType, class ArgType2, class ArgType3>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpnormc_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& n, const bool& lg = false){
+dnpnormc_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& n, const bool& lg = false){
 	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	if (mu0.size() == 1){
@@ -333,13 +352,13 @@ dnpnormc_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2>
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-pdiscnormarray(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &stdev, const double &h, const bool &lt = true, const bool &lg = false){
+pdiscnormarray(const MatrixBase<ArgType> &x, const double &mu0, const double &stdev, const double &h, const bool &lt = true, const bool &lg = false){
 	return pnormarray(x, mu0 - h, stdev, lt, lg);
 }
 
 template <class ArgType, class ArgType2>
 inline typename densityarray<ArgType, ArgType2>::MatrixType
-pdiscnormarray(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const double &stdev, const double &h, const bool &lt = true, const bool &lg = false){
+pdiscnormarray(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const double &stdev, const double &h, const bool &lt = true, const bool &lg = false){
 	if (mu0.size() == 1){
 		return pdiscnormarray(x, mu0.coeff(0), stdev, h, lt, lg);
 	}else{
@@ -353,7 +372,7 @@ pdiscnormarray(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgT
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-pnpdiscnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double &stdev, const double& h, const double &lt = true, const bool& lg = false){
+pnpdiscnorm_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double &stdev, const double& h, const double &lt = true, const bool& lg = false){
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	ans = pdiscnormarray(x, mu0, stdev, h, lt, false) * pi0;
 	if (lg){
@@ -365,7 +384,7 @@ pnpdiscnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const doubl
 
 template <class ArgType, class ArgType2, class ArgType3>
 inline typename densityarrayscale<ArgType>::MatrixType
-pnpdiscnorm_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& stdev, const double &h, const bool &lt = true, const bool& lg = false){
+pnpdiscnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& stdev, const double &h, const bool &lt = true, const bool& lg = false){
 	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	if (mu0.size() == 1){
@@ -383,7 +402,7 @@ pnpdiscnorm_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgTyp
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-ddiscnormarray(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &stdev, const double &h, const bool &lg = false){
+ddiscnormarray(const MatrixBase<ArgType> &x, const double &mu0, const double &stdev, const double &h, const bool &lg = false){
 	// Trapezoid rule. Relative error <= 1e-6 / 12;
 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
 	int N = std::max(std::ceil((x.array() - mu0).abs().maxCoeff() * 1e3 * std::pow(h, 1.5)), 5.);
@@ -402,7 +421,7 @@ ddiscnormarray(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const dou
 
 template <class ArgType, class ArgType2>
 inline typename densityarray<ArgType, ArgType2>::MatrixType
-ddiscnormarray(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const double &stdev, const double &h, const bool &lg = false){
+ddiscnormarray(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const double &stdev, const double &h, const bool &lg = false){
 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
 	MatrixType ans(x.size(), mu0.size());
 	if (mu0.size() == 1){
@@ -426,7 +445,7 @@ ddiscnormarray(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgT
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpdiscnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double &stdev, const double& h, const bool& lg = false){
+dnpdiscnorm_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double &stdev, const double& h, const bool& lg = false){
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	ans = ddiscnormarray(x, mu0, stdev, h, false) * pi0;
 	if (lg){
@@ -438,7 +457,7 @@ dnpdiscnorm_(const Eigen::MatrixBase<ArgType> &x, const double &mu0, const doubl
 
 template <class ArgType, class ArgType2, class ArgType3>
 inline typename densityarrayscale<ArgType>::MatrixType
-dnpdiscnorm_(const Eigen::MatrixBase<ArgType> &x, const Eigen::MatrixBase<ArgType2> &mu0, const Eigen::MatrixBase<ArgType3> &pi0, const double& stdev, const double &h, const bool& lg = false){
+dnpdiscnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& stdev, const double &h, const bool& lg = false){
 	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
 	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
 	if (mu0.size() == 1){
@@ -483,7 +502,7 @@ namespace Eigen {
 
 	template <class ArgType, class RowIndexType, class ColIndexType>
 	CwiseNullaryOp<indexing_functor<ArgType,RowIndexType,ColIndexType>, typename indexing_functor<ArgType,RowIndexType,ColIndexType>::MatrixType>
-	indexing(const Eigen::MatrixBase<ArgType>& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
+	indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
 	{
 	  typedef indexing_functor<ArgType,RowIndexType,ColIndexType> Func;
 	  typedef typename Func::MatrixType MatrixType;
