@@ -479,24 +479,28 @@ dnpdiscnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, cons
 namespace Eigen {
 	template<class ArgType, class RowIndexType, class ColIndexType>
 	class indexing_functor {
-	  const ArgType &m_arg;
-	  const RowIndexType &m_rowIndices;
-	  const ColIndexType &m_colIndices;
+		const ArgType &m_arg;
+		const RowIndexType &m_rowIndices;
+		const ColIndexType &m_colIndices;
 	public:
-	  typedef Matrix<typename ArgType::Scalar,
-	                 RowIndexType::SizeAtCompileTime,
-	                 ColIndexType::SizeAtCompileTime,
-	                 ArgType::Flags&RowMajorBit?RowMajor:ColMajor,
-	                 RowIndexType::MaxSizeAtCompileTime,
-	                 ColIndexType::MaxSizeAtCompileTime> MatrixType;
-	 
-	  indexing_functor(const ArgType& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
-	    : m_arg(arg), m_rowIndices(row_indices), m_colIndices(col_indices)
-	  {}
-	 
-	  const typename ArgType::Scalar& operator() (Index row, Index col) const {
-	    return m_arg(m_rowIndices[row], m_colIndices[col]);
-	  }
+		typedef Matrix<typename ArgType::Scalar,
+		             RowIndexType::SizeAtCompileTime,
+		             ColIndexType::SizeAtCompileTime,
+		             ArgType::Flags&RowMajorBit?RowMajor:ColMajor,
+		             RowIndexType::MaxSizeAtCompileTime,
+		             ColIndexType::MaxSizeAtCompileTime> MatrixType;
+
+		indexing_functor(const ArgType& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
+		: m_arg(arg), m_rowIndices(row_indices), m_colIndices(col_indices)
+		{}
+
+		const typename ArgType::Scalar& operator() (Index row, Index col) const {
+			return m_arg(m_rowIndices[row], m_colIndices[col]);
+		}
+
+		const typename ArgType::Scalar& operator() (Index row) const {
+			return m_arg.coef(m_rowIndices[row]);
+		}
 	};
 
 
@@ -504,9 +508,19 @@ namespace Eigen {
 	CwiseNullaryOp<indexing_functor<ArgType,RowIndexType,ColIndexType>, typename indexing_functor<ArgType,RowIndexType,ColIndexType>::MatrixType>
 	indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
 	{
-	  typedef indexing_functor<ArgType,RowIndexType,ColIndexType> Func;
-	  typedef typename Func::MatrixType MatrixType;
-	  return MatrixType::NullaryExpr(row_indices.size(), col_indices.size(), Func(arg.derived(), row_indices, col_indices));
+		typedef indexing_functor<ArgType,RowIndexType,ColIndexType> Func;
+		typedef typename Func::MatrixType MatrixType;
+		return MatrixType::NullaryExpr(row_indices.size(), col_indices.size(), Func(arg.derived(), row_indices, col_indices));
+	}
+
+	template <class ArgType, class RowIndexType>
+	CwiseNullaryOp<indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> >, typename indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> >::MatrixType>
+	indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices)
+	{
+		EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);	
+		typedef indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> > Func;
+		typedef typename Func::MatrixType MatrixType;
+		return MatrixType::NullaryExpr(row_indices.size(), Func(arg.derived(), row_indices, Eigen::VectorXi::Zero(1)));
 	}
 }
 
@@ -570,14 +584,14 @@ inline Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b){
 		p[maxind] = 1;
 		index.lazyAssign(index2num(p));
 		s.setZero();
-		vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index, Eigen::VectorXi::Zero(1))), p);
+		vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index)), p);
 		while ((p.array() > 0).select(s, one).minCoeff() <= 0){
-			alpha = indexing(x.cwiseQuotient(x - s).eval(), index2num(((p.array() > 0).select(s, one).array() <= 0).cast<int>()), Eigen::VectorXi::Zero(1)).minCoeff();
+			alpha = indexing(x.cwiseQuotient(x - s).eval(), index2num(((p.array() > 0).select(s, one).array() <= 0).cast<int>())).minCoeff();
 			x.noalias() += alpha * (s - x);
 			p.array() *= (x.array() > 0).cast<int>();
 			index.lazyAssign(index2num(p));
 			s.setZero();
-			vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index, Eigen::VectorXi::Zero(1))), p);
+			vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index)), p);
 		}
 		x = s;
 		w = ZX - ZZ * x;

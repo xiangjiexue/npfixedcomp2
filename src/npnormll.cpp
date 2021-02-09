@@ -53,7 +53,7 @@ public:
 		}
 
 		if (d1){
-			ansd1 = (mu.transpose().colwise().replicate(this->len).colwise() - this->data).cwiseProduct(temp).transpose() * fullden  / (this->beta * this->beta) * scale;
+			ansd1 = (mu.transpose().colwise().replicate(this->len).colwise() - this->data).cwiseProduct(temp).transpose() * fullden * (scale / this->beta / this->beta);
 		}
 	}
 

@@ -9,8 +9,8 @@
 inline void simplifymix(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0){
 	if (mu0.size() != 1) {
 		Eigen::VectorXi index = index2num((pi0.array() == 0).select(Eigen::VectorXi::Zero(pi0.size()), Eigen::VectorXi::Ones(pi0.size())));
-		Eigen::VectorXd mu0new = indexing(mu0, index, Eigen::VectorXi::Zero(1));
-		Eigen::VectorXd pi0new = indexing(pi0, index, Eigen::VectorXi::Zero(1));
+		Eigen::VectorXd mu0new = indexing(mu0, index);
+		Eigen::VectorXd pi0new = indexing(pi0, index);
 		// int count = pi0.size() - pi0.cwiseEqual(0).count(), index = 0;
 		// Eigen::VectorXd mu0new(count), pi0new(count);
 		// for (int i = 0; i < mu0.size(); i++){
@@ -66,8 +66,8 @@ inline void sortmix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0){
 	// 	mu0[i] = mu0new[index[i]];
 	// 	pi0[i] = pi0new[index[i]];
 	// }
-	mu0 = indexing(mu0new, index, Eigen::VectorXi::Zero(1));
-	pi0 = indexing(pi0new, index, Eigen::VectorXi::Zero(1));
+	mu0 = indexing(mu0new, index);
+	pi0 = indexing(pi0new, index);
 }
 
 inline double newmin(const Eigen::Vector3d &x, const Eigen::Vector3d &fx){
@@ -150,7 +150,7 @@ public:
 		} while(true);
 	}
 
-	void Brmin(double & x, const double &lb, const double &ub, 
+	double Brmin(const double &lb, const double &ub, 
 		const Eigen::VectorXd &dens, const double & tol = 1e-6) const{
 		double fa, fb, a = lb, b = ub, duma, dumb;
 		this->gradfun(a, dens, duma, fa, false, true);
@@ -198,10 +198,10 @@ public:
 
 		if (std::abs(fc) < tol){
 			// this->gradfun(c, dens, dumc, fc, true, false);
-			x = c; // fx = dumc;
+			return c; // fx = dumc;
 		}else{
 			// this->gradfun(s, dens, dums, fs, true, false);
-			x = s; // fx = dums;
+			return s; // fx = dums;
 		}
 	}
 
@@ -212,13 +212,17 @@ public:
 		Eigen::VectorXi index = index2num((pointsgrad.head(L - 1).array() < 0).cast<int>() * (pointsgrad.tail(L - 1).array() > 0).cast<int>());
 		Eigen::VectorXd ans(index.size());
 		if (index.size() > 0){
-			double x;
-			for (auto i = 0; i < ans.size(); ++i){
-				this->Brmin(x, gridpoints[index[i]], gridpoints[index[i] + 1], dens);
-				ans[i] = x;
-			}
+			ans = Eigen::VectorXd::NullaryExpr(index.size(),
+				[this, &index, &dens](Eigen::Index row){
+					return this->Brmin(this->gridpoints[index[row]], this->gridpoints[index[row] + 1], dens);
+				});
+			// double x;
+			// for (auto i = 0; i < ans.size(); ++i){
+			// 	this->Brmin(x, gridpoints[index[i]], gridpoints[index[i] + 1], dens);
+			// 	ans[i] = x;
+			// }
 			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
-			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()), Eigen::VectorXd::Zero(1));
+			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
 		}else{
 			return ans;
 		}
