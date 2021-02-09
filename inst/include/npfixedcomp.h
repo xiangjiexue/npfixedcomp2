@@ -110,8 +110,8 @@ public:
 	// For each method, need passing lossfunction, gradfun, computeweights
 
 	// check loss function
-	void checklossfun(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0, const Eigen::VectorXd &eta,
-		const Eigen::VectorXd &p, const int &maxit = 100) const{
+	void checklossfun(const Eigen::VectorXd & mu0, Eigen::VectorXd & pi0, const Eigen::VectorXd &eta,
+		const Eigen::VectorXd &p, const int &maxit = 10) const{
 		double llorigin = this->lossfunction(this->mapping(mu0, pi0));
 		double sigma = 0.5, alpha = 1/3, u = -1.;
 		double con = - p.dot(eta);
@@ -131,6 +131,28 @@ public:
 				break;
 			}
 		}while(true);
+	}
+
+	virtual void checklossfun2(const Eigen::VectorXd &diff, Eigen::VectorXd &pi0, const Eigen::VectorXd &eta,
+		const Eigen::VectorXd &p, const Eigen::VectorXd &dens) const{
+		double llorigin = this->lossfunction(dens);
+		double sigma = 2., alpha = 1/3;
+		double con = - p.dot(eta);
+		double lhs, rhs;
+		Eigen::VectorXd ans(pi0);
+		do{
+			sigma *= .5;
+			lhs = this->lossfunction(dens + sigma * diff);
+			rhs = llorigin + alpha * sigma * con;
+			if (lhs < rhs){
+				ans = pi0 + sigma * eta;
+				break;
+			}
+			if (sigma < 0.001){
+				break;
+			}
+		}while(true);
+		pi0 = ans;
 	}
 
 	// collapsing
@@ -228,7 +250,7 @@ public:
 		}
 	}
 
-	void Dfmin(double & x, double & fx, const Eigen::Vector3d &x1, const Eigen::Vector3d &fx1,
+	double Dfmin(const Eigen::Vector3d &x1, const Eigen::Vector3d &fx1,
 		const Eigen::VectorXd &dens, const double &tol = 1e-6) const{
 		double lb = x1[0], ub = x1[1], newpoint, fnewpoint, dummy;
 		Eigen::Vector3d xx(x1), fxx(fx1);
@@ -236,6 +258,10 @@ public:
 		if (fxx[0] < fxx[1]){
 			std::swap(xx[0], xx[1]);
 			std::swap(fxx[0], fxx[1]);
+		}
+		if (fxx[1] < fxx[2]){
+			std::swap(xx[1], xx[2]);
+			std::swap(fxx[1], fxx[2]);
 		}	
 
 		while (ub - lb > tol){
@@ -271,7 +297,11 @@ public:
 			}
 		}
 
-		x = xx[2]; fx = fxx[2];
+		if (fxx[2] < 0){
+			return xx[2];
+		}else{
+			return NAN;
+		}
 	}
 
 	Eigen::VectorXd solvegradd0(const Eigen::VectorXd &dens) const{
@@ -279,24 +309,28 @@ public:
 		this->gradfunvec(gridpoints, dens, pointsval, pointsgrad, true, false);
 		Eigen::VectorXd temp = diff_(pointsval);
 		const int L = temp.size();
-		int length = 0;
 		Eigen::VectorXi index = index2num((temp.head(L - 1).array() < 0).cast<int>() * (temp.tail(L - 1).array() > 0).cast<int>());
 		Eigen::VectorXd ans(index.size());
 		if (index.size() > 0){
-			double x, fx;
-			Eigen::Vector3d inputx(3), inputfx(3);
-			for (auto i = 0; i < ans.size(); ++i){
-				inputx << gridpoints[index[i]], gridpoints[index[i] + 2], gridpoints[index[i] + 1];
-    			inputfx << pointsval[index[i]], pointsval[index[i] + 2], pointsval[index[i] + 1];
-    			this->Dfmin(x, fx, inputx, inputfx, dens);
-				if (fx < 0){
-    				ans[length] = x;
-    				length++;
-    			}
-			}
-			ans.conservativeResize(length);
+			ans = Eigen::VectorXd::NullaryExpr(index.size(),
+				[this, &index, &dens, &pointsval](Eigen::Index row){
+					return this->Dfmin(this->gridpoints.segment<3>(index[row]), pointsval.segment<3>(index[row]), dens);
+				});
+			return indexing(ans, index2num(1 - ans.array().isNaN().cast<int>()));
+			// double x, fx;
+			// for (auto ptr = index.data(); ptr < index.data() + index.size(); ptr++){
+			// 	// inputx << gridpoints[index[i]], gridpoints[index[i] + 2], gridpoints[index[i] + 1];
+   //  			// inputfx << pointsval[index[i]], pointsval[index[i] + 2], pointsval[index[i] + 1];
+   //  			this->Dfmin(x, fx, gridpoints.segment<3>(*ptr), pointsval.segment<3>(*ptr), dens);
+			// 	if (fx < 0){
+   //  				ans[length] = x;
+   //  				length++;
+   //  			}
+			// }
+			// ans.conservativeResize(length);
+		}else{
+			return ans;
 		}
-		return ans;
 	}
 
 	Eigen::VectorXd solvegrad(const Eigen::VectorXd &dens) const{
@@ -317,6 +351,12 @@ public:
 		do{
 			newpoints.lazyAssign(this->solvegrad(dens));
 
+			mu0.conservativeResize(mu0.size() + newpoints.size());
+			pi0.conservativeResize(pi0.size() + newpoints.size());
+			mu0.tail(newpoints.size()) = newpoints;
+			pi0.tail(newpoints.size()) = Eigen::VectorXd::Zero(newpoints.size());
+			sortmix(mu0, pi0);
+
 			if (verbose >= 1){
 				Rcpp::Rcout<<"Iteration: "<<iter<<" with loss "<<nloss<<std::endl;
 				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
@@ -331,7 +371,8 @@ public:
 				Rcpp::Rcout<<"gradient derivative: "<<pointsgrad.transpose()<<std::endl;
 			}
 
-			this->computeweights(mu0, pi0, dens, newpoints); // return using mu0, pi0? remember to sort
+			this->computeweights(mu0, pi0, dens); // return using mu0, pi0? remember to sort
+			this->collapse(mu0, pi0);
 			iter++;
 			dens = this->mapping(mu0, pi0);
 			nloss = this->lossfunction(dens);
@@ -490,8 +531,7 @@ public:
 		}
 	}
 
-	virtual void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
-		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{}
+	virtual void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{}
 
 	virtual double extrafun() const{
 		return 0;

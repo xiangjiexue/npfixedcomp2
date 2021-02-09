@@ -46,23 +46,11 @@ public:
 		}
 	}
 
-	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
-		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{
-		Eigen::VectorXd mu0new(mu0.size() + newpoints.size());
-		Eigen::VectorXd pi0new(pi0.size() + newpoints.size());
-		mu0new.head(mu0.size()) = mu0; mu0new.tail(newpoints.size()) = newpoints;
-		pi0new.head(pi0.size()) = pi0; pi0new.tail(newpoints.size()) = Eigen::VectorXd::Zero(newpoints.size());
-
-		sortmix(mu0new, pi0new);
-
+	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
 		Eigen::VectorXd fp = dens + this->precompute;
-		Eigen::MatrixXd sp = dtarray(this->data, mu0new, this->beta).array().colwise() / fp.array();
-		Eigen::VectorXd nw = pnnlssum_(sp, Eigen::VectorXd::Constant(this->len, 2.) - this->precompute.cwiseQuotient(fp), 1. - this->pi0fixed.sum());
-		this->checklossfun(mu0new, pi0new, nw - pi0new, sp.colwise().sum());
-		this->collapse(mu0new, pi0new);
-
-		mu0.lazyAssign(mu0new);
-		pi0.lazyAssign(pi0new);
+		Eigen::MatrixXd sp = dtarray(this->data, mu0, this->beta), tp = sp.array().colwise() / fp.array();
+		Eigen::VectorXd nw = pnnlssum_(tp, 2. - this->precompute.array() / fp.array(), 1. - this->pi0fixed.sum());
+		this->checklossfun2(sp * nw - dens, pi0, nw - pi0, tp.colwise().sum(), dens);
 	}
 
 	double hypofun(const double &ll, const double &minloss) const{

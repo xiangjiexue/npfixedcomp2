@@ -60,19 +60,8 @@ public:
 		}
 	}
 
-	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
-		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{
-		Eigen::VectorXd mu0new(mu0.size() + newpoints.size());
-		mu0new.head(mu0.size()) = mu0; mu0new.tail(newpoints.size()) = newpoints;
-
-		Eigen::VectorXd pi0new = pnnlssum_(pnormarray(this->data, mu0new, this->beta), this->precompute, 1. - this->pi0fixed.sum());
-
-		sortmix(mu0new, pi0new);
-
-		this->collapse(mu0new, pi0new);
-
-		mu0.lazyAssign(mu0new);
-		pi0.lazyAssign(pi0new);
+	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
+		pi0 = pnnlssum_(pnormarray(this->data, mu0, this->beta), this->precompute, 1. - this->pi0fixed.sum());
 	}
 
 	double extrafun() const{
@@ -169,20 +158,9 @@ public:
 		}
 	}
 
-	void computeweights(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, 
-		const Eigen::VectorXd &dens, const Eigen::VectorXd &newpoints) const{
-		Eigen::VectorXd mu0new(mu0.size() + newpoints.size());
-		mu0new.head(mu0.size()) = mu0; mu0new.tail(newpoints.size()) = newpoints;
-
-		Eigen::VectorXd pi0new = pnnlssum_(pdiscnormarray(this->data, mu0new, this->beta, this->h).array().colwise() * this->weights.array().sqrt(),
+	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
+		pi0 = pnnlssum_(pdiscnormarray(this->data, mu0, this->beta, this->h).array().colwise() * this->weights.array().sqrt(),
 			this->precompute.array() * this->weights.array().sqrt(), 1. - this->pi0fixed.sum());
-
-		sortmix(mu0new, pi0new);
-
-		this->collapse(mu0new, pi0new);
-
-		mu0.lazyAssign(mu0new);
-		pi0.lazyAssign(pi0new);
 	}
 
 	double extrafun() const{
