@@ -8,7 +8,7 @@
 
 inline void simplifymix(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0){
 	if (mu0.size() != 1) {
-		Eigen::VectorXi index = index2num((pi0.array() == 0).select(Eigen::VectorXi::Zero(pi0.size()), Eigen::VectorXi::Ones(pi0.size())));
+		Eigen::VectorXi index = index2num((pi0.array().abs() < 1e-14).select(Eigen::VectorXi::Zero(pi0.size()), Eigen::VectorXi::Ones(pi0.size())));
 		Eigen::VectorXd mu0new = indexing(mu0, index);
 		Eigen::VectorXd pi0new = indexing(pi0, index);
 		// int count = pi0.size() - pi0.cwiseEqual(0).count(), index = 0;
@@ -170,6 +170,7 @@ public:
 				mu0.lazyAssign(mu0new);
 			}else{break;}
 		} while(true);
+		simplifymix(mu0, pi0);
 	}
 
 	double Brmin(const double &lb, const double &ub, 

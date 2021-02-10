@@ -584,14 +584,14 @@ inline Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b){
 		p[maxind] = 1;
 		index.lazyAssign(index2num(p));
 		s.setZero();
-		vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index)), p);
+		vecsubassign(s, indexing(ZZ, index, index).ldlt().solve(indexing(ZX, index)), p);
 		while ((p.array() > 0).select(s, one).minCoeff() <= 0){
 			alpha = indexing(x.cwiseQuotient(x - s).eval(), index2num(((p.array() > 0).select(s, one).array() <= 0).cast<int>())).minCoeff();
 			x.noalias() += alpha * (s - x);
 			p.array() *= (x.array() > 0).cast<int>();
 			index.lazyAssign(index2num(p));
 			s.setZero();
-			vecsubassign(s, indexing(ZZ, index, index).llt().solve(indexing(ZX, index)), p);
+			vecsubassign(s, indexing(ZZ, index, index).ldlt().solve(indexing(ZX, index)), p);
 		}
 		x = s;
 		w = ZX - ZZ * x;
@@ -611,9 +611,13 @@ inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd
 
 // The program pnnqp using LLT
 inline Eigen::VectorXd pnnqp_(const Eigen::MatrixXd &q, const Eigen::VectorXd &p, const double &sum){
-	Eigen::LLT<Eigen::MatrixXd> llt;
-	llt.compute(q);
-	return pnnlssum_(llt.matrixU(), llt.matrixL().solve(-p), sum);
+	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eig;
+	eig.compute(q);
+	Eigen::VectorXd eigvec = eig.eigenvalues();
+	Eigen::MatrixXd eigmat = eig.eigenvectors();
+	int index = (eigvec.array() > eigvec[0] * 1e-15).count();
+	return pnnlssum_((eigmat.leftCols(index) * eigvec.head(index).cwiseSqrt().asDiagonal()).transpose(), 
+		(eigmat.leftCols(index).transpose() * -p).cwiseQuotient(eigvec.head(index).cwiseSqrt()), sum);
 }
 
 #endif
