@@ -559,20 +559,6 @@ inline Eigen::VectorXi index2num(const Eigen::VectorXi &index){
 	return ans;
 }
 
-
-inline void vecsubassign(Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eigen::VectorXi &index){
-	// y is of size index.sum();
-	// This function should only be used before Eigen 3.4.
-	// In Eigen 3.4 there is a built-in function for slicing.
-	int j = 0;
-	for (int i = 0; i < x.size(); i++){
-		if (index[i] > 0){
-			x[i] = y[j];
-			j++;
-		}
-	}
-}
-
 inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
 	int m = A.rows(), n = A.cols();
 	Eigen::MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();

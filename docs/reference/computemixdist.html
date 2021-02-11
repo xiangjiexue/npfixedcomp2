@@ -198,7 +198,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 <span class='va'>data</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1000</span>, mean <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.032   0.001   0.033 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.033   0.001   0.034 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 24
 #&gt; 
@@ -239,7 +239,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -4.607426e-15
+#&gt; [1] -2.650657e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -264,7 +264,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"nptll"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.062   0.001   0.063 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.064   0.001   0.065 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 20
 #&gt; 
@@ -272,7 +272,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npt"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -0.0001828467
+#&gt; [1] -0.0001828517
 #&gt; 
 #&gt; $beta
 #&gt; [1] Inf
@@ -297,7 +297,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormad"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.021   0.000   0.022 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.021   0.001   0.021 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 12
 #&gt; 
@@ -305,7 +305,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -0.0003599018
+#&gt; [1] -0.0003599026
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -330,7 +330,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Hyperbolic.html'>tanh</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcll"</span>, beta <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.054   0.001   0.055 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.064   0.002   0.068 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 19
 #&gt; 
@@ -338,21 +338,21 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npnormc"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -6.35714e-06
+#&gt; [1] -6.35625e-06
 #&gt; 
 #&gt; $beta
 #&gt; [1] 4
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt;  [1] -0.97592035 -0.91581992 -0.78102071  0.00000000  0.02846399  0.73497170
-#&gt;  [7]  0.84823232  0.95219383  0.97788278  0.98580296  0.98732489  0.99610280
-#&gt; [13]  0.99818689  0.99921159  0.99958934
+#&gt;  [1] -0.97592035 -0.91581992 -0.78102072  0.00000000  0.02846393  0.73497169
+#&gt;  [7]  0.84823234  0.95219383  0.97788278  0.98580296  0.98732489  0.99610280
+#&gt; [13]  0.99818689  0.99921159  0.99958933
 #&gt; 
 #&gt; $mix$pr
-#&gt;  [1] 7.732227e-05 2.710596e-02 6.047501e-02 0.000000e+00 3.285847e-01
-#&gt;  [6] 1.428885e-01 7.814903e-02 1.371633e-01 6.232461e-02 5.484384e-02
-#&gt; [11] 3.291959e-02 4.286430e-02 1.712639e-02 1.460179e-02 8.757215e-04
+#&gt;  [1] 7.732227e-05 2.710596e-02 6.047500e-02 0.000000e+00 3.285847e-01
+#&gt;  [6] 1.428885e-01 7.814901e-02 1.371633e-01 6.232461e-02 5.484386e-02
+#&gt; [11] 3.291959e-02 4.286430e-02 1.712638e-02 1.460177e-02 8.757495e-04
 #&gt; 
 #&gt; 
 #&gt; $ll
@@ -367,7 +367,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormllw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.083   0.001   0.084 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.081   0.001   0.082 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 24
 #&gt; 
@@ -375,14 +375,14 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -0.0001647844
+#&gt; [1] -0.0001647869
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 0.147180 1.972370 3.009666
+#&gt; [1] 0.000000 0.147180 1.972369 3.009666
 #&gt; 
 #&gt; $mix$pr
 #&gt; [1] 0.00000000 0.53032367 0.45833569 0.01134064
@@ -400,7 +400,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcvmw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.032   0.000   0.032 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.035   0.000   0.035 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 9
 #&gt; 
@@ -408,7 +408,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -1.630403e-14
+#&gt; [1] -4.5634e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -433,7 +433,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormadw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.012   0.000   0.012 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.012   0.001   0.012 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 12
 #&gt; 
@@ -441,7 +441,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -5.592483e-09
+#&gt; [1] -5.594529e-09
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -451,7 +451,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; [1] 0.000000 0.156645 1.930258 2.118926
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.0000000 0.5333871 0.2785507 0.1880622
+#&gt; [1] 0.0000000 0.5333871 0.2785506 0.1880622
 #&gt; 
 #&gt; 
 #&gt; $ll
@@ -466,7 +466,7 @@ There is no default beta. The structure beta is the number of observations.</p><
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>nspmix</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nspmix/man/cnm.html'>cnm</a></span><span class='op'>(</span><span class='fu'>nspmix</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nspmix/man/npnorm.html'>npnorm</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.098   0.029   0.129 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.102   0.032   0.135 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
