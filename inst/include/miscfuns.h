@@ -2,6 +2,8 @@
 #define miscfuns_h
 #define EIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS
 
+extern "C" void pnnls_(double* A, int* MDA, int* M, int* N, double* B, double* X, double* RNORM, double* W, double* ZZ, int* INDEX, int* MODE, int* K);
+
 // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
 // we only include RcppEigen.h which pulls Rcpp.h in for us
@@ -571,40 +573,15 @@ inline void vecsubassign(Eigen::VectorXd &x, const Eigen::VectorXd &y, const Eig
 	}
 }
 
-inline Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b){
-	// fnnls by Bros and Jong (1997)
-	int n = A.cols();
-	Eigen::VectorXi p = Eigen::VectorXi::Zero(n), index;
-	Eigen::VectorXd x = Eigen::VectorXd::Zero(n), ZX = A.transpose() * b, s(n), one = Eigen::VectorXd::Ones(n);
-	Eigen::MatrixXd ZZ = A.transpose() * A;
-	Eigen::VectorXd w = ZX - ZZ * x;
-	int maxind, iter = 0;
-	double alpha, tol = std::max(ZX.array().abs().maxCoeff(), ZZ.array().abs().maxCoeff()) * 10 * std::numeric_limits<double>::epsilon();
-	while ((p.array() == 0).count() > 0 & (p.array() == 0).select(w, -1 * one).maxCoeff(&maxind) > tol & iter < 3 * n){
-		p[maxind] = 1;
-		index.lazyAssign(index2num(p));
-		s.setZero();
-		vecsubassign(s, indexing(ZZ, index, index).householderQr().solve(indexing(ZX, index)), p);
-		while ((p.array() > 0).select(s, one).minCoeff() <= 0){
-			alpha = indexing(x.cwiseQuotient(x - s).eval(), index2num(((p.array() > 0).select(s, one).array() <= 0).cast<int>())).minCoeff();
-			x.noalias() += alpha * (s - x);
-			p.array() *= (x.array() > 0).cast<int>();
-			index.lazyAssign(index2num(p));
-			s.setZero();
-			vecsubassign(s, indexing(ZZ, index, index).householderQr().solve(indexing(ZX, index)), p);
-		}
-		x = s;
-		w = ZX - ZZ * x;
-		iter++;
-	}
-	return x;
-}
-
 inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
 	int m = A.rows(), n = A.cols();
 	Eigen::MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
-	Eigen::VectorXd x(n), bb = Eigen::VectorXd::Zero(m).homogeneous();
-	x = nnls(AA, bb);
+	Eigen::VectorXd x(n), bb = Eigen::VectorXd::Zero(m).homogeneous(), w(n), zz(m + 1);
+	double rnorm;
+	Eigen::VectorXi index(n);
+	int mode, k = 0;
+	m++;
+	pnnls_(AA.data(), &m, &m, &n, bb.data(), x.data(), &rnorm, w.data(), zz.data(), index.data(), &mode, &k);
 	x = x / x.sum() * sum;
 	return x;
 }
