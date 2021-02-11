@@ -584,14 +584,14 @@ inline Eigen::VectorXd nnls(const Eigen::MatrixXd &A, const Eigen::VectorXd &b){
 		p[maxind] = 1;
 		index.lazyAssign(index2num(p));
 		s.setZero();
-		vecsubassign(s, indexing(ZZ, index, index).ldlt().solve(indexing(ZX, index)), p);
+		vecsubassign(s, indexing(ZZ, index, index).householderQr().solve(indexing(ZX, index)), p);
 		while ((p.array() > 0).select(s, one).minCoeff() <= 0){
 			alpha = indexing(x.cwiseQuotient(x - s).eval(), index2num(((p.array() > 0).select(s, one).array() <= 0).cast<int>())).minCoeff();
 			x.noalias() += alpha * (s - x);
 			p.array() *= (x.array() > 0).cast<int>();
 			index.lazyAssign(index2num(p));
 			s.setZero();
-			vecsubassign(s, indexing(ZZ, index, index).ldlt().solve(indexing(ZX, index)), p);
+			vecsubassign(s, indexing(ZZ, index, index).householderQr().solve(indexing(ZX, index)), p);
 		}
 		x = s;
 		w = ZX - ZZ * x;
