@@ -7,6 +7,8 @@
 #' @import Rcpp RcppEigen nspmix
 #' @importFrom utils getFromNamespace
 #' @importFrom stats pnorm pt qnorm qt cov cov2cor
+#' @importFrom grDevices rainbow
+#' @importFrom graphics abline lines points
 #' @useDynLib npfixedcomp2
 #' @name npfixedcomp2
 NULL

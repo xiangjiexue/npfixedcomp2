@@ -5,13 +5,17 @@
 \alias{covestEB.cor}
 \title{Estimating Covariance Matrix using Empirical Bayes}
 \usage{
-covestEB(X, order = -3, verbose = FALSE, force.nonbin = FALSE)
+covestEB(X, estpi0 = FALSE, order = -3, verbose = FALSE, force.nonbin = FALSE)
 
 covestEB.cor(X, verbose = FALSE)
 }
 \arguments{
 \item{X}{a matrix of size n * p, where n is the number of observations and
 p is the number of variables}
+
+\item{estpi0}{logical; if TRUE, the NPMLE is estimated based on the
+estimation of pi0, which in this case can be used to detect sparsity or
+assume sparsity.}
 
 \item{order}{the level of binning to use when the number of observations
 passed to the computation is greater than 5000.}

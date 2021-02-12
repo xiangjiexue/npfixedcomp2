@@ -490,6 +490,7 @@ public:
 				}
 				;
 				sp = (-x1[1] + std::sqrt(x1[1] * x1[1] - 4 * x1[0] * x1[2])) / 2 / x1[0];
+				sp = std::isnan(sp) ? (lb + ub) / 2 : sp;
 
 				mix = this->result["mix"];
 				tmu0 = mix["pt"]; tpi0 = mix["pr"];

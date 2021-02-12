@@ -94,6 +94,9 @@ returnlower = function(v){
 #' @title Estimating Covariance Matrix using Empirical Bayes
 #' @param X a matrix of size n * p, where n is the number of observations and
 #' p is the number of variables
+#' @param estpi0 logical; if TRUE, the NPMLE is estimated based on the
+#' estimation of pi0, which in this case can be used to detect sparsity or
+#' assume sparsity.
 #' @param order the level of binning to use when the number of observations
 #' passed to the computation is greater than 5000.
 #' @param verbose logical; If TRUE, the intermediate results will be shown.
@@ -109,16 +112,24 @@ returnlower = function(v){
 #' system.time(ans <- covestEB(X))
 #' system.time(ans1 <- covestEB.cor(X))
 #' @export
-covestEB = function(X, order = -3, verbose = FALSE, force.nonbin = FALSE){
+covestEB = function(X, estpi0 = FALSE, order = -3, verbose = FALSE, force.nonbin = FALSE){
   p = dim(X)[2]
   n = dim(X)[1]
   covest = cov(X)
   index = diag(covest) > .Machine$double.eps
   fisherdata = atanh(extractlower(cov2cor(covest[index, index])))
-  if (length(fisherdata) > 5000 & !force.nonbin){
-    r = computemixdist(fisherdata, method = "npnormllw", order = order, beta = sqrt(1 / (n - 3)), verbose = verbose)
+  if (estpi0){
+    if (length(fisherdata) > 5000& !force.nonbin){
+      r = estpi0(fisherdata, method = "npnormllw", order = order, beta = sqrt(1 / (n - 3)), verbose = verbose, val = 1)
+    }else{
+      r = estpi0(fisherdata, beta = sqrt(1 / (n - 3)), verbose = verbose, val = 1)
+    }
   }else{
-    r = computemixdist(fisherdata, beta = sqrt(1 / (n - 3)), verbose = verbose)
+    if (length(fisherdata) > 5000 & !force.nonbin){
+      r = computemixdist(fisherdata, method = "npnormllw", order = order, beta = sqrt(1 / (n - 3)), verbose = verbose)
+    }else{
+      r = computemixdist(fisherdata, beta = sqrt(1 / (n - 3)), verbose = verbose)
+    }
   }
   
   postmean = posteriormean(fisherdata, r, fun = tanh)
@@ -163,4 +174,106 @@ covestEB.cor = function(X, verbose = FALSE){
        correction = ifelse(ans1$iterations == 0, FALSE, TRUE),
        correction.Fnorm = norm(ans2 - ans, type = "F"),
        mix.dist = r)
+}
+
+#' plot the mapping between the original observations and its posterior mean
+#'
+#' This function explicity considers that map between the transformed sample
+#' correlation coefficients to the posterior mean of tanh(x) under normal cases.
+#' \code{result} typically is the mixing distribution of the transformed sample
+#' correlations and \code{result2} is the mixing distribution on the sample
+#' correlation scale.
+#'
+#' @title plot the posterier map
+#' @param x a vector of observations
+#' @param result an object of class nspmix to show in the top
+#' @param result2 an object of class nspmix to show in the bottom. If NULL,
+#' then the density in the bottom is not drawn.
+#' @param ... other parameter passed to \code{plot}
+#' @return none
+#' @examples
+#' n = 100; p = 50
+#' X = matrix(rnorm(n * p), nrow = n, ncol = p)
+#' r = cor(X)
+#' r1 = computemixdist(atanh(extractlower(r)), beta = 1 / sqrt(n - 3))
+#' plotposteriormapping(atanh(extractlower(r)), r1)
+#' @export
+plotposteriormapping = function(x, result, result2 = NULL, ...){
+  values = 0;
+  plot(values, 0, xlim = range(x), ylim = c(0, 1), type = "n", ylab = "", yaxt = "n", ...)
+  ordered.x = sort(x)
+  postmean = posteriormean(ordered.x, result, tanh)
+  cols = rainbow(length(ordered.x), end = 0.85)
+  sapply(1:length(ordered.x), function(ddd){
+    points(tanh(ordered.x[ddd]), 1, col = cols[ddd], pch = 16)
+    points(ordered.x[ddd], 0.5, col = cols[ddd], pch = 16)
+    points(postmean[ddd], 0, col = cols[ddd], pch = 16)
+    lines(c(ordered.x[ddd], tanh(ordered.x[ddd])), c(0.5, 1), col = cols[ddd])
+    lines(c(ordered.x[ddd], postmean[ddd]), c(0.5, 0), col = cols[ddd])
+  })
+  points(result$mix$pt, rep(0.5, length(result$mix$pt)))
+  sapply(1:length(result$mix$pr), function(ddd){
+    lines(rep(result$mix$pt[ddd], 2), 0.5 + c(0, result$mix$pr[ddd] * 0.18), lwd = 3)
+  })
+  d = seq(min(x), to = max(x), length = 1000)
+  dens = dnpnorm(d, mu0 = result$mix$pt, pi0 = result$mix$pr, stdev = result$beta)
+  lines(d, dens / max(dens) * 0.2 + 0.5, lwd = 2)
+  abline(h = c(0, 0.5, 1), lwd = 0.5)
+  if (!is.null(result2)){
+    points(result2$mix$pt, rep(0, length(result2$mix$pt)))
+    sapply(1:length(result2$mix$pr), function(ddd){
+      lines(rep(result2$mix$pt[ddd], 2), c(0, result2$mix$pr[ddd] * 0.18), lwd = 3)
+    })
+    d2 = pmin(pmax(-0.95, seq(min(x), to = max(x), length = 1000)), 0.95)
+    dens2 = dnpnormc(d2, mu0 = result2$mix$pt, pi0 = result2$mix$pr, n = ceiling((1 / result$beta)^2 + 3))
+    lines(d2, dens2 / max(dens2) * 0.2, lwd = 2)
+  }
+  
+  NULL
+}
+
+#' Implementation of several FDR-controlling procedure in R.
+#'
+#' The function \code{adaptive.stepdown} is a simple implementation of the
+#' adaptive step-down procedure described in Gavrilov et al. (2009)
+#'
+#' The function \code{BH} is a direct implementation of the procedure
+#' described in Benjamini and Hochberg (1995).
+#'
+#' @title FDR controlling procedures
+#' @param pval a vector of p-values (no necessarily sorted)
+#' @param alpha given FDR level
+#' @return a list with num.rejection, the number of rejections computed by this function,
+#' and classifer, a vector of TRUE and FALSE; if TRUE, the corresponding input is regarded
+#' as null, and as non-null if otherwise.
+#' @examples
+#' adaptive.stepdown(pnorm(-abs(rnorm(1000, c(0, 2)))) * 2)
+#' BH(pnorm(-abs(rnorm(1000, c(0, 2)))) * 2)
+#' @name FDRcontrol
+NULL
+
+#' @rdname FDRcontrol
+#' @export
+adaptive.stepdown = function(pval, alpha = 0.05){
+  pval.sorted = sort(pval)
+  LLL = length(pval)
+  # alpha / (1 - alpha) = i*q/(m + 1 - i)
+  # alpha =  i * q / (m + 1 - i) * (1 - alpha)
+  # alpha =  (i * q / (m + 1 - i)) / (1 + i * q / (m + 1 - i))
+  const = 1:LLL * alpha / LLL:1
+  a = const / (1 + const)
+  k = match(FALSE, pval.sorted <= a)
+  list(num.rejection = k - 1,
+       classifier = pval >= pval.sorted[k])
+}
+
+#' @rdname FDRcontrol
+#' @export
+BH = function(pval, alpha = 0.05){
+  pval.sorted = sort(pval, decreasing = TRUE)
+  LLL = length(pval)
+  a = LLL:1 * alpha / LLL
+  k = match(TRUE, pval.sorted <= a)
+  list(num.rejection = ifelse(is.na(k), 0, LLL + 1 - k),
+       classifier = if (is.na(k)) rep(TRUE, LLL) else pval > pval.sorted[k])
 }
