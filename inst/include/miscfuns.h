@@ -124,81 +124,81 @@ dnpnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Ma
 
 
 template<class ArgType, class ArgType2>
-class pnormlog_functor {
+class pnorm_functor {
 	const ArgType &x;
 	const ArgType2 &mu;
 	const double stdev;
-	const bool lt;
+	const bool lt, lg;
 public:
-	pnormlog_functor(const ArgType& x_, const ArgType2 &mu_, const double &stdev_, const bool &lt_) : x(x_), mu(mu_), stdev(stdev_), lt(lt_) {}
+	pnorm_functor(const ArgType& x_, const ArgType2 &mu_, const double &stdev_, const bool &lt_, const bool &lg_) : x(x_), mu(mu_), stdev(stdev_), lt(lt_), lg(lg_) {}
 
 	const double operator() (Index row, Index col) const {
-		return R::pnorm5(x.coeff(row), mu.coeff(col), stdev, lt, true);
+		return R::pnorm5(x.coeff(row), mu.coeff(col), stdev, lt, lg);
 	}
 };
 
 
 template <class ArgType, class ArgType2>
-CwiseNullaryOp<pnormlog_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
-pnormarraylog(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> &mu0, const double &stdev, const bool &lt = true)
+CwiseNullaryOp<pnorm_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
+pnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> &mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
 {
 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
-	return MatrixType::NullaryExpr(x.size(), mu0.size(), pnormlog_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lt));
+	return MatrixType::NullaryExpr(x.size(), mu0.size(), pnorm_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lt, lg));
 }
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
-pnormarraylog(const MatrixBase<ArgType>& x, const double &mu0, const double &stdev, const bool &lt = true)
+pnormarray(const MatrixBase<ArgType>& x, const double &mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
 {
  	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
- 	return pnormarraylog(x, MatrixType::Constant(1, mu0), stdev, lt);
+ 	return pnormarray(x, MatrixType::Constant(1, mu0), stdev, lt, lg);
 }
 
-template <class ArgType>
-inline typename densityarrayscale<ArgType>::MatrixType
-pnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
-{
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
-	MatrixType ans(x.size(), 1);
-	if (lg){
-		ans = pnormarraylog(x, mu0, stdev, lt);
-	}else{
-		if (lt){
-			ans = 0.5 * (1 + ((x.array() - mu0) / (stdev * std::sqrt(2))).erf());
-		}else{
-			ans = 0.5 * ((x.array() - mu0) / (stdev * std::sqrt(2))).erfc();
-		}
-	}
+// template <class ArgType>
+// inline typename densityarrayscale<ArgType>::MatrixType
+// pnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
+// {
+// 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
+// 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+// 	MatrixType ans(x.size(), 1);
+// 	if (lg){
+// 		ans = pnormarraylog(x, mu0, stdev, lt);
+// 	}else{
+// 		if (lt){
+// 			ans = 0.5 * (1 + ((x.array() - mu0) / (stdev * std::sqrt(2))).erf());
+// 		}else{
+// 			ans = 0.5 * ((x.array() - mu0) / (stdev * std::sqrt(2))).erfc();
+// 		}
+// 	}
 
-	return ans;
-}
+// 	return ans;
+// }
 
-template <class ArgType, class ArgType2>
-inline typename densityarray<ArgType, ArgType2>::MatrixType
-pnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
-{
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
-	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
-	MatrixType ans(x.size(), mu0.size());
-	if (lg){
-		ans = pnormarraylog(x, mu0, stdev, lt);
-	}else{
-		if (mu0.size() == 1){
-			ans = pnormarray(x, mu0.coeff(0), stdev, lt, false);
-		}else{
-			if (lt){
-				ans = 0.5 * (1 + ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erf());
-			}else{
-				ans = 0.5 * ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erfc();
-			}		
-		}
+// template <class ArgType, class ArgType2>
+// inline typename densityarray<ArgType, ArgType2>::MatrixType
+// pnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
+// {
+// 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
+// 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
+// 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+// 	MatrixType ans(x.size(), mu0.size());
+// 	if (lg){
+// 		ans = pnormarraylog(x, mu0, stdev, lt);
+// 	}else{
+// 		if (mu0.size() == 1){
+// 			ans = pnormarray(x, mu0.coeff(0), stdev, lt, false);
+// 		}else{
+// 			if (lt){
+// 				ans = 0.5 * (1 + ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erf());
+// 			}else{
+// 				ans = 0.5 * ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erfc();
+// 			}		
+// 		}
 	
-	}
+// 	}
 
-	return ans;
-}
+// 	return ans;
+// }
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
