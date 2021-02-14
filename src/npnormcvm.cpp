@@ -56,7 +56,7 @@ public:
 			ansd0.noalias() += pnormarray(this->data, mu, this->beta).transpose() * fullden * (scale * 2);
 		}
 		if (d1){
-			ansd1 = fullden.transpose() * dnormarray(this->data, mu, this->beta) * -2 * scale;
+			ansd1 = dnormarray(this->data, mu, this->beta).transpose() * fullden * -2 * scale;
 		}
 	}
 
@@ -151,10 +151,10 @@ public:
 		Eigen::VectorXd fullden = (dens - this->precompute).cwiseProduct(this->weights);
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = fullden.transpose() * (pdiscnormarray(this->data, mu, this->beta, this->h) * scale - dens.rowwise().replicate(mu.size())) * 2;
+			ansd0 = (pdiscnormarray(this->data, mu, this->beta, this->h) * scale - dens.rowwise().replicate(mu.size())).transpose() * fullden * 2;
 		}
 		if (d1){
-			ansd1 = fullden.transpose() * ddiscnormarray(this->data, mu, this->beta, this->h) * -2 * scale;
+			ansd1 = ddiscnormarray(this->data, mu, this->beta, this->h).transpose() * fullden * -2 * scale;
 		}
 	}
 

@@ -14,21 +14,93 @@
 \usage{
 computemixdist(v, method = "npnormll", ...)
 
-computemixdist.npnormll(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.npnormll(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 
-computemixdist.npnormcvm(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.npnormcvm(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 
-computemixdist.npnormad(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.npnormad(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 
-computemixdist.npnormcll(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.npnormcll(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 
-computemixdist.nptll(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.nptll(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 
-computemixdist.npnormllw(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.npnormllw(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 
-computemixdist.npnormcvmw(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.npnormcvmw(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 
-computemixdist.npnormadw(v, mu0, pi0, beta, order, mix = NULL, ...)
+computemixdist.npnormadw(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 }
 \arguments{
 \item{v}{a vector of observations}
@@ -46,6 +118,8 @@ computemixdist.npnormadw(v, mu0, pi0, beta, order, mix = NULL, ...)
 \item{order}{the parameter for the binned version.}
 
 \item{mix}{initial mixing distribution.}
+
+\item{gridpoints}{a vector of gridpoints to evaluate new support points}
 }
 \description{
 Computing non-parametric mixing distribution

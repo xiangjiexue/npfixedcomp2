@@ -14,21 +14,21 @@
 \usage{
 estpi0(v, method = "npnormll", ...)
 
-estpi0.npnormll(v, beta, val, order, mix = NULL, ...)
+estpi0.npnormll(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.npnormcvm(v, beta, val, order, mix = NULL, ...)
+estpi0.npnormcvm(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.npnormad(v, beta, val, order, mix = NULL, ...)
+estpi0.npnormad(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.npnormcll(v, beta, val, order, mix = NULL, ...)
+estpi0.npnormcll(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.nptll(v, beta, val, order, mix = NULL, ...)
+estpi0.nptll(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.npnormllw(v, beta, val, order, mix = NULL, ...)
+estpi0.npnormllw(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.npnormcvmw(v, beta, val, order, mix = NULL, ...)
+estpi0.npnormcvmw(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.npnormadw(v, beta, val, order, mix = NULL, ...)
+estpi0.npnormadw(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 }
 \arguments{
 \item{v}{observations}
@@ -44,6 +44,8 @@ estpi0.npnormadw(v, beta, val, order, mix = NULL, ...)
 \item{order}{the parameter for the binned version.}
 
 \item{mix}{initial mixing distribution.}
+
+\item{gridpoints}{a vector of gridpoints to evaluate new support points}
 }
 \description{
 computing non-parametric mixing distribution with estimated proportion at 0
