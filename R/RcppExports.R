@@ -112,12 +112,24 @@ pdiscnormarray_ <- function(x, mu0, stdev, h, lt = TRUE, lg = FALSE) {
     .Call('_npfixedcomp2_pdiscnormarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, h, lt, lg)
 }
 
+log1mexp_ <- function(x) {
+    .Call('_npfixedcomp2_log1mexp_', PACKAGE = 'npfixedcomp2', x)
+}
+
+logspaceadd_ <- function(lx, ly) {
+    .Call('_npfixedcomp2_logspaceadd_', PACKAGE = 'npfixedcomp2', lx, ly)
+}
+
 npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormad_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
 estpi0npnormad_ <- function(data, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
     .Call('_npfixedcomp2_estpi0npnormad_', PACKAGE = 'npfixedcomp2', data, beta, val, initpt, initpr, gridpoints, tol, verbose)
+}
+
+gfnpnormad <- function(data, mu0fixed, pi0fixed, beta, mu0, pi0, gridpoints) {
+    .Call('_npfixedcomp2_gfnpnormad', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, mu0, pi0, gridpoints)
 }
 
 npnormadw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
@@ -142,6 +154,10 @@ npnormcvm_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoint
 
 estpi0npnormcvm_ <- function(data, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
     .Call('_npfixedcomp2_estpi0npnormcvm_', PACKAGE = 'npfixedcomp2', data, beta, val, initpt, initpr, gridpoints, tol, verbose)
+}
+
+gfnpnormcvm <- function(data, mu0fixed, pi0fixed, beta, mu0, pi0, gridpoints) {
+    .Call('_npfixedcomp2_gfnpnormcvm', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, mu0, pi0, gridpoints)
 }
 
 npnormcvmw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {

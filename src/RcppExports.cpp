@@ -214,6 +214,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// log1mexp_
+Eigen::VectorXd log1mexp_(const Eigen::VectorXd& x);
+RcppExport SEXP _npfixedcomp2_log1mexp_(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(log1mexp_(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// logspaceadd_
+Eigen::VectorXd logspaceadd_(const Eigen::VectorXd& lx, const Eigen::VectorXd& ly);
+RcppExport SEXP _npfixedcomp2_logspaceadd_(SEXP lxSEXP, SEXP lySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type lx(lxSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type ly(lySEXP);
+    rcpp_result_gen = Rcpp::wrap(logspaceadd_(lx, ly));
+    return rcpp_result_gen;
+END_RCPP
+}
 // npnormad_
 Rcpp::List npnormad_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormad_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
@@ -249,6 +272,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(estpi0npnormad_(data, beta, val, initpt, initpr, gridpoints, tol, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gfnpnormad
+Eigen::VectorXd gfnpnormad(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& mu0, const Eigen::VectorXd& pi0, const Eigen::VectorXd& gridpoints);
+RcppExport SEXP _npfixedcomp2_gfnpnormad(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP mu0SEXP, SEXP pi0SEXP, SEXP gridpointsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0fixed(mu0fixedSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0fixed(pi0fixedSEXP);
+    Rcpp::traits::input_parameter< const double& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0(pi0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
+    rcpp_result_gen = Rcpp::wrap(gfnpnormad(data, mu0fixed, pi0fixed, beta, mu0, pi0, gridpoints));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -367,6 +407,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
     rcpp_result_gen = Rcpp::wrap(estpi0npnormcvm_(data, beta, val, initpt, initpr, gridpoints, tol, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gfnpnormcvm
+Eigen::VectorXd gfnpnormcvm(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& mu0, const Eigen::VectorXd& pi0, const Eigen::VectorXd& gridpoints);
+RcppExport SEXP _npfixedcomp2_gfnpnormcvm(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP mu0SEXP, SEXP pi0SEXP, SEXP gridpointsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0fixed(mu0fixedSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0fixed(pi0fixedSEXP);
+    Rcpp::traits::input_parameter< const double& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0(pi0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gridpoints(gridpointsSEXP);
+    rcpp_result_gen = Rcpp::wrap(gfnpnormcvm(data, mu0fixed, pi0fixed, beta, mu0, pi0, gridpoints));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -546,14 +603,18 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_ddiscnormarray_", (DL_FUNC) &_npfixedcomp2_ddiscnormarray_, 5},
     {"_npfixedcomp2_pnpdiscnorm", (DL_FUNC) &_npfixedcomp2_pnpdiscnorm, 7},
     {"_npfixedcomp2_pdiscnormarray_", (DL_FUNC) &_npfixedcomp2_pdiscnormarray_, 6},
+    {"_npfixedcomp2_log1mexp_", (DL_FUNC) &_npfixedcomp2_log1mexp_, 1},
+    {"_npfixedcomp2_logspaceadd_", (DL_FUNC) &_npfixedcomp2_logspaceadd_, 2},
     {"_npfixedcomp2_npnormad_", (DL_FUNC) &_npfixedcomp2_npnormad_, 10},
     {"_npfixedcomp2_estpi0npnormad_", (DL_FUNC) &_npfixedcomp2_estpi0npnormad_, 8},
+    {"_npfixedcomp2_gfnpnormad", (DL_FUNC) &_npfixedcomp2_gfnpnormad, 7},
     {"_npfixedcomp2_npnormadw_", (DL_FUNC) &_npfixedcomp2_npnormadw_, 12},
     {"_npfixedcomp2_estpi0npnormadw_", (DL_FUNC) &_npfixedcomp2_estpi0npnormadw_, 10},
     {"_npfixedcomp2_npnormcll_", (DL_FUNC) &_npfixedcomp2_npnormcll_, 10},
     {"_npfixedcomp2_estpi0npnormcll_", (DL_FUNC) &_npfixedcomp2_estpi0npnormcll_, 8},
     {"_npfixedcomp2_npnormcvm_", (DL_FUNC) &_npfixedcomp2_npnormcvm_, 10},
     {"_npfixedcomp2_estpi0npnormcvm_", (DL_FUNC) &_npfixedcomp2_estpi0npnormcvm_, 8},
+    {"_npfixedcomp2_gfnpnormcvm", (DL_FUNC) &_npfixedcomp2_gfnpnormcvm, 7},
     {"_npfixedcomp2_npnormcvmw_", (DL_FUNC) &_npfixedcomp2_npnormcvmw_, 12},
     {"_npfixedcomp2_estpi0npnormcvmw_", (DL_FUNC) &_npfixedcomp2_estpi0npnormcvmw_, 10},
     {"_npfixedcomp2_npnormll_", (DL_FUNC) &_npfixedcomp2_npnormll_, 10},

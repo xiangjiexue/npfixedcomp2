@@ -155,3 +155,12 @@ Eigen::MatrixXd pdiscnormarray_(const Eigen::VectorXd &x,
 	return pdiscnormarray(x, mu0, stdev, h, lt, lg);
 }
 
+// [[Rcpp::export]]
+Eigen::VectorXd log1mexp_(const Eigen::VectorXd &x){
+	return log1mexp(x);
+}
+
+// [[Rcpp::export]]
+Eigen::VectorXd logspaceadd_(const Eigen::VectorXd &lx, const Eigen::VectorXd &ly){
+	return logspaceadd(lx, ly);
+}

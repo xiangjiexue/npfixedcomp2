@@ -113,16 +113,17 @@ public:
 	void checklossfun(const Eigen::VectorXd & mu0, Eigen::VectorXd & pi0, const Eigen::VectorXd &eta,
 		const Eigen::VectorXd &p, const int &maxit = 10) const{
 		double llorigin = this->lossfunction(this->mapping(mu0, pi0));
-		double sigma = 0.5, alpha = 1/3, u = -1.;
+		double sigma = 2., alpha = 0.3333;
+		int u = -1;
 		double con = - p.dot(eta);
 		double lhs, rhs;
 		Eigen::VectorXd pi0new(pi0.size());
 		do{
 			u++;
-			pi0new = pi0;
-			pi0new.noalias() += std::pow(sigma, u) * eta;
+			sigma *= 0.5;
+			pi0new = pi0 + sigma * eta;
 			lhs = this->lossfunction(this->mapping(mu0, pi0new));
-			rhs = llorigin + alpha * std::pow(sigma, u) * con;
+			rhs = llorigin + alpha * sigma * con;
 			if (lhs < rhs){
 				pi0 = pi0new;
 				break;
@@ -136,7 +137,7 @@ public:
 	virtual void checklossfun2(const Eigen::VectorXd &diff, Eigen::VectorXd &pi0, const Eigen::VectorXd &eta,
 		const Eigen::VectorXd &p, const Eigen::VectorXd &dens) const{
 		double llorigin = this->lossfunction(dens);
-		double sigma = 2., alpha = 1/3;
+		double sigma = 2., alpha = 0.3333;
 		double con = - p.dot(eta);
 		double lhs, rhs;
 		Eigen::VectorXd ans(pi0);
@@ -228,26 +229,31 @@ public:
 		}
 	}
 
-	Eigen::VectorXd solvegradd1(const Eigen::VectorXd &dens) const{
+	Eigen::VectorXd solvegradd1(const Eigen::VectorXd &dens, const double & tol = 1e-6) const{
 		Eigen::VectorXd pointsval, pointsgrad;
-		this->gradfunvec(gridpoints, dens, pointsval, pointsgrad, false, true);
-		const int L = gridpoints.size();
+		this->gradfunvec(this->gridpoints, dens, pointsval, pointsgrad, false, true);
+		const int L = this->gridpoints.size();
 		Eigen::VectorXi index = index2num((pointsgrad.head(L - 1).array() < 0).cast<int>() * (pointsgrad.tail(L - 1).array() > 0).cast<int>());
 		Eigen::VectorXd ans(index.size());
 		if (index.size() > 0){
 			ans = Eigen::VectorXd::NullaryExpr(index.size(),
-				[this, &index, &dens](Eigen::Index row){
-					return this->Brmin(this->gridpoints[index[row]], this->gridpoints[index[row] + 1], dens);
+				[this, &index, &dens, &tol](Eigen::Index row){
+					return this->Brmin(this->gridpoints[index[row]], this->gridpoints[index[row] + 1], dens, tol);
 				});
 			// double x;
 			// for (auto i = 0; i < ans.size(); ++i){
 			// 	this->Brmin(x, gridpoints[index[i]], gridpoints[index[i] + 1], dens);
 			// 	ans[i] = x;
 			// }
+			ans.conservativeResize(ans.size() + 2);
+			ans.tail<2>() << this->gridpoints[0], this->gridpoints.tail(1)[0];
 			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
 			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
 		}else{
-			return ans;
+			ans.resize(2);
+			ans << this->gridpoints[0], this->gridpoints.tail(1)[0];
+			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
+			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
 		}
 	}
 
@@ -305,18 +311,21 @@ public:
 		}
 	}
 
-	Eigen::VectorXd solvegradd0(const Eigen::VectorXd &dens) const{
+	Eigen::VectorXd solvegradd0(const Eigen::VectorXd &dens, const double &tol = 1e-6) const{
 		Eigen::VectorXd pointsval, pointsgrad; // pointsgrad not referenced.
-		this->gradfunvec(gridpoints, dens, pointsval, pointsgrad, true, false);
+		this->gradfunvec(this->gridpoints, dens, pointsval, pointsgrad, true, false);
 		Eigen::VectorXd temp = diff_(pointsval);
 		const int L = temp.size();
 		Eigen::VectorXi index = index2num((temp.head(L - 1).array() < 0).cast<int>() * (temp.tail(L - 1).array() > 0).cast<int>());
 		Eigen::VectorXd ans(index.size());
 		if (index.size() > 0){
 			ans = Eigen::VectorXd::NullaryExpr(index.size(),
-				[this, &index, &dens, &pointsval](Eigen::Index row){
-					return this->Dfmin(this->gridpoints.segment<3>(index[row]), pointsval.segment<3>(index[row]), dens);
+				[this, &index, &dens, &pointsval, &tol](Eigen::Index row){
+					return this->Dfmin(this->gridpoints.segment<3>(index[row]), pointsval.segment<3>(index[row]), dens, tol);
 				});
+			ans.conservativeResize(ans.size() + 2);
+			ans[index.size()] = (pointsval[0] < 0) ? gridpoints[0] : NAN;
+			ans[index.size() + 1] = (pointsval.tail<1>()[0] < 0) ? gridpoints.tail<1>()[0] : NAN;
 			return indexing(ans, index2num(1 - ans.array().isNaN().cast<int>()));
 			// double x, fx;
 			// for (auto ptr = index.data(); ptr < index.data() + index.size(); ptr++){
@@ -330,15 +339,18 @@ public:
 			// }
 			// ans.conservativeResize(length);
 		}else{
-			return ans;
+			ans.resize(2);
+			ans << this->gridpoints[0], this->gridpoints.tail(1)[0];
+			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
+			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
 		}
 	}
 
-	Eigen::VectorXd solvegrad(const Eigen::VectorXd &dens) const{
+	Eigen::VectorXd solvegrad(const Eigen::VectorXd &dens, const double & tol = 1e-6) const{
 		if (this->flag == "d1"){
-			return solvegradd1(dens);
+			return solvegradd1(dens, tol);
 		}else{
-			return solvegradd0(dens);
+			return solvegradd0(dens, tol);
 		}
 	}
 
@@ -350,7 +362,7 @@ public:
 		double closs = this->lossfunction(dens), nloss;
 
 		do{
-			newpoints.lazyAssign(this->solvegrad(dens));
+			newpoints.lazyAssign(this->solvegrad(dens, tol));
 
 			mu0.conservativeResize(mu0.size() + newpoints.size());
 			pi0.conservativeResize(pi0.size() + newpoints.size());
@@ -369,11 +381,22 @@ public:
 				Eigen::VectorXd pointsval, pointsgrad;
 				this->gradfunvec(newpoints, dens, pointsval, pointsgrad, true, true);
 				Rcpp::Rcout<<"gradient: "<<pointsval.transpose()<<std::endl;
-				Rcpp::Rcout<<"gradient derivative: "<<pointsgrad.transpose()<<std::endl;
+				if (this->flag == "d1") {Rcpp::Rcout<<"gradient derivative: "<<pointsgrad.transpose()<<std::endl;}
+				
 			}
 
 			this->computeweights(mu0, pi0, dens); // return using mu0, pi0? remember to sort
+			if (verbose >= 2){
+				Rcpp::Rcout<<"After computeweights"<<std::endl;
+				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
+				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
+			}
 			this->collapse(mu0, pi0);
+			if (verbose >= 2){
+				Rcpp::Rcout<<"After collapse"<<std::endl;
+				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
+				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
+			}
 			iter++;
 			dens = this->mapping(mu0, pi0);
 			nloss = this->lossfunction(dens);

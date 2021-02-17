@@ -20,7 +20,7 @@ public:
 
 	void setprecompute() const{
 		this->precompute.resize(this->len);
-		this->precompute = Eigen::VectorXd::LinSpaced(this->len, 1, 2 * this->len - 1) / 2 / this->len - 
+		this->precompute = Eigen::VectorXd::LinSpaced(this->len, 1., 2. * this->len - 1.) / (2. * this->len) - 
 			mapping(this->mu0fixed, this->pi0fixed);
 	}
 
@@ -35,12 +35,12 @@ public:
 	void gradfun(const double &mu, const Eigen::VectorXd &dens,
 		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
 		Eigen::VectorXd fullden = dens - this->precompute;
-		double scale = 1 - this->pi0fixed.sum();
+		double scale = 1. - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = (pnpnorm_(this->data, mu, scale, this->beta) - dens).dot(fullden) * 2;	
+			ansd0 = (pnpnorm_(this->data, mu, scale, this->beta) - dens).dot(fullden) * 2.;	
 		}
 		if (d1){
-			ansd1 = dnpnorm_(this->data, mu, 1., this->beta).dot(fullden) * -2 * scale;
+			ansd1 = dnpnorm_(this->data, mu, 1., this->beta).dot(fullden) * (-2. * scale);
 		}
 	}
 
@@ -49,11 +49,10 @@ public:
 		ansd0.resize(mu.size());
 		ansd1.resize(mu.size());
 		Eigen::VectorXd fullden = dens - this->precompute;
-		double scale = 1 - this->pi0fixed.sum();
+		double scale = 1. - this->pi0fixed.sum();
 		if (d0){
 			// ansd0 = (pnormarray(this->data, mu, this->beta).transpose() * fullden * scale - Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens))) * 2;
-			ansd0 = Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens)) * -2;
-			ansd0.noalias() += pnormarray(this->data, mu, this->beta).transpose() * fullden * (scale * 2);
+			ansd0 = pnormarray(this->data, mu, this->beta).transpose() * fullden * (scale * 2.) - Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens) * 2.);
 		}
 		if (d1){
 			ansd1 = dnormarray(this->data, mu, this->beta).transpose() * fullden * -2 * scale;
@@ -93,6 +92,15 @@ Rcpp::List estpi0npnormcvm_(const Eigen::VectorXd &data,
 	npnormcvm f(data, Eigen::VectorXd::Zero(1), Eigen::VectorXd::Zero(1), beta, initpt, initpr, gridpoints);
 	f.estpi0(val, tol, verbose);
 	return f.result;
+}
+
+// [[Rcpp::export]]
+Eigen::VectorXd gfnpnormcvm(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fixed, const Eigen::VectorXd &pi0fixed,
+	const double &beta, const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, const Eigen::VectorXd &gridpoints){
+	npnormcvm f(data, mu0fixed, pi0fixed, beta, mu0, pi0, gridpoints);
+	Eigen::VectorXd ans(gridpoints.size()), dummy(gridpoints.size());
+	f.gradfunvec(gridpoints, f.mapping(mu0, pi0), ans, dummy, true, false);
+	return ans;
 }
 
 // large-scale computation
