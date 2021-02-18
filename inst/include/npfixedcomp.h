@@ -245,16 +245,23 @@ public:
 			// 	this->Brmin(x, gridpoints[index[i]], gridpoints[index[i] + 1], dens);
 			// 	ans[i] = x;
 			// }
-			ans.conservativeResize(ans.size() + 2);
-			ans.tail<2>() << this->gridpoints[0], this->gridpoints.tail(1)[0];
 			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
-			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
-		}else{
-			ans.resize(2);
-			ans << this->gridpoints[0], this->gridpoints.tail(1)[0];
-			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
-			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
+			Eigen::VectorXd anstemp = indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
+			ans.lazyAssign(anstemp);
 		}
+		double pv2,ps2;
+		this->gradfun(this->gridpoints[0], dens, pv2, ps2, true, true);
+		if (pv2 < 0 & ps2 > 0){
+			ans.conservativeResize(ans.size() + 1);
+			ans.tail<1>() = gridpoints.head<1>();
+		}
+		this->gradfun(this->gridpoints.tail<1>()[0], dens, pv2, ps2, true, true);
+		if (pv2 < 0 & ps2 < 0){
+			ans.conservativeResize(ans.size() + 1);
+			ans.tail<1>() = gridpoints.tail<1>();
+		}
+
+		return ans;
 	}
 
 	double Dfmin(const Eigen::Vector3d &x1, const Eigen::Vector3d &fx1,
@@ -323,10 +330,8 @@ public:
 				[this, &index, &dens, &pointsval, &tol](Eigen::Index row){
 					return this->Dfmin(this->gridpoints.segment<3>(index[row]), pointsval.segment<3>(index[row]), dens, tol);
 				});
-			ans.conservativeResize(ans.size() + 2);
-			ans[index.size()] = (pointsval[0] < 0) ? gridpoints[0] : NAN;
-			ans[index.size() + 1] = (pointsval.tail<1>()[0] < 0) ? gridpoints.tail<1>()[0] : NAN;
-			return indexing(ans, index2num(1 - ans.array().isNaN().cast<int>()));
+			Eigen::VectorXd anstemp = indexing(ans, index2num(1 - ans.array().isNaN().cast<int>()));
+			ans.lazyAssign(anstemp);
 			// double x, fx;
 			// for (auto ptr = index.data(); ptr < index.data() + index.size(); ptr++){
 			// 	// inputx << gridpoints[index[i]], gridpoints[index[i] + 2], gridpoints[index[i] + 1];
@@ -338,12 +343,16 @@ public:
    //  			}
 			// }
 			// ans.conservativeResize(length);
-		}else{
-			ans.resize(2);
-			ans << this->gridpoints[0], this->gridpoints.tail(1)[0];
-			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
-			return indexing(ans, index2num((pointsval.array() < 0).cast<int>()));
 		}
+		if (pointsval[0] < 0 & diff_(pointsval.head<2>())[0] > 0){
+			ans.conservativeResize(ans.size() + 1);
+			ans.tail<1>() = pointsval.head<1>();
+		}
+		if (pointsval.tail<1>()[0] < 0 & diff_(pointsval.tail<2>())[0] < 0){
+			ans.conservativeResize(ans.size() + 1);
+			ans.tail<1>() = pointsval.tail<1>();			
+		}
+		return ans;
 	}
 
 	Eigen::VectorXd solvegrad(const Eigen::VectorXd &dens, const double & tol = 1e-6) const{
