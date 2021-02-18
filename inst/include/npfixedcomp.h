@@ -479,6 +479,8 @@ public:
 			this->computemixdist();
 			ll = this->result["ll"];
 			int iter = 1;
+			Eigen::Matrix3d A;
+			Eigen::Vector3d b, x1;
 			while (std::abs(this->hypofun(ll, minloss) - val) > tol & std::abs(ub - lb) > tol){
 				if (verbose >= 1){
 					Rcpp::Rcout<<"Iter: "<<iter<<" lower: "<<lb<<" upper: "<<ub<<std::endl;
@@ -506,13 +508,11 @@ public:
 				this->computemixdist();
 				ll = this->result["ll"];
 
-				Eigen::MatrixXd A(3, 3);
-				A << lb * lb, lb, 1, 
-					 sp * sp, sp, 1, 
-					 ub * ub, ub, 1;
-				Eigen::Vector3d b;
+				A << lb * lb, lb, 1., 
+					 sp * sp, sp, 1., 
+					 ub * ub, ub, 1.;
 				b<<this->hypofun(flb, minloss) - val, this->hypofun(ll, minloss) - val, this->hypofun(fub, minloss) - val;
-				Eigen::Vector3d x1 = A.inverse() * b;
+				x1 = A.inverse() * b;
 
 				if (this->hypofun(ll, minloss) - val < 0){
 					lb = sp; flb = ll;
@@ -522,7 +522,7 @@ public:
 				}
 				;
 				sp = (-x1[1] + std::sqrt(x1[1] * x1[1] - 4 * x1[0] * x1[2])) / 2 / x1[0];
-				sp = std::isnan(sp) ? (lb + ub) / 2 : sp;
+				sp = (std::isnan(sp) | sp < lb | sp > ub) ? (lb + ub) / 2 : sp;
 
 				mix = this->result["mix"];
 				tmu0 = mix["pt"]; tpi0 = mix["pr"];
