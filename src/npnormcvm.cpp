@@ -167,8 +167,8 @@ public:
 	}
 
 	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
-		pi0 = pnnlssum_(pdiscnormarray(this->data, mu0, this->beta, this->h).array().colwise() * this->weights.array().sqrt(),
-			this->precompute.array() * this->weights.array().sqrt(), 1. - this->pi0fixed.sum());
+		pi0 = pnnlssum_(pdiscnormarray(this->data, mu0, this->beta, this->h).cwiseProduct(this->weights.cwiseSqrt().replicate(1, mu0.size())),
+			this->precompute.cwiseProduct(this->weights.cwiseSqrt()), 1. - this->pi0fixed.sum());
 	}
 
 	double extrafun() const{

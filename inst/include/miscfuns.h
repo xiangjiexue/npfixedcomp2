@@ -17,8 +17,10 @@ extern "C" void pnnls_(double* A, int* MDA, int* M, int* N, double* B, double* X
 
 namespace Eigen{
 
+// begin diff
+
 template<class ArgType>
-struct diffstruct {
+struct diff_struct {
   typedef Matrix<typename ArgType::Scalar,
                  (ArgType::SizeAtCompileTime > 0) ? ArgType::SizeAtCompileTime - 1 : -1,
                  1,
@@ -28,42 +30,25 @@ struct diffstruct {
 };
 
 template <class ArgType>
-inline typename diffstruct<ArgType>::MatrixType
+inline typename diff_struct<ArgType>::MatrixType
 diff_(const MatrixBase<ArgType>& x)
 {
 	const int L = x.size() - 1;
 	return x.tail(L) - x.head(L);
 }
 
+// end diff
+
+// begin log1mexp
 
 template<class ArgType>
-struct densityarrayscale {
-  typedef Matrix<typename ArgType::Scalar,
+struct log1mexp_struct {
+  typedef Matrix<typename ScalarBinaryOpTraits<typename ArgType::Scalar, double>::ReturnType,
                  ArgType::RowsAtCompileTime,
                  ArgType::ColsAtCompileTime,
                  ColMajor,
                  ArgType::MaxRowsAtCompileTime,
                  ArgType::MaxColsAtCompileTime> MatrixType;
-};
-
-template<class ArgType>
-struct densityarrayscalerow {
-  typedef Matrix<typename ArgType::Scalar,
-  				 ArgType::ColsAtCompileTime,
-                 ArgType::RowsAtCompileTime,
-                 RowMajor,
-                 ArgType::MaxColsAtCompileTime,
-                 ArgType::MaxRowsAtCompileTime> MatrixType;
-};
-
-template<class ArgType, class ArgType2>
-struct densityarray {
-  typedef Matrix<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType,
-                 ArgType::SizeAtCompileTime,
-                 ArgType2::SizeAtCompileTime,
-                 ColMajor,
-                 ArgType::MaxSizeAtCompileTime,
-                 ArgType2::MaxSizeAtCompileTime> MatrixType;
 };
 
 template<class ArgType>
@@ -79,69 +64,126 @@ public:
 
 
 template <class ArgType>
-CwiseNullaryOp<log1mexp_functor<ArgType>, typename densityarrayscale<ArgType>::MatrixType>
+CwiseNullaryOp<log1mexp_functor<ArgType>, typename log1mexp_struct<ArgType>::MatrixType>
 log1mexp(const MatrixBase<ArgType> &x)
 {
-	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+	typedef typename log1mexp_struct<ArgType>::MatrixType MatrixType;
 	return MatrixType::NullaryExpr(x.rows(), x.cols(), log1mexp_functor<ArgType>(x.derived()));
 }
 
+// end log1mexp
+
+// begin logspaceadd/sub
+
+template<class ArgType, class ArgType2>
+struct logspace_struct {
+  typedef Matrix<typename ScalarBinaryOpTraits<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType, double>::ReturnType,
+                 ArgType::SizeAtCompileTime,
+                 ArgType::SizeAtCompileTime,
+                 ColMajor,
+                 ArgType::MaxSizeAtCompileTime,
+                 ArgType::MaxSizeAtCompileTime> MatrixType;
+};
+
+template<class ArgType, class ArgType2>
+class logspaceadd_functor {
+	const ArgType &lx;
+	const ArgType2 &ly;
+public:
+	logspaceadd_functor(const ArgType& lx_, const ArgType2 &ly_) : lx(lx_), ly(ly_) {}
+
+	const double operator() (Index row, Index col) const {
+		return R::logspace_add(lx.coeff(row, col), ly.coeff(row, col));
+	}
+};
+
+
 template <class ArgType, class ArgType2>
-inline typename densityarray<ArgType, ArgType2>::MatrixType
+CwiseNullaryOp<logspaceadd_functor<ArgType, ArgType2>, typename logspace_struct<ArgType, ArgType2>::MatrixType>
 logspaceadd(const MatrixBase<ArgType> &lx, const MatrixBase<ArgType2> &ly)
 {
 	EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(ArgType, ArgType2);
-	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
-	MatrixType ans(lx.rows(), lx.cols());
-	ans = lx.array().max(ly.array()) + ((lx - ly).array().abs() * -1.).exp().log1p();
-	return ans;
+	typedef typename logspace_struct<ArgType, ArgType2>::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(lx.rows(), lx.cols(), logspaceadd_functor<ArgType, ArgType2>(lx.derived(), ly.derived()));
 }
 
+template<class ArgType, class ArgType2>
+class logspacesub_functor {
+	const ArgType &lx;
+	const ArgType2 &ly;
+public:
+	logspacesub_functor(const ArgType& lx_, const ArgType2 &ly_) : lx(lx_), ly(ly_) {}
+
+	const double operator() (Index row, Index col) const {
+		return R::logspace_sub(lx.coeff(row, col), ly.coeff(row, col));
+	}
+};
+
+
 template <class ArgType, class ArgType2>
-inline typename densityarray<ArgType, ArgType2>::MatrixType
+CwiseNullaryOp<logspacesub_functor<ArgType, ArgType2>, typename logspace_struct<ArgType, ArgType2>::MatrixType>
 logspacesub(const MatrixBase<ArgType> &lx, const MatrixBase<ArgType2> &ly)
 {
 	EIGEN_STATIC_ASSERT_SAME_MATRIX_SIZE(ArgType, ArgType2);
-	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
-	MatrixType ans(lx.rows(), lx.cols());
-	ans = lx + log1mexp(ly - lx);
-	return ans;
+	typedef typename logspace_struct<ArgType, ArgType2>::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(lx.rows(), lx.cols(), logspacesub_functor<ArgType, ArgType2>(lx.derived(), ly.derived()));
 }
 
+// end logspaceadd/sub
+
+// begin densities
+
+template<class ArgType>
+struct densityarrayscale {
+  typedef Matrix<typename ScalarBinaryOpTraits<typename ArgType::Scalar, double>::ReturnType,
+                 ArgType::RowsAtCompileTime,
+                 1,
+                 ColMajor,
+                 ArgType::MaxRowsAtCompileTime,
+                 1> MatrixType;
+};
+
+template<class ArgType, class ArgType2>
+struct densityarray {
+  typedef Matrix<typename ScalarBinaryOpTraits<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType, double>::ReturnType,
+                 ArgType::SizeAtCompileTime,
+                 ArgType2::SizeAtCompileTime,
+                 ColMajor,
+                 ArgType::MaxSizeAtCompileTime,
+                 ArgType2::MaxSizeAtCompileTime> MatrixType;
+};
+
+// begin normal density
+template<class ArgType, class ArgType2>
+class dnorm_functor {
+	const ArgType &x;
+	const ArgType2 &mu;
+	const double stdev;
+	const bool lg;
+public:
+	dnorm_functor(const ArgType& x_, const ArgType2 &mu_, const double &stdev_, const bool &lg_) : x(x_), mu(mu_), stdev(stdev_), lg(lg_) {}
+
+	const double operator() (Index row, Index col) const {
+		return R::dnorm4(x.coeff(row), mu.coeff(col), stdev, lg);
+	}
+};
+
+template <class ArgType, class ArgType2>
+inline CwiseNullaryOp<dnorm_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
+dnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(x.size(), mu0.size(), dnorm_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lg));
+}
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
 dnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lg = false)
 {
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
-	MatrixType ans(x.size(), 1);
-	ans = (x.array() - mu0).square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
-	if (lg){
-		return ans;
-	}else{
-		return ans.array().exp();
-	}
-}
-
-template <class ArgType, class ArgType2>
-inline typename densityarray<ArgType, ArgType2>::MatrixType
-dnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
-{
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
-	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
-	MatrixType ans(x.size(), mu0.size());
-	if (mu0.size() == 1){
-		ans = dnormarray<ArgType>(x, mu0.coeff(0), stdev, true);
-	}else{
-		ans = (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
-	}
-	if (lg){
-		return ans;
-	}else{
-		return ans.array().exp();
-	}
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	return dnormarray(x, Matrix<double, 1, 1>::Constant(1, mu0), stdev, lg);
 }
 
 template <class ArgType>
@@ -165,16 +207,10 @@ dnpnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Ma
 		ans = dnpnorm_(x, mu0[0], pi0[0], stdev, lg);
 	}else{
 		if (lg){
-			typename densityarray<ArgType, ArgType2>::MatrixType temp(x.size(), mu0.size());
-			typedef typename densityarrayscalerow<ArgType3>::MatrixType VecType;
-			VecType pi0transpose(1, pi0.size());
-			pi0transpose = (pi0.array() > 0).select(pi0.array().log().transpose(), VecType::Constant(pi0.size(), -1e100));
-			temp = dnormarray(x, mu0, stdev, true).rowwise() + pi0transpose;
+			ans = dnpnorm_(x, mu0[0], pi0[0], stdev, true); 
 			for (auto i = 1; i < mu0.size(); ++i){
-				temp.col(i) = logspaceadd(temp.col(i - 1), temp.col(i));
+				ans = logspaceadd(ans, dnpnorm_(x, mu0[i], pi0[i], stdev, true));
 			}
-			
-			ans = temp.template rightCols<1>();
 		}else{
 			ans = dnormarray(x, mu0, stdev) * pi0;
 		}		
@@ -183,7 +219,9 @@ dnpnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Ma
 	return ans;
 }
 
+// end normal density
 
+// begin normal cdf
 
 template<class ArgType, class ArgType2>
 class pnorm_functor {
@@ -201,9 +239,11 @@ public:
 
 
 template <class ArgType, class ArgType2>
-CwiseNullaryOp<pnorm_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
+inline CwiseNullaryOp<pnorm_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
 pnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> &mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
 {
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
 	return MatrixType::NullaryExpr(x.size(), mu0.size(), pnorm_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lt, lg));
 }
@@ -212,55 +252,9 @@ template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
 pnormarray(const MatrixBase<ArgType>& x, const double &mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
 {
- 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
- 	return pnormarray(x, MatrixType::Constant(1, mu0), stdev, lt, lg);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+ 	return pnormarray(x, Matrix<double, 1, 1>::Constant(1, mu0), stdev, lt, lg);
 }
-
-// template <class ArgType>
-// inline typename densityarrayscale<ArgType>::MatrixType
-// pnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
-// {
-// 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-// 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
-// 	MatrixType ans(x.size(), 1);
-// 	if (lg){
-// 		ans = pnormarraylog(x, mu0, stdev, lt);
-// 	}else{
-// 		if (lt){
-// 			ans = 0.5 * (1 + ((x.array() - mu0) / (stdev * std::sqrt(2))).erf());
-// 		}else{
-// 			ans = 0.5 * ((x.array() - mu0) / (stdev * std::sqrt(2))).erfc();
-// 		}
-// 	}
-
-// 	return ans;
-// }
-
-// template <class ArgType, class ArgType2>
-// inline typename densityarray<ArgType, ArgType2>::MatrixType
-// pnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
-// {
-// 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-// 	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
-// 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
-// 	MatrixType ans(x.size(), mu0.size());
-// 	if (lg){
-// 		ans = pnormarraylog(x, mu0, stdev, lt);
-// 	}else{
-// 		if (mu0.size() == 1){
-// 			ans = pnormarray(x, mu0.coeff(0), stdev, lt, false);
-// 		}else{
-// 			if (lt){
-// 				ans = 0.5 * (1 + ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erf());
-// 			}else{
-// 				ans = 0.5 * ((mu0.transpose().replicate(x.size(), 1).colwise() - x) / (stdev * -std::sqrt(2))).array().erfc();
-// 			}		
-// 		}
-	
-// 	}
-
-// 	return ans;
-// }
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
@@ -285,16 +279,10 @@ pnpnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Ma
 		ans = pnpnorm_(x, mu0.coeff(0), pi0.coeff(0), stdev, lt, lg);
 	}else{
 		if (lg){
-			typename densityarray<ArgType, ArgType2>::MatrixType temp(x.size(), mu0.size());
-			typedef typename densityarrayscalerow<ArgType3>::MatrixType VecType;
-			VecType pi0transpose(1, pi0.size());
-			pi0transpose = (pi0.array() > 0).select(pi0.array().log().transpose(), VecType::Constant(1, pi0.size(), -1e100));
-			temp = pnormarray(x, mu0, stdev, lt, true).rowwise() + pi0transpose;
+			ans = pnpnorm_(x, mu0[0], pi0[0], stdev, lt, true);
 			for (auto i = 1; i < mu0.size(); ++i){
-				temp.col(i) = logspaceadd(temp.col(i - 1), temp.col(i));
+				ans = logspaceadd(ans, pnpnorm_(x, mu0[i], pi0[i], stdev, lt, true));
 			}
-			
-			ans = temp.template rightCols<1>();
 		}else{
 			ans = pnormarray(x, mu0, stdev, lt, false) * pi0;
 		}	
@@ -302,6 +290,10 @@ pnpnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Ma
 
 	return ans;
 }
+
+// end normal cdf
+
+// begin t density
 
 template<class ArgType, class ArgType2>
 class dnt_functor {
@@ -318,9 +310,11 @@ public:
 };
 
 template <class ArgType, class ArgType2>
-CwiseNullaryOp<dnt_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
+inline CwiseNullaryOp<dnt_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
 dtarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> &mu0, const double &n, const bool &lg = false)
 {
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
 	return MatrixType::NullaryExpr(x.size(), mu0.size(), dnt_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), n, lg));
 }
@@ -329,8 +323,8 @@ template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
 dtarray(const MatrixBase<ArgType>& x, const double &mu0, const double &n, const bool &lg = false)
 {
- 	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
- 	return dtarray(x, MatrixType::Constant(1, mu0), n, lg);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+ 	return dtarray(x, Matrix<double, 1, 1>::Constant(1, mu0), n, lg);
 }
 
 template <class ArgType>
@@ -355,16 +349,10 @@ dnpt_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Matri
 		ans = dnpt_(x, mu0.coeff(0), pi0.coeff(0), n, lg);
 	}else{
 		if (lg){
-			typename densityarray<ArgType, ArgType2>::MatrixType temp(x.size(), mu0.size());
-			typedef typename densityarrayscalerow<ArgType3>::MatrixType VecType;
-			VecType pi0transpose(1, pi0.size());
-			pi0transpose = (pi0.array() > 0).select(pi0.array().log().transpose(), VecType::Constant(1, pi0.size(), -1e100));
-			temp = dtarray(x, mu0, n, true).rowwise() + pi0transpose;
+			ans = dnpt_(x, mu0[0], pi0[0], n, true);
 			for (auto i = 1; i < mu0.size(); ++i){
-				temp.col(i) = logspaceadd(temp.col(i - 1), temp.col(i));
+				ans = logspaceadd(ans, dnpt_(x, mu0[i], pi0[i], n, true));
 			}
-			
-			ans = temp.template rightCols<1>();
 		}else{
 			ans = dtarray(x, mu0, n, false) * pi0;
 		}	
@@ -373,40 +361,39 @@ dnpt_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Matri
 	return ans;
 }
 
+// end t density
 
-template <class ArgType>
-inline typename densityarrayscale<ArgType>::MatrixType
-dnormcarray(const MatrixBase<ArgType>& x, const double & mu0, const double &n, const bool &lg = false)
-{
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
-	MatrixType ans(x.size(), 1);
-	const double stdev = (1. - mu0 * mu0) / std::sqrt(n);
-	ans = ((x.array() - mu0) / stdev).square() * -.5 - M_LN_SQRT_2PI - std::log(stdev);
-	if (lg){
-		return ans;
-	}else{
-		return ans.array().exp();
+// begin one-parameter normal density
+template<class ArgType, class ArgType2>
+class dnormc_functor {
+	const ArgType &x;
+	const ArgType2 &mu;
+	const double n;
+	const bool lg;
+public:
+	dnormc_functor(const ArgType& x_, const ArgType2 &mu_, const double &n_, const bool &lg_) : x(x_), mu(mu_), n(n_), lg(lg_) {}
+
+	const double operator() (Index row, Index col) const {
+		return R::dnorm4(x.coeff(row), mu.coeff(col), (1. - mu.coeff(col) * mu.coeff(col)) / std::sqrt(n), lg);
 	}
-}
+};
 
 template <class ArgType, class ArgType2>
 inline typename densityarray<ArgType, ArgType2>::MatrixType
 dnormcarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &n, const bool &lg = false)
 {
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType, -1, 1);
-	EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(ArgType2, -1, 1);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
-	MatrixType ans(x.size(), mu0.size());
-	if (mu0.size() == 1){
-		ans = dnormcarray<ArgType>(x, mu0.coeff(0), n, lg);
-	}else{
-		MatrixType temp = mu0.transpose().colwise().replicate(x.size());
-		MatrixType stdev = (1. - temp.array().square()) / std::sqrt(n);
-		ans = ((temp.colwise() - x).array() / stdev.array()).square() * -.5 - M_LN_SQRT_2PI - stdev.array().log();	
-		if (!lg) {ans = ans.array().exp();}
-	}
-	return ans;
+	return MatrixType::NullaryExpr(x.size(), mu0.size(), dnormc_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), n, lg));
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnormcarray(const MatrixBase<ArgType>& x, const double & mu0, const double &n, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	return dnormcarray(x, Matrix<double, 1, 1>::Constant(1, mu0), n, lg);
 }
 
 template <class ArgType>
@@ -431,16 +418,10 @@ dnpnormc_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const M
 		ans = dnpnormc_(x, mu0.coeff(0), pi0.coeff(0), n, lg);
 	}else{
 		if (lg){
-			typename densityarray<ArgType, ArgType2>::MatrixType temp(x.size(), mu0.size());
-			typedef typename densityarrayscalerow<ArgType3>::MatrixType VecType;
-			VecType pi0transpose(1, pi0.size());
-			pi0transpose = (pi0.array() > 0).select(pi0.array().log().transpose(), VecType::Constant(1, pi0.size(), -1e100));
-			temp = dnormcarray(x, mu0, n, true).rowwise() + pi0transpose;
+			ans = dnpnormc_(x, mu0[0], pi0[0], n, true);
 			for (auto i = 1; i < mu0.size(); ++i){
-				temp.col(i) = logspaceadd(temp.col(i - 1), temp.col(i));
+				ans = logspaceadd(ans, dnpnormc_(x, mu0[i], pi0[i], n, true));
 			}
-			
-			ans = temp.template rightCols<1>();
 		}else{
 			ans = dnormcarray(x, mu0, n, false) * pi0;
 		}	
@@ -449,6 +430,9 @@ dnpnormc_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const M
 	return ans;
 }
 
+// end one-parameter normal density
+
+// begin discrete normal cdf
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
@@ -493,16 +477,10 @@ pnpdiscnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, cons
 		ans = pnpdiscnorm_(x, mu0.coeff(0), pi0.coeff(0), stdev, h, lt, lg);
 	}else{
 		if (lg){
-			typename densityarray<ArgType, ArgType2>::MatrixType temp(x.size(), mu0.size());
-			typedef typename densityarrayscalerow<ArgType3>::MatrixType VecType;
-			VecType pi0transpose(1, pi0.size());
-			pi0transpose = (pi0.array() > 0).select(pi0.array().log().transpose(), VecType::Constant(1, pi0.size(), -1e100));
-			temp = pdiscnormarray(x, mu0, stdev, h, lt, true).rowwise() + pi0transpose;
+			ans = pnpdiscnorm_(x, mu0[0], pi0[0], stdev, h, lt, true);
 			for (auto i = 1; i < mu0.size(); ++i){
-				temp.col(i) = logspaceadd(temp.col(i - 1), temp.col(i));
+				ans = logspaceadd(ans, pnpdiscnorm_(x, mu0[i], pi0[i], stdev, h, lt, true));
 			}
-			
-			ans = temp.template rightCols<1>();
 		}else{
 			ans = pdiscnormarray(x, mu0, stdev, h, lt, false) * pi0;
 		}	
@@ -511,6 +489,9 @@ pnpdiscnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, cons
 	return ans;
 }
 
+// end discrete normal cdf
+
+// begin discrete normal density
 
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
@@ -579,74 +560,111 @@ dnpdiscnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, cons
 		ans = dnpdiscnorm_(x, mu0.coeff(0), pi0.coeff(0), stdev, h, lg);
 	}else{
 		if (lg){
-			typename densityarray<ArgType, ArgType2>::MatrixType temp(x.size(), mu0.size());
-			typedef typename densityarrayscalerow<ArgType3>::MatrixType VecType;
-			VecType pi0transpose(1, pi0.size());
-			pi0transpose = (pi0.array() > 0).select(pi0.array().log().transpose(), VecType::Constant(1, pi0.size(), -1e100));
-			temp = ddiscnormarray(x, mu0, stdev, h, true).rowwise() + pi0transpose;
+			ans = dnpdiscnorm_(x, mu0[0], pi0[0], stdev, h, true);
 			for (auto i = 1; i < mu0.size(); ++i){
-				temp.col(i) = logspaceadd(temp.col(i - 1), temp.col(i));
+				ans = logspaceadd(ans, dnpdiscnorm_(x, mu0[i], pi0[i], stdev, h, true));
 			}
-			
-			ans = temp.template rightCols<1>();
 		}else{
 			ans = ddiscnormarray(x, mu0, stdev, h, false) * pi0;
 		}	
 	}
 	return ans;
 }
+
+// end discrete normal density
+
+// begin indexing
 	
-}
+template<class ArgType, class RowIndexType, class ColIndexType>
+class indexing_functor {
+	const ArgType &m_arg;
+	const RowIndexType &m_rowIndices;
+	const ColIndexType &m_colIndices;
+public:
+	typedef Matrix<typename ArgType::Scalar,
+	             RowIndexType::SizeAtCompileTime,
+	             ColIndexType::SizeAtCompileTime,
+	             ArgType::Flags&RowMajorBit?RowMajor:ColMajor,
+	             RowIndexType::MaxSizeAtCompileTime,
+	             ColIndexType::MaxSizeAtCompileTime> MatrixType;
 
-// class for comparison
-// sort mixing distribution
-namespace Eigen {
-	template<class ArgType, class RowIndexType, class ColIndexType>
-	class indexing_functor {
-		const ArgType &m_arg;
-		const RowIndexType &m_rowIndices;
-		const ColIndexType &m_colIndices;
-	public:
-		typedef Matrix<typename ArgType::Scalar,
-		             RowIndexType::SizeAtCompileTime,
-		             ColIndexType::SizeAtCompileTime,
-		             ArgType::Flags&RowMajorBit?RowMajor:ColMajor,
-		             RowIndexType::MaxSizeAtCompileTime,
-		             ColIndexType::MaxSizeAtCompileTime> MatrixType;
+	indexing_functor(const ArgType& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
+	: m_arg(arg), m_rowIndices(row_indices), m_colIndices(col_indices)
+	{}
 
-		indexing_functor(const ArgType& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
-		: m_arg(arg), m_rowIndices(row_indices), m_colIndices(col_indices)
-		{}
-
-		const typename ArgType::Scalar& operator() (Index row, Index col) const {
-			return m_arg(m_rowIndices[row], m_colIndices[col]);
-		}
-
-		const typename ArgType::Scalar& operator() (Index row) const {
-			return m_arg.coef(m_rowIndices[row]);
-		}
-	};
-
-
-	template <class ArgType, class RowIndexType, class ColIndexType>
-	CwiseNullaryOp<indexing_functor<ArgType,RowIndexType,ColIndexType>, typename indexing_functor<ArgType,RowIndexType,ColIndexType>::MatrixType>
-	indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
-	{
-		typedef indexing_functor<ArgType,RowIndexType,ColIndexType> Func;
-		typedef typename Func::MatrixType MatrixType;
-		return MatrixType::NullaryExpr(row_indices.size(), col_indices.size(), Func(arg.derived(), row_indices, col_indices));
+	const typename ArgType::Scalar& operator() (Index row, Index col) const {
+		return m_arg(m_rowIndices[row], m_colIndices[col]);
 	}
 
-	template <class ArgType, class RowIndexType>
-	CwiseNullaryOp<indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> >, typename indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> >::MatrixType>
-	indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices)
-	{
-		EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);	
-		typedef indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> > Func;
-		typedef typename Func::MatrixType MatrixType;
-		return MatrixType::NullaryExpr(row_indices.size(), Func(arg.derived(), row_indices, Eigen::VectorXi::Zero(1)));
+	const typename ArgType::Scalar& operator() (Index row) const {
+		return m_arg.coef(m_rowIndices[row]);
 	}
+};
+
+
+template <class ArgType, class RowIndexType, class ColIndexType>
+CwiseNullaryOp<indexing_functor<ArgType,RowIndexType,ColIndexType>, typename indexing_functor<ArgType,RowIndexType,ColIndexType>::MatrixType>
+indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices, const ColIndexType& col_indices)
+{
+	typedef indexing_functor<ArgType,RowIndexType,ColIndexType> Func;
+	typedef typename Func::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(row_indices.size(), col_indices.size(), Func(arg.derived(), row_indices, col_indices));
 }
+
+template <class ArgType, class RowIndexType>
+CwiseNullaryOp<indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> >, typename indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> >::MatrixType>
+indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);	
+	typedef indexing_functor<ArgType,RowIndexType, Matrix<int, 1, 1> > Func;
+	typedef typename Func::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(row_indices.size(), Func(arg.derived(), row_indices, Eigen::VectorXi::Zero(1)));
+}
+
+// end indexing
+
+// begin pnnls
+template<class ArgType, class ArgType2>
+struct pnnls_struct {
+  typedef Matrix<typename ScalarBinaryOpTraits<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType, double>::ReturnType,
+                 ArgType::ColsAtCompileTime,
+                 1,
+                 ColMajor,
+                 ArgType::MaxColsAtCompileTime,
+                 1> MatrixType;
+};
+
+template<class ArgType, class ArgType2>
+inline typename pnnls_struct<ArgType, ArgType2>::MatrixType
+pnnlssum_(const MatrixBase<ArgType> &A, const MatrixBase<ArgType2> &b, const double &sum){
+	int m = A.rows() + 1, n = A.cols();
+	MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
+	VectorXd bb = Eigen::VectorXd::Zero(m - 1).homogeneous(), zz(m);
+	VectorXd x(n), w(n);
+	double rnorm;
+	VectorXi index(n);
+	int mode, k = 0;
+	pnnls_(AA.data(), &m, &m, &n, bb.data(), x.data(), &rnorm, w.data(), zz.data(), index.data(), &mode, &k);
+	x = x / x.sum() * sum;
+	return x;
+}
+
+// The program pnnqp using LLT
+template<class ArgType, class ArgType2>
+inline typename pnnls_struct<ArgType, ArgType2>::MatrixType
+pnnqp_(const MatrixBase<ArgType> &q, const MatrixBase<ArgType2> &p, const double &sum){
+	SelfAdjointEigenSolver<MatrixXd> eig(q.rows());
+	eig.compute(q);
+	Matrix<typename ArgType::Scalar, ArgType::RowsAtCompileTime, 1> eigvec = eig.eigenvalues();
+	Matrix<typename ArgType::Scalar, ArgType::RowsAtCompileTime, ArgType::RowsAtCompileTime> eigmat = eig.eigenvectors();
+	int index = (eigvec.array() > eigvec.template tail<1>()[0] * 1e-15).count();
+	return pnnlssum_((eigmat.rightCols(index) * eigvec.tail(index).cwiseSqrt().asDiagonal()).transpose(), 
+		(eigmat.rightCols(index).transpose() * -p).cwiseQuotient(eigvec.tail(index).cwiseSqrt()), sum);
+}
+
+
+}
+
 
 class comparemu0
 {
@@ -658,13 +676,6 @@ public:
 	const bool operator()(const int & x, const int & y) const {return mu0[x] < mu0[y];};
 };
 
-inline void sort1(Eigen::VectorXd &x){
-	std::sort(x.data(), x.data() + x.size(), std::less<double>());
-}
-
-inline void sort2(Eigen::VectorXd &x){
-	std::sort(x.data(), x.data() + x.size(), std::greater<double>());
-}
 
 // The program NNLS
 inline Eigen::VectorXi index2num(const Eigen::VectorXi &index){
@@ -679,30 +690,6 @@ inline Eigen::VectorXi index2num(const Eigen::VectorXi &index){
 		}
 	}
 	return ans;
-}
-
-inline Eigen::VectorXd pnnlssum_(const Eigen::MatrixXd &A, const Eigen::VectorXd &b, const double &sum){
-	int m = A.rows(), n = A.cols();
-	Eigen::MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
-	Eigen::VectorXd x(n), bb = Eigen::VectorXd::Zero(m).homogeneous(), w(n), zz(m + 1);
-	double rnorm;
-	Eigen::VectorXi index(n);
-	int mode, k = 0;
-	m++;
-	pnnls_(AA.data(), &m, &m, &n, bb.data(), x.data(), &rnorm, w.data(), zz.data(), index.data(), &mode, &k);
-	x = x / x.sum() * sum;
-	return x;
-}
-
-// The program pnnqp using LLT
-inline Eigen::VectorXd pnnqp_(const Eigen::MatrixXd &q, const Eigen::VectorXd &p, const double &sum){
-	Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eig;
-	eig.compute(q);
-	Eigen::VectorXd eigvec = eig.eigenvalues();
-	Eigen::MatrixXd eigmat = eig.eigenvectors();
-	int index = (eigvec.array() > eigvec[0] * 1e-15).count();
-	return pnnlssum_((eigmat.leftCols(index) * eigvec.head(index).cwiseSqrt().asDiagonal()).transpose(), 
-		(eigmat.leftCols(index).transpose() * -p).cwiseQuotient(eigvec.head(index).cwiseSqrt()), sum);
 }
 
 #endif

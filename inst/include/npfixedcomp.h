@@ -8,7 +8,7 @@
 
 inline void simplifymix(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0){
 	if (mu0.size() != 1) {
-		Eigen::VectorXi index = index2num((pi0.array().abs() < 1e-14).select(Eigen::VectorXi::Zero(pi0.size()), Eigen::VectorXi::Ones(pi0.size())));
+		Eigen::VectorXi index = index2num((pi0.array().abs() > 1e-14).cast<int>());
 		Eigen::VectorXd mu0new = indexing(mu0, index);
 		Eigen::VectorXd pi0new = indexing(pi0, index);
 		// int count = pi0.size() - pi0.cwiseEqual(0).count(), index = 0;
@@ -266,8 +266,9 @@ public:
 
 	double Dfmin(const Eigen::Vector3d &x1, const Eigen::Vector3d &fx1,
 		const Eigen::VectorXd &dens, const double &tol = 1e-6) const{
-		double lb = x1[0], ub = x1[1], newpoint, fnewpoint, dummy;
+		double lb = x1[0], ub = x1[2], newpoint, fnewpoint, dummy;
 		Eigen::Vector3d xx(x1), fxx(fx1);
+
 		// ensure tail has the smallest fxx.
 		if (fxx[0] < fxx[1]){
 			std::swap(xx[0], xx[1]);
@@ -280,6 +281,7 @@ public:
 
 		while (ub - lb > tol){
 			newpoint = newmin(xx, fxx);
+			newpoint = (std::isnan(newpoint) | (newpoint < lb) | (newpoint > ub)) ? (lb + ub) / 2 : newpoint;
 			this->gradfun(newpoint, dens, fnewpoint, dummy, true, false);
 
 			if (fnewpoint > fxx[2]){
@@ -346,11 +348,11 @@ public:
 		}
 		if (pointsval[0] < 0 & diff_(pointsval.head<2>())[0] > 0){
 			ans.conservativeResize(ans.size() + 1);
-			ans.tail<1>() = pointsval.head<1>();
+			ans.tail<1>() = gridpoints.head<1>();
 		}
 		if (pointsval.tail<1>()[0] < 0 & diff_(pointsval.tail<2>())[0] < 0){
 			ans.conservativeResize(ans.size() + 1);
-			ans.tail<1>() = pointsval.tail<1>();			
+			ans.tail<1>() = gridpoints.tail<1>();			
 		}
 		return ans;
 	}
@@ -391,6 +393,7 @@ public:
 				this->gradfunvec(newpoints, dens, pointsval, pointsgrad, true, true);
 				Rcpp::Rcout<<"gradient: "<<pointsval.transpose()<<std::endl;
 				if (this->flag == "d1") {Rcpp::Rcout<<"gradient derivative: "<<pointsgrad.transpose()<<std::endl;}
+				Rcpp::Rcout<<"loss:"<<this->lossfunction(this->mapping(mu0, pi0))<<std::endl;
 				
 			}
 
@@ -399,12 +402,14 @@ public:
 				Rcpp::Rcout<<"After computeweights"<<std::endl;
 				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
 				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
+				Rcpp::Rcout<<"loss:"<<this->lossfunction(this->mapping(mu0, pi0))<<std::endl;
 			}
 			this->collapse(mu0, pi0);
 			if (verbose >= 2){
 				Rcpp::Rcout<<"After collapse"<<std::endl;
 				Rcpp::Rcout<<"support points: "<<mu0.transpose()<<std::endl;
 				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
+				Rcpp::Rcout<<"loss:"<<this->lossfunction(this->mapping(mu0, pi0))<<std::endl;
 			}
 			iter++;
 			dens = this->mapping(mu0, pi0);
@@ -522,7 +527,7 @@ public:
 				}
 				;
 				sp = (-x1[1] + std::sqrt(x1[1] * x1[1] - 4 * x1[0] * x1[2])) / 2 / x1[0];
-				sp = (std::isnan(sp) | sp < lb | sp > ub) ? (lb + ub) / 2 : sp;
+				sp = (std::isnan(sp) | (sp < lb) | (sp > ub)) ? (lb + ub) / 2 : sp;
 
 				mix = this->result["mix"];
 				tmu0 = mix["pt"]; tpi0 = mix["pr"];

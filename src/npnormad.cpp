@@ -140,16 +140,16 @@ public:
 		Eigen::VectorXd ecdf(weights);
 		std::partial_sum(ecdf.data(), ecdf.data() + ecdf.size(), ecdf.data(), std::plus<double>());
 		this->w1.resize(this->len);
-		this->w1 = (2 * ecdf - this->weights).cwiseProduct(this->weights);
+		this->w1 = (2 * ecdf - this->weights).cwiseProduct(this->weights) / this->weights.sum();
 		this->w2.resize(this->len);
-		this->w2 = 2 * this->weights.sum() * this->weights - this->w1;
+		this->w2 = 2 * this->weights - this->w1;
 		family = "npnorm";
 		flag = "d1";
 	}
 
 	double lossfunction(const Eigen::VectorXd &maps) const{
 		Eigen::VectorXd temp = maps + this->precompute;
-		return (w1.array() * temp.array().log() + w2.array() * (temp.array() * -1.).log1p()).sum() / this->weights.sum() * -1.; 
+		return (w1.array() * temp.array().log() + w2.array() * (temp.array() * -1.).log1p()).sum() * -1.; 
 	}
 
 	Eigen::VectorXd mapping(const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
@@ -163,11 +163,11 @@ public:
 		Eigen::VectorXd one = Eigen::VectorXd::Ones(this->len);
 		Eigen::VectorXd s1 = this->w1.cwiseQuotient(fullden) - this->w2.cwiseQuotient(one - fullden);
 		if (d0){
-			ansd0 = (s1.dot(pnpdiscnorm_(this->data, mu, scale, this->beta, this->h) + this->precompute) + this->w2.cwiseQuotient(one - fullden).sum()) / -this->weights.sum() + 2 * this->weights.sum();
+			ansd0 = (s1.dot(pnpdiscnorm_(this->data, mu, scale, this->beta, this->h) + this->precompute) + this->w2.cwiseQuotient(one - fullden).sum()) * -1. + 2 * this->weights.sum();
 		}
 
 		if (d1){
-			ansd1 = dnpnorm_(this->data, mu - h, scale, this->beta).dot(s1) / this->weights.sum();
+			ansd1 = dnpnorm_(this->data, mu - h, scale, this->beta).dot(s1);
 		}
 	}
 
@@ -181,13 +181,12 @@ public:
 		if (d0){
 			// Eigen::ArrayXXd temp = (pnormarray(this->data, mu, this->beta) * scale).colwise() + this->precompute;
 			// ansd0 = (temp.colwise() * this->w1.cwiseQuotient(fullden).array() + (1 - temp).colwise() * (this->w2.array() / (1 - fullden.array()))).colwise().mean() * -1 + 2 * this->len; 
-			ansd0 = (((pdiscnormarray(this->data, mu, this->beta, this->h) * scale).colwise() + this->precompute).transpose() * s1 +
-							Eigen::VectorXd::Constant(mu.size(), this->w2.cwiseQuotient(one - fullden).sum())) / -this->weights.sum() +
-							Eigen::VectorXd::Constant(mu.size(), 2. * this->weights.sum());
+			ansd0 = ((pdiscnormarray(this->data, mu, this->beta, this->h) * scale).colwise() + this->precompute).transpose() * s1 * -1. +
+							Eigen::VectorXd::Constant(mu.size(), 2. * this->weights.sum() - this->w2.cwiseQuotient(one - fullden).sum());
 		} 
 
 		if (d1){
-			ansd1 = dnormarray(this->data, mu- Eigen::VectorXd::Constant(mu.size(), h), this->beta).transpose() * s1 * (scale / this->weights.sum());
+			ansd1 = dnormarray(this->data, mu- Eigen::VectorXd::Constant(mu.size(), h), this->beta).transpose() * s1 * scale;
 		}
 	}
 
@@ -202,7 +201,7 @@ public:
 			-2. * S2 + S.transpose() * this->precompute.cwiseQuotient(sp).cwiseProduct(this->w1) + 
 			U.transpose() * (Eigen::VectorXd::Ones(this->len) - this->precompute).cwiseQuotient(Eigen::VectorXd::Ones(this->len) - sp).cwiseProduct(this->w2),
 			1. - this->pi0fixed.sum());
-		this->checklossfun2(sf * nw - dens, pi0, nw - pi0, S2 / this->weights.sum(), dens);
+		this->checklossfun2(sf * nw - dens, pi0, nw - pi0, S2, dens);
 
 	}
 

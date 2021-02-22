@@ -60,7 +60,7 @@ public:
 	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
 		Eigen::VectorXd fp = dens + this->precompute;
 		Eigen::MatrixXd sp = dnormarray(this->data, mu0, this->beta), tp = sp.array().colwise() / fp.array();
-		Eigen::VectorXd nw = pnnlssum_(tp, 2. - this->precompute.array() / fp.array(), 1. - this->pi0fixed.sum());
+		Eigen::VectorXd nw = pnnlssum_(tp, Eigen::VectorXd::Constant(this->len, 2) - this->precompute.cwiseQuotient(fp), 1. - this->pi0fixed.sum());
 		this->checklossfun2(sp * nw - dens, pi0, nw - pi0, tp.colwise().sum(), dens);
 	}
 
@@ -143,8 +143,8 @@ public:
 	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
 		Eigen::VectorXd fp = dens + this->precompute;
 		Eigen::MatrixXd sp = ddiscnormarray(this->data, mu0, this->beta, this->h), tp = sp.array().colwise() / fp.array();
-		Eigen::VectorXd nw = pnnlssum_(tp.array().colwise() * this->weights.array().sqrt(), 
-			(2. - this->precompute.array() / fp.array()) * this->weights.array().sqrt(), 1. - this->pi0fixed.sum());
+		Eigen::VectorXd nw = pnnlssum_(tp.cwiseProduct(this->weights.cwiseSqrt().replicate(1, mu0.size())), 
+			(Eigen::VectorXd::Constant(this->len, 2) - this->precompute.cwiseQuotient(fp)).cwiseProduct(this->weights.cwiseSqrt()), 1. - this->pi0fixed.sum());
 		this->checklossfun2(sp * nw - dens, pi0, nw - pi0, tp.transpose() * this->weights, dens);
 		// this->checklossfun(mu0, pi0, nw - pi0, tp.transpose() * this->weights);
 	}

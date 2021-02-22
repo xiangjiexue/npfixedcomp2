@@ -58,7 +58,7 @@ public:
 	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
 		Eigen::VectorXd fp = dens + this->precompute;
 		Eigen::MatrixXd sp = dnormcarray(this->data, mu0, this->beta), tp = sp.array().colwise() / fp.array();
-		Eigen::VectorXd nw = pnnlssum_(tp, 2. - this->precompute.array() / fp.array(), 1. - this->pi0fixed.sum());
+		Eigen::VectorXd nw = pnnlssum_(tp, Eigen::VectorXd::Constant(this->len, 2) - this->precompute.cwiseQuotient(fp), 1. - this->pi0fixed.sum());
 		this->checklossfun2(sp * nw - dens, pi0, nw - pi0, tp.colwise().sum(), dens);
 	}
 
