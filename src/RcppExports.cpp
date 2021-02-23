@@ -237,6 +237,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// bisearchsorted_
+int bisearchsorted_(const Eigen::VectorXd& mu0, const int& lowerindex, const int& upperindex, const double& targetval);
+RcppExport SEXP _npfixedcomp2_bisearchsorted_(SEXP mu0SEXP, SEXP lowerindexSEXP, SEXP upperindexSEXP, SEXP targetvalSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const int& >::type lowerindex(lowerindexSEXP);
+    Rcpp::traits::input_parameter< const int& >::type upperindex(upperindexSEXP);
+    Rcpp::traits::input_parameter< const double& >::type targetval(targetvalSEXP);
+    rcpp_result_gen = Rcpp::wrap(bisearchsorted_(mu0, lowerindex, upperindex, targetval));
+    return rcpp_result_gen;
+END_RCPP
+}
 // npnormad_
 Rcpp::List npnormad_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormad_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
@@ -605,6 +619,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_pdiscnormarray_", (DL_FUNC) &_npfixedcomp2_pdiscnormarray_, 6},
     {"_npfixedcomp2_log1mexp_", (DL_FUNC) &_npfixedcomp2_log1mexp_, 1},
     {"_npfixedcomp2_logspaceadd_", (DL_FUNC) &_npfixedcomp2_logspaceadd_, 2},
+    {"_npfixedcomp2_bisearchsorted_", (DL_FUNC) &_npfixedcomp2_bisearchsorted_, 4},
     {"_npfixedcomp2_npnormad_", (DL_FUNC) &_npfixedcomp2_npnormad_, 10},
     {"_npfixedcomp2_estpi0npnormad_", (DL_FUNC) &_npfixedcomp2_estpi0npnormad_, 8},
     {"_npfixedcomp2_gfnpnormad", (DL_FUNC) &_npfixedcomp2_gfnpnormad, 7},

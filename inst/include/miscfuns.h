@@ -46,7 +46,7 @@ struct log1mexp_struct {
   typedef Matrix<typename ScalarBinaryOpTraits<typename ArgType::Scalar, double>::ReturnType,
                  ArgType::RowsAtCompileTime,
                  ArgType::ColsAtCompileTime,
-                 ColMajor,
+                 ArgType::Flags&RowMajorBit?RowMajor:ColMajor,
                  ArgType::MaxRowsAtCompileTime,
                  ArgType::MaxColsAtCompileTime> MatrixType;
 };
@@ -80,7 +80,7 @@ struct logspace_struct {
   typedef Matrix<typename ScalarBinaryOpTraits<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType, double>::ReturnType,
                  ArgType::SizeAtCompileTime,
                  ArgType::SizeAtCompileTime,
-                 ColMajor,
+                 ArgType::Flags&RowMajorBit?RowMajor:ColMajor,
                  ArgType::MaxSizeAtCompileTime,
                  ArgType::MaxSizeAtCompileTime> MatrixType;
 };
@@ -154,36 +154,75 @@ struct densityarray {
 };
 
 // begin normal density
-template<class ArgType, class ArgType2>
-class dnorm_functor {
-	const ArgType &x;
-	const ArgType2 &mu;
-	const double stdev;
-	const bool lg;
-public:
-	dnorm_functor(const ArgType& x_, const ArgType2 &mu_, const double &stdev_, const bool &lg_) : x(x_), mu(mu_), stdev(stdev_), lg(lg_) {}
 
-	const double operator() (Index row, Index col) const {
-		return R::dnorm4(x.coeff(row), mu.coeff(col), stdev, lg);
-	}
-};
+// conservative version using R API
+// template<class ArgType, class ArgType2>
+// class dnorm_functor {
+// 	const ArgType &x;
+// 	const ArgType2 &mu;
+// 	const double stdev;
+// 	const bool lg;
+// public:
+// 	dnorm_functor(const ArgType& x_, const ArgType2 &mu_, const double &stdev_, const bool &lg_) : x(x_), mu(mu_), stdev(stdev_), lg(lg_) {}
 
-template <class ArgType, class ArgType2>
-inline CwiseNullaryOp<dnorm_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
-dnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
-{
-	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
-	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
-	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
-	return MatrixType::NullaryExpr(x.size(), mu0.size(), dnorm_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lg));
-}
+// 	const double operator() (Index row, Index col) const {
+// 		return R::dnorm4(x.coeff(row), mu.coeff(col), stdev, lg);
+// 	}
+// };
 
+// template <class ArgType, class ArgType2>
+// inline CwiseNullaryOp<dnorm_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
+// dnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
+// {
+// 	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+// 	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
+// 	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+// 	return MatrixType::NullaryExpr(x.size(), mu0.size(), dnorm_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), stdev, lg));
+// }
+
+// template <class ArgType>
+// inline typename densityarrayscale<ArgType>::MatrixType
+// dnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lg = false)
+// {
+// 	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+// 	return dnormarray(x, Matrix<double, 1, 1>::Constant(1, mu0), stdev, lg);
+// }
+// end 
+
+// Eigen implementation. Might have weird behaviour under some circumstance.
 template <class ArgType>
 inline typename densityarrayscale<ArgType>::MatrixType
 dnormarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
-	return dnormarray(x, Matrix<double, 1, 1>::Constant(1, mu0), stdev, lg);
+	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+	MatrixType ans(x.size(), 1);
+	ans = (x.array() - mu0).square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
+	if (lg){
+		return ans;
+	}else{
+		return ans.array().exp();
+	}
+}
+
+template <class ArgType, class ArgType2>
+inline typename densityarray<ArgType, ArgType2>::MatrixType
+dnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	MatrixType ans(x.size(), mu0.size());
+	if (mu0.size() == 1){
+		ans = dnormarray<ArgType>(x, mu0.coeff(0), stdev, true);
+	}else{
+		ans = (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
+	}
+	if (lg){
+		return ans;
+	}else{
+		return ans.array().exp();
+	}
 }
 
 template <class ArgType>

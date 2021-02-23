@@ -120,6 +120,10 @@ logspaceadd_ <- function(lx, ly) {
     .Call('_npfixedcomp2_logspaceadd_', PACKAGE = 'npfixedcomp2', lx, ly)
 }
 
+bisearchsorted_ <- function(mu0, lowerindex, upperindex, targetval) {
+    .Call('_npfixedcomp2_bisearchsorted_', PACKAGE = 'npfixedcomp2', mu0, lowerindex, upperindex, targetval)
+}
+
 npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormad_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
