@@ -679,7 +679,8 @@ pnnlssum_(const MatrixBase<ArgType> &A, const MatrixBase<ArgType2> &b, const dou
 	int m = A.rows() + 1, n = A.cols();
 	MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
 	VectorXd bb = Eigen::VectorXd::Zero(m - 1).homogeneous(), zz(m);
-	VectorXd x(n), w(n);
+	VectorXd w(n);
+	typename pnnls_struct<ArgType, ArgType2>::MatrixType x(n);
 	double rnorm;
 	VectorXi index(n);
 	int mode, k = 0;

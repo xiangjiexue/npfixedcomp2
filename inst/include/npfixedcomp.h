@@ -296,7 +296,13 @@ public:
 
 		while (ub - lb > tol){
 			newpoint = newmin(xx, fxx);
-			newpoint = (std::isnan(newpoint) | (newpoint < lb) | (newpoint > ub)) ? (lb + ub) / 2 : newpoint;
+			if (std::isnan(newpoint) | (newpoint < lb) | (newpoint > ub)){
+				if (std::fabs(xx[0] - xx[2]) < std::fabs(xx[1] - xx[2])){
+					newpoint = (xx[1] + xx[2]) / 2.;
+				}else{
+					newpoint = (xx[0] + xx[2]) / 2.;
+				}
+			}
 			this->gradfun(newpoint, dens, fnewpoint, dummy, true, false);
 
 			if (fnewpoint > fxx[2]){

@@ -60,7 +60,12 @@ public:
 	}
 
 	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
-		pi0 = pnnlssum_(pnormarray(this->data, mu0, this->beta), this->precompute, 1. - this->pi0fixed.sum());
+		Eigen::MatrixXd fp = pnormarray(this->data, mu0, this->beta);
+		if (this->len > 1e3){
+			pi0 = pnnqp_(fp.transpose() * fp, fp.transpose() * this->precompute * -1., 1. - this->pi0fixed.sum());
+		}else{
+			pi0 = pnnlssum_(pnormarray(this->data, mu0, this->beta), this->precompute, 1. - this->pi0fixed.sum());
+		}
 	}
 
 	double extrafun() const{
