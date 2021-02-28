@@ -165,8 +165,3 @@ Eigen::VectorXd log1mexp_(const Eigen::VectorXd &x){
 Eigen::VectorXd logspaceadd_(const Eigen::VectorXd &lx, const Eigen::VectorXd &ly){
 	return logspaceadd(lx, ly);
 }
-
-// [[Rcpp::export]]
-int bisearchsorted_(const Eigen::VectorXd &mu0, const int &lowerindex, const int &upperindex, const double &targetval){
-	return bisearchsorted(mu0, lowerindex, upperindex, targetval);
-}

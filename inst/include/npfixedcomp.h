@@ -25,49 +25,34 @@ inline void simplifymix(Eigen::VectorXd & mu0, Eigen::VectorXd & pi0){
 	}
 }
 
-inline int bisearchsorted(const Eigen::VectorXd &mu0, const int &lowerindex, const int &upperindex, const double &targetval){
-	// assuming mu0 is a sorted array
-	if (upperindex == lowerindex){
-		return upperindex;
-	}else{
-		int tempindex = std::ceil((lowerindex + upperindex) / 2.);
-		if (mu0[tempindex] < targetval){
-			return bisearchsorted(mu0, tempindex, upperindex, targetval);
-			// it is possible that tempindex is the one required.
-		}else{
-			return bisearchsorted(mu0, lowerindex, tempindex - 1, targetval);
-		}
-	}
-}
-
 // This function collpse the mixing distribution
 inline void collapsemix(Eigen::VectorXd &mu0, Eigen::VectorXd &pi0,
 	const double &prec){
-	double temppr, temppt;
-	bool foo = (diff_(mu0).minCoeff() <= prec);
-	// update: blocked operations.
-	int i, strid;
-	while (foo){
-		i = 0;
-		while (i < mu0.size() - 1){
-			strid = bisearchsorted(mu0, i, mu0.size() - 1, mu0[i] + prec);
-			if (strid > i){
-				int step = strid - i + 1;
-				temppr = pi0.segment(i, step).sum();
-				temppt = mu0.segment(i, step).dot(pi0.segment(i, step)) / temppr;
-				mu0[i] = temppt;
-				pi0[i] = temppr;
-				pi0.segment(i + 1, step - 1).setZero();
-				i = strid + 1;
-			}else{
-				i++;
+	bool foo;
+	if (mu0.size() > 1){
+		foo = (diff_(mu0).minCoeff() <= prec);
+//		sortmix(mu0, pi0);
+		double temp;
+		int i;
+		while (foo){
+			i = 0;
+			while (i < mu0.size() - 1){
+				if (mu0[i + 1] - mu0[i] <= prec){
+					temp = pi0[i] + pi0[i + 1];
+					mu0[i] = (mu0[i] * pi0[i] + mu0[i + 1] * pi0[i + 1]) / temp;
+					pi0[i + 1] = 0;
+					pi0[i] = temp;
+					i = i + 2;
+				}else{
+					i++;
+				}
 			}
-		}
-		simplifymix(mu0, pi0);
-		if (mu0.size() <= 1) {
-			foo = false;
-		}else{
-			foo = (diff_(mu0).minCoeff() <= prec);
+			simplifymix(mu0, pi0);
+			if (mu0.size() <= 1) {
+				foo = false;
+			}else{
+				foo = (diff_(mu0).minCoeff() <= prec);
+			}
 		}
 	}
 }

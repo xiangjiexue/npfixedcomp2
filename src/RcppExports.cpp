@@ -6,6 +6,17 @@
 
 using namespace Rcpp;
 
+// CorrelationMatrixcpp
+Eigen::MatrixXd CorrelationMatrixcpp(const Eigen::MatrixXd& G1);
+RcppExport SEXP _npfixedcomp2_CorrelationMatrixcpp(SEXP G1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type G1(G1SEXP);
+    rcpp_result_gen = Rcpp::wrap(CorrelationMatrixcpp(G1));
+    return rcpp_result_gen;
+END_RCPP
+}
 // pnnlssum
 Eigen::VectorXd pnnlssum(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const double& sum);
 RcppExport SEXP _npfixedcomp2_pnnlssum(SEXP ASEXP, SEXP bSEXP, SEXP sumSEXP) {
@@ -234,20 +245,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type lx(lxSEXP);
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type ly(lySEXP);
     rcpp_result_gen = Rcpp::wrap(logspaceadd_(lx, ly));
-    return rcpp_result_gen;
-END_RCPP
-}
-// bisearchsorted_
-int bisearchsorted_(const Eigen::VectorXd& mu0, const int& lowerindex, const int& upperindex, const double& targetval);
-RcppExport SEXP _npfixedcomp2_bisearchsorted_(SEXP mu0SEXP, SEXP lowerindexSEXP, SEXP upperindexSEXP, SEXP targetvalSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type mu0(mu0SEXP);
-    Rcpp::traits::input_parameter< const int& >::type lowerindex(lowerindexSEXP);
-    Rcpp::traits::input_parameter< const int& >::type upperindex(upperindexSEXP);
-    Rcpp::traits::input_parameter< const double& >::type targetval(targetvalSEXP);
-    rcpp_result_gen = Rcpp::wrap(bisearchsorted_(mu0, lowerindex, upperindex, targetval));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -603,6 +600,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_npfixedcomp2_CorrelationMatrixcpp", (DL_FUNC) &_npfixedcomp2_CorrelationMatrixcpp, 1},
     {"_npfixedcomp2_pnnlssum", (DL_FUNC) &_npfixedcomp2_pnnlssum, 3},
     {"_npfixedcomp2_pnnqp", (DL_FUNC) &_npfixedcomp2_pnnqp, 3},
     {"_npfixedcomp2_dnpnorm", (DL_FUNC) &_npfixedcomp2_dnpnorm, 5},
@@ -619,7 +617,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_pdiscnormarray_", (DL_FUNC) &_npfixedcomp2_pdiscnormarray_, 6},
     {"_npfixedcomp2_log1mexp_", (DL_FUNC) &_npfixedcomp2_log1mexp_, 1},
     {"_npfixedcomp2_logspaceadd_", (DL_FUNC) &_npfixedcomp2_logspaceadd_, 2},
-    {"_npfixedcomp2_bisearchsorted_", (DL_FUNC) &_npfixedcomp2_bisearchsorted_, 4},
     {"_npfixedcomp2_npnormad_", (DL_FUNC) &_npfixedcomp2_npnormad_, 10},
     {"_npfixedcomp2_estpi0npnormad_", (DL_FUNC) &_npfixedcomp2_estpi0npnormad_, 8},
     {"_npfixedcomp2_gfnpnormad", (DL_FUNC) &_npfixedcomp2_gfnpnormad, 7},
