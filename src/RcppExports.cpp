@@ -6,14 +6,16 @@
 
 using namespace Rcpp;
 
-// CorrelationMatrixcpp
-Eigen::MatrixXd CorrelationMatrixcpp(const Eigen::MatrixXd& G1);
-RcppExport SEXP _npfixedcomp2_CorrelationMatrixcpp(SEXP G1SEXP) {
+// correlationmatrixcpp
+Eigen::MatrixXd correlationmatrixcpp(const Eigen::MatrixXd& G1, const double tau, const double tol);
+RcppExport SEXP _npfixedcomp2_correlationmatrixcpp(SEXP G1SEXP, SEXP tauSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type G1(G1SEXP);
-    rcpp_result_gen = Rcpp::wrap(CorrelationMatrixcpp(G1));
+    Rcpp::traits::input_parameter< const double >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< const double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(correlationmatrixcpp(G1, tau, tol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -600,7 +602,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_npfixedcomp2_CorrelationMatrixcpp", (DL_FUNC) &_npfixedcomp2_CorrelationMatrixcpp, 1},
+    {"_npfixedcomp2_correlationmatrixcpp", (DL_FUNC) &_npfixedcomp2_correlationmatrixcpp, 3},
     {"_npfixedcomp2_pnnlssum", (DL_FUNC) &_npfixedcomp2_pnnlssum, 3},
     {"_npfixedcomp2_pnnqp", (DL_FUNC) &_npfixedcomp2_pnnqp, 3},
     {"_npfixedcomp2_dnpnorm", (DL_FUNC) &_npfixedcomp2_dnpnorm, 5},
