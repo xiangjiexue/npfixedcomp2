@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>non-parametric t distribution — dnpt • npfixedcomp2</title>
+<title>non-parametric normal distribution — dnppois • npfixedcomp2</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="non-parametric t distribution — dnpt" />
-<meta property="og:description" content="The density and the distribution function of non-parametric t distribution" />
+<meta property="og:title" content="non-parametric normal distribution — dnppois" />
+<meta property="og:description" content="The density and the distribution function of non-parametric poisson distribution" />
 
 
 
@@ -103,16 +103,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>non-parametric t distribution</h1>
+    <h1>non-parametric normal distribution</h1>
     
-    <div class="hidden name"><code>npt.Rd</code></div>
+    <div class="hidden name"><code>nppois.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The density and the distribution function of non-parametric t distribution</p>
+    <p>The density and the distribution function of non-parametric poisson distribution</p>
     </div>
 
-    <pre class="usage"><span class='fu'>dnpt</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>df</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>dnppois</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, stdev <span class='op'>=</span> <span class='fl'>1</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+
+<span class='fu'>pnppois</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, stdev <span class='op'>=</span> <span class='fl'>1</span>, lt <span class='op'>=</span> <span class='cn'>TRUE</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -130,18 +132,24 @@
       <td><p>the vector of weights correponding to the support points</p></td>
     </tr>
     <tr>
-      <th>df</th>
-      <td><p>degree of freedom.</p></td>
+      <th>stdev</th>
+      <td><p>structure parameter, passed but not referenced, for compatibility</p></td>
     </tr>
     <tr>
       <th>lg</th>
       <td><p>logical; if TRUE, the result will be given in log scale.</p></td>
     </tr>
+    <tr>
+      <th>lt</th>
+      <td><p>logical; if TRUE, the lower probability is computed</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>dnpnorm</code> gives the density.</p>
+    <p><code>dnppois</code> gives the density, <code>pnppois</code> gives the distribution function.</p>
+<p>It is important to note that <code>pnppois</code> and its underlying function did not use
+logspaceadd type implementation, the accuracy may be affected.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

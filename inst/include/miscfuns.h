@@ -612,6 +612,150 @@ dnpdiscnorm_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, cons
 
 // end discrete normal density
 
+// begin poisson density
+// Eigen implementation. Might have weird behaviour under some circumstance.
+// return type conversion is not working for <int, double>. the vector x needs to be of double type.
+// structure parameter stdev not referenced.
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+dpoisarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+	MatrixType ans(x.size(), 1);
+	ans = (x.array() + mu0 > 0).select(x.array() * std::log(mu0) - mu0 - (x.array() + 1.).lgamma(), MatrixType::Zero(x.size(), 1));
+	if (lg){
+		return ans;
+	}else{
+		return ans.array().exp();
+	}
+}
+
+template <class ArgType, class ArgType2>
+inline typename densityarray<ArgType, ArgType2>::MatrixType
+dpoisarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	MatrixType ans(x.size(), mu0.size());
+	if (mu0.size() == 1){
+		ans = dpoisarray<ArgType>(x, mu0.coeff(0), stdev, true);
+	}else{
+		Eigen::MatrixXd mu0array = mu0.replicate(1, x.size()).transpose();
+		ans = (mu0array.array().colwise() + x.array() > 0).select(mu0array.array().log().colwise() * x.array() - mu0array.array() - (x.array() + 1.).lgamma().replicate(1, mu0.size()), MatrixType::Zero(x.size(), mu0.size()));
+	}
+	if (lg){
+		return ans;
+	}else{
+		return ans.array().exp();
+	}
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnppois_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool& lg = false){
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (lg){
+		ans = dpoisarray(x, mu0, stdev, true).array() + ((pi0 > 0) ? std::log(pi0) : -1e100);
+	}else{
+		ans = dpoisarray(x, mu0, stdev) * pi0;
+	}
+	return ans;
+}
+
+template <class ArgType, class ArgType2, class ArgType3>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnppois_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& stdev, const bool& lg = false){
+	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (mu0.size() == 1){
+		ans = dnppois_(x, mu0[0], pi0[0], stdev, lg);
+	}else{
+		if (lg){
+			ans = dnppois_(x, mu0[0], pi0[0], stdev, true); 
+			for (auto i = 1; i < mu0.size(); ++i){
+				ans = logspaceadd(ans, dnpnorm_(x, mu0[i], pi0[i], stdev, true));
+			}
+		}else{
+			ans = dpoisarray(x, mu0, stdev) * pi0;
+		}		
+	}
+	
+	return ans;
+}
+
+// end poisson density
+
+// begin poisson CDF
+template<class ArgType, class ArgType2>
+class ppois_functor {
+	const ArgType &x;
+	const ArgType2 &mu;
+	const bool lt;
+	const bool lg;
+public:
+	ppois_functor(const ArgType& x_, const ArgType2 &mu_, const bool &lt_, const bool &lg_) : x(x_), mu(mu_), lt(lt_), lg(lg_) {}
+
+	const double operator() (Index row, Index col) const {
+		return R::ppois(x.coeff(row), mu.coeff(col), lt, lg);
+	}
+};
+
+template <class ArgType, class ArgType2>
+inline typename densityarray<ArgType, ArgType2>::MatrixType
+ppoisarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = false, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(x.size(), mu0.size(), ppois_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), lt, lg));
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+ppoisarray(const MatrixBase<ArgType>& x, const double & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	return ppoisarray(x, Matrix<double, 1, 1>::Constant(1, mu0), stdev, lt, lg);
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnppois_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (lg){
+		ans = ppoisarray(x, mu0, stdev, lt, true).array() + ((pi0 > 0) ? std::log(pi0) : -1e100);
+	}else{
+		ans = ppoisarray(x, mu0, stdev, lt) * pi0;
+	}
+
+	return ans;
+}
+
+template <class ArgType, class ArgType2, class ArgType3>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnppois_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& stdev, const bool &lt = true, const bool& lg = false){
+	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (mu0.size() == 1){
+		ans = pnppois_(x, mu0.coeff(0), pi0.coeff(0), stdev, lt, lg);
+	}else{
+		if (lg){
+			ans = pnppois_(x, mu0[0], pi0[0], stdev, lt, true);
+			for (auto i = 1; i < mu0.size(); ++i){
+				ans = logspaceadd(ans, pnppois_(x, mu0[i], pi0[i], stdev, lt, true));
+			}
+		}else{
+			ans = ppoisarray(x, mu0, stdev, lt, false) * pi0;
+		}	
+	}
+
+	return ans;
+}
+
+// end poisson CDF
+
 // begin indexing
 	
 template<class ArgType, class RowIndexType, class ColIndexType>

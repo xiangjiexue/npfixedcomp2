@@ -138,14 +138,12 @@ covestEB = function(X, estpi0 = FALSE, order = -3, verbose = FALSE, force.nonbin
   
   ans[index, index] = returnlower(postmean)
   
-  ans1 = CorrelationMatrix(ans, b = rep(1, p), tol = 1e-3)
-  ans2 = ans1$CorrMat
+  ans1 = correlationmatrixcpp(ans, tol = 1e-3)
   
   varest = sqrt(diag(covest))
   
-  list(mat = ans2 * varest * rep(varest, rep(length(varest), length(varest))),
-       correction = ifelse(ans1$iterations == 0, FALSE, TRUE),
-       correction.Fnorm = norm(ans2 - ans, type = "F"),
+  list(mat = ans1 * varest * rep(varest, rep(length(varest), length(varest))),
+       correction.Fnorm = norm(ans1 - ans, type = "F"),
        mix.dist = r)
 }
 
@@ -165,14 +163,12 @@ covestEB.cor = function(X, verbose = FALSE){
   
   ans[index, index] = returnlower(postmean)
   
-  ans1 = CorrelationMatrix(ans, b = rep(1, p), tol = 1e-3)
-  ans2 = ans1$CorrMat
+  ans1 = correlationmatrixcpp(ans, tol = 1e-3)
   
   varest = sqrt(diag(covest))
   
-  list(mat = ans2 * varest * rep(varest, rep(length(varest), length(varest))),
-       correction = ifelse(ans1$iterations == 0, FALSE, TRUE),
-       correction.Fnorm = norm(ans2 - ans, type = "F"),
+  list(mat = ans1 * varest * rep(varest, rep(length(varest), length(varest))),
+       correction.Fnorm = norm(ans1 - ans, type = "F"),
        mix.dist = r)
 }
 

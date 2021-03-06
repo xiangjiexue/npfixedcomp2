@@ -15,6 +15,8 @@ NULL
 
 initial.npnorm = utils::getFromNamespace("initial.npnorm", "nspmix")
 gridpoints.npnorm = utils::getFromNamespace("gridpoints.npnorm", "nspmix")
+initial.nppois = utils::getFromNamespace("initial.nppois", "nspmix")
+gridpoints.nppois = utils::getFromNamespace("gridpoints.nppois", "nspmix")
 
 #' Bin the continuous data.
 #'
@@ -71,6 +73,8 @@ bin = function(data, order = -2){
 #' correlation coefficients using maximum likelihood. This does not have a
 #' corresponding estimation of zero due to incompleted theory (Chapter 8).
 #' There is no default beta. The structure beta is the number of observations.
+#' - nppoisll : poisson mixture using maximum likelihood. There is no structural parameter, and hence
+#' the template will pass beta but this beta will never be referenced.
 #'
 #' The default method used is npnormll.
 #'
@@ -103,6 +107,9 @@ bin = function(data, order = -2){
 #' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -2))
 #' r
 #' system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormadw", order = -2))
+#' r
+#' data2 = rpois(1000, c(0, 2))
+#' system.time(r <- computemixdist(data2, pi0 = pi0, method = "nppoisll"))
 #' r
 #' system.time(r <- nspmix::cnm(nspmix::npnorm(data)))
 #' r
@@ -160,6 +167,9 @@ computemixdist = function(v, method = "npnormll", ...){
 #' r
 #' system.time(r <- estpi0(tanh(data), method = "npnormcll", val = 2, beta = 4, verbose = TRUE))
 #' r
+#' data2 = rpois(1000, c(0, 2))
+#' system.time(r <- estpi0(data2, method = "nppoisll", val = 2))
+#' r
 #' @export
 estpi0 = function(v, method = "npnormll", ...){
   f = match.fun(paste0("estpi0.", method))
@@ -201,7 +211,7 @@ computemixdist.npnormcvm = function(v, mu0, pi0, beta, order, mix = NULL, gridpo
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
   v1 = npnorm(sort(v))
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v1, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v1, beta = beta), v1$v[1] - 3 * beta, v1$v[length(v1$v)] + 3 * beta)}
   init = initial.npnorm(v1, beta = beta, mix = mix)
   k = npnormcvm_(v1$v, mu0, pi0, beta, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
@@ -214,7 +224,7 @@ computemixdist.npnormcvm = function(v, mu0, pi0, beta, order, mix = NULL, gridpo
 estpi0.npnormcvm = function(v, beta, val, order, mix = NULL, gridpoints = NULL, ...){
   if (missing(beta)) {beta = 1}
   v1 = npnorm(sort(v))
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v1, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v1, beta = beta), v1$v[1] - 3 * beta, v1$v[length(v1$v)] + 3 * beta)}
   init = initial.npnorm(v1, beta = beta, mix = mix)
   k = estpi0npnormcvm_(v1$v, beta, val, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
@@ -229,7 +239,7 @@ computemixdist.npnormad = function(v, mu0, pi0, beta, order, mix = NULL, gridpoi
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
   v1 = npnorm(sort(v))
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v1, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v1, beta = beta), v1$v[1] - 3 * beta, v1$v[length(v1$v)] + 3 * beta)}
   init = initial.npnorm(v1, beta = beta, mix = mix)
   k = npnormad_(v1$v, mu0, pi0, beta, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
@@ -243,7 +253,7 @@ estpi0.npnormad = function(v, beta, val, order, mix = NULL, gridpoints = NULL, .
   if (missing(beta)) {beta = 1}
   v1 = npnorm(sort(v))
   init = initial.npnorm(v1, beta = beta, mix = mix)
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v1, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v1, beta = beta), v1$v[1] - 3 * beta, v1$v[length(v1$v)] + 3 * beta)}
   k = estpi0npnormad_(v1$v, beta, val, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
   
@@ -264,7 +274,7 @@ computemixdist.npnormcll = function(v, mu0, pi0, beta, order, mix = NULL, gridpo
                           mix = list(pt = atanh(mix$pt), pr = mix$pr))
   }
   k = npnormcll_(v, mu0, pi0, beta, tanh(init$mix$pt), init$mix$pr, 
-                sort(gridpoints), ...)
+                 sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
   
   k
@@ -282,7 +292,7 @@ estpi0.npnormcll = function(v, beta, val, order, mix = NULL, gridpoints = NULL, 
                           mix = list(pt = atanh(mix$pt), pr = mix$pr))
   }
   k = estpi0npnormcll_(v, beta, val, tanh(init$mix$pt), init$mix$pr, 
-                 sort(gridpoints), ...)
+                       sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
   
   k
@@ -303,7 +313,7 @@ computemixdist.nptll = function(v, mu0, pi0, beta, order, mix = NULL, gridpoints
                           mix = list(pt = qnorm(pt(mix$pt, df = beta)), pr = mix$pr))   
   }
   k = nptll_(v, mu0, pi0, beta, qt(pnorm(init$mix$pt), df = beta), init$mix$pr, 
-                 sort(gridpoints), ...)
+             sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
   
   k
@@ -322,7 +332,7 @@ estpi0.nptll = function(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
                           mix = list(pt = qnorm(pt(mix$pt, df = beta)), pr = mix$pr))   
   }
   k = estpi0nptll_(v, beta, val, qt(pnorm(init$mix$pt), df = beta), init$mix$pr, 
-             sort(gridpoints), ...)
+                   sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
   
   k
@@ -330,7 +340,7 @@ estpi0.nptll = function(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
 #' @rdname computemixdist
 #' @export
-computemixdist.npnormllw = function(v, mu0, pi0, beta, order, mix = NULL, gridpoints = NULL, ...){
+computemixdist.npnormllw = function(v, mu0, pi0, beta, order = -3, mix = NULL, gridpoints = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
@@ -346,7 +356,7 @@ computemixdist.npnormllw = function(v, mu0, pi0, beta, order, mix = NULL, gridpo
 
 #' @rdname estpi0
 #' @export
-estpi0.npnormllw = function(v, beta, val, order, mix = NULL, gridpoints = NULL, ...){
+estpi0.npnormllw = function(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...){
   if (missing(beta)) {beta = 1}
   v1 = bin(v, order)
   v2 = npnorm(v = v1$v, w = v1$w)
@@ -360,13 +370,13 @@ estpi0.npnormllw = function(v, beta, val, order, mix = NULL, gridpoints = NULL, 
 
 #' @rdname computemixdist
 #' @export
-computemixdist.npnormcvmw = function(v, mu0, pi0, beta, order, mix = NULL, gridpoints = NULL, ...){
+computemixdist.npnormcvmw = function(v, mu0, pi0, beta, order = -3, mix = NULL, gridpoints = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
   v1 = bin(v, order)
   v2 = npnorm(v = v1$v, w = v1$w)
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v2, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v2, beta = beta), v2$v[1] - 3 * beta, v2$v[length(v2$v)] + 3 * beta)}
   init = initial.npnorm(v2, beta = beta, mix = mix)
   k = npnormcvmw_(v1$v, v1$w, mu0, pi0, beta, 10^order, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
@@ -376,11 +386,11 @@ computemixdist.npnormcvmw = function(v, mu0, pi0, beta, order, mix = NULL, gridp
 
 #' @rdname estpi0
 #' @export
-estpi0.npnormcvmw = function(v, beta, val, order, mix = NULL, gridpoints = NULL, ...){
+estpi0.npnormcvmw = function(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...){
   if (missing(beta)) {beta = 1}
   v1 = bin(v, order)
   v2 = npnorm(v = v1$v, w = v1$w)
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v2, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v2, beta = beta), v2$v[1] - 3 * beta, v2$v[length(v2$v)] + 3 * beta)}
   init = initial.npnorm(v2, beta = beta, mix = mix)
   k = estpi0npnormcvmw_(v1$v, v1$w, beta, 10^order, val, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
@@ -390,13 +400,13 @@ estpi0.npnormcvmw = function(v, beta, val, order, mix = NULL, gridpoints = NULL,
 
 #' @rdname computemixdist
 #' @export
-computemixdist.npnormadw = function(v, mu0, pi0, beta, order, mix = NULL, gridpoints = NULL, ...){
+computemixdist.npnormadw = function(v, mu0, pi0, beta, order = -3, mix = NULL, gridpoints = NULL, ...){
   if (missing(mu0)) {mu0 = 0}
   if (missing(pi0)) {pi0 = 0}
   if (missing(beta)) {beta = 1}
   v1 = bin(v, order)
   v2 = npnorm(v = v1$v, w = v1$w)
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v2, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v2, beta = beta), v2$v[1] - 3 * beta, v2$v[length(v2$v)] + 3 * beta)}
   init = initial.npnorm(v2, beta = beta, mix = mix)
   k = npnormadw_(v1$v, v1$w, mu0, pi0, beta, 10^order, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
@@ -406,13 +416,43 @@ computemixdist.npnormadw = function(v, mu0, pi0, beta, order, mix = NULL, gridpo
 
 #' @rdname estpi0
 #' @export
-estpi0.npnormadw = function(v, beta, val, order, mix = NULL, gridpoints = NULL, ...){
+estpi0.npnormadw = function(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...){
   if (missing(beta)) {beta = 1}
   v1 = bin(v, order)
   v2 = npnorm(v = v1$v, w = v1$w)
-  if (is.null(gridpoints)) {gridpoints = gridpoints.npnorm(v2, beta = beta)}
+  if (is.null(gridpoints)) {gridpoints = c(gridpoints.npnorm(v2, beta = beta), v2$v[1] - 3 * beta, v2$v[length(v2$v)] + 3 * beta)}
   init = initial.npnorm(v2, beta = beta, mix = mix)
   k = estpi0npnormadw_(v1$v, v1$w, beta, 10^order, val, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname computemixdist
+#' @export
+computemixdist.nppoisll = function(v, mu0, pi0, beta, order, mix = NULL, gridpoints = NULL, ...){
+  if (missing(mu0)) {mu0 = 0}
+  if (missing(pi0)) {pi0 = 0}
+  if (missing(beta)) {beta = 1}
+  v1 = table(v)
+  v2 = nppois(v = as.numeric(names(v1)), w = as.numeric(v1))
+  if (is.null(gridpoints)) {gridpoints = gridpoints.nppois(v2, beta = beta)}
+  init = initial.nppois(v2, beta = beta, mix = mix)
+  k = nppoisll_(v2$v, v2$w, mu0, pi0, beta, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname estpi0
+#' @export
+estpi0.nppoisll = function(v, beta, val, order, mix = NULL, gridpoints = NULL, ...){
+  if (missing(beta)) {beta = 1}
+  v1 = table(v)
+  v2 = nppois(v = as.numeric(names(v1)), w = as.numeric(v1))
+  if (is.null(gridpoints)) {gridpoints = gridpoints.nppois(v2, beta = beta)}
+  init = initial.nppois(v2, beta = beta, mix = mix)
+  k = estpi0nppoisll_(v2$v, v2$w, beta, val, init$mix$pt, init$mix$pr, sort(gridpoints), ...)
   attr(k, "class") = "nspmix"
   
   k

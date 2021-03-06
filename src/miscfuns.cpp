@@ -114,7 +114,9 @@ Eigen::MatrixXd dtarray_(const Eigen::VectorXd &x,
 
 //' The density and the distribution function of non-parametric discrete normal distribution
 //'
-//' \code{dnpdiscnorm} gives the density and \code{pnpdiscnorm} gives the CDF
+//' \code{dnpdiscnorm} gives the density and \code{pnpdiscnorm} gives the CDF.
+//'
+//' In this implementation, the support space is ..., -h, 0, h, ...
 //'
 //' @title non-parametric discrete normal distribution
 //' @param x vector of observations, vector of quantiles
@@ -154,6 +156,52 @@ Eigen::MatrixXd pdiscnormarray_(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0,
 	const double &stdev, const double &h, const bool &lt = true, const bool &lg = false){
 	return pdiscnormarray(x, mu0, stdev, h, lt, lg);
+}
+
+//' The density and the distribution function of non-parametric poisson distribution
+//'
+//' \code{dnppois} gives the density, \code{pnppois} gives the distribution function.
+//'
+//' It is important to note that \code{pnppois} and its underlying function did not use
+//' logspaceadd type implementation, the accuracy may be affected. 
+//'
+//' @title non-parametric normal distribution
+//' @param x vector of observations, vector of quantiles
+//' @param mu0 the vector of support points
+//' @param stdev structure parameter, passed but not referenced, for compatibility
+//' @param pi0 the vector of weights correponding to the support points
+//' @param lt logical; if TRUE, the lower probability is computed
+//' @param lg logical; if TRUE, the result will be given in log scale.
+//' @rdname nppois
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd dnppois(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &stdev = 1, const bool &lg = false){
+	return dnppois_(x, mu0, pi0, stdev, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd dpoisarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &stdev = 1, const bool &lg = false){
+	return dpoisarray(x, mu0, stdev, lg);
+}
+
+//' @rdname nppois
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd pnppois(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
+	return pnppois_(x, mu0, pi0, stdev, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd ppoisarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
+	return ppoisarray(x, mu0, stdev, lt, lg);
 }
 
 // [[Rcpp::export]]

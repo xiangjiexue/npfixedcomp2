@@ -3,7 +3,6 @@
 // Xiangjie Xue translate the R code into C++ using Eigen library.
 
 #include <RcppEigen.h>
-#include <unsupported/Eigen/IterativeSolvers>
 #include "../inst/include/miscfuns.h"
 
 void MyEigen(const Eigen::MatrixXd &X, Eigen::MatrixXd &eigvec, Eigen::VectorXd &eigval){

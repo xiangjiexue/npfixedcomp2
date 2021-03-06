@@ -86,7 +86,9 @@ dtarray_ <- function(x, mu0, df, lg = FALSE) {
 
 #' The density and the distribution function of non-parametric discrete normal distribution
 #'
-#' \code{dnpdiscnorm} gives the density and \code{pnpdiscnorm} gives the CDF
+#' \code{dnpdiscnorm} gives the density and \code{pnpdiscnorm} gives the CDF.
+#'
+#' In this implementation, the support space is ..., -h, 0, h, ...
 #'
 #' @title non-parametric discrete normal distribution
 #' @param x vector of observations, vector of quantiles
@@ -114,6 +116,40 @@ pnpdiscnorm <- function(x, mu0, pi0, stdev, h, lt = TRUE, lg = FALSE) {
 
 pdiscnormarray_ <- function(x, mu0, stdev, h, lt = TRUE, lg = FALSE) {
     .Call('_npfixedcomp2_pdiscnormarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, h, lt, lg)
+}
+
+#' The density and the distribution function of non-parametric poisson distribution
+#'
+#' \code{dnppois} gives the density, \code{pnppois} gives the distribution function.
+#'
+#' It is important to note that \code{pnppois} and its underlying function did not use
+#' logspaceadd type implementation, the accuracy may be affected. 
+#'
+#' @title non-parametric normal distribution
+#' @param x vector of observations, vector of quantiles
+#' @param mu0 the vector of support points
+#' @param stdev structure parameter, passed but not referenced, for compatibility
+#' @param pi0 the vector of weights correponding to the support points
+#' @param lt logical; if TRUE, the lower probability is computed
+#' @param lg logical; if TRUE, the result will be given in log scale.
+#' @rdname nppois
+#' @export
+dnppois <- function(x, mu0, pi0, stdev = 1, lg = FALSE) {
+    .Call('_npfixedcomp2_dnppois', PACKAGE = 'npfixedcomp2', x, mu0, pi0, stdev, lg)
+}
+
+dpoisarray_ <- function(x, mu0, stdev = 1, lg = FALSE) {
+    .Call('_npfixedcomp2_dpoisarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, lg)
+}
+
+#' @rdname nppois
+#' @export
+pnppois <- function(x, mu0, pi0, stdev = 1, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_pnppois', PACKAGE = 'npfixedcomp2', x, mu0, pi0, stdev, lt, lg)
+}
+
+ppoisarray_ <- function(x, mu0, stdev = 1, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_ppoisarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, lt, lg)
 }
 
 log1mexp_ <- function(x) {
@@ -186,6 +222,14 @@ npnormllw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initp
 
 estpi0npnormllw_ <- function(data, weights, beta, h, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
     .Call('_npfixedcomp2_estpi0npnormllw_', PACKAGE = 'npfixedcomp2', data, weights, beta, h, val, initpt, initpr, gridpoints, tol, verbose)
+}
+
+nppoisll_ <- function(data, weights, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
+    .Call('_npfixedcomp2_nppoisll_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+estpi0nppoisll_ <- function(data, weights, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
+    .Call('_npfixedcomp2_estpi0nppoisll_', PACKAGE = 'npfixedcomp2', data, weights, beta, val, initpt, initpr, gridpoints, tol, verbose)
 }
 
 nptll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {

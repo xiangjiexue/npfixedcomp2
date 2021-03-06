@@ -10,6 +10,7 @@
 \alias{computemixdist.npnormllw}
 \alias{computemixdist.npnormcvmw}
 \alias{computemixdist.npnormadw}
+\alias{computemixdist.nppoisll}
 \title{Computing non-parametric mixing distribution}
 \usage{
 computemixdist(v, method = "npnormll", ...)
@@ -74,7 +75,7 @@ computemixdist.npnormllw(
   mu0,
   pi0,
   beta,
-  order,
+  order = -3,
   mix = NULL,
   gridpoints = NULL,
   ...
@@ -85,13 +86,24 @@ computemixdist.npnormcvmw(
   mu0,
   pi0,
   beta,
-  order,
+  order = -3,
   mix = NULL,
   gridpoints = NULL,
   ...
 )
 
 computemixdist.npnormadw(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order = -3,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
+
+computemixdist.nppoisll(
   v,
   mu0,
   pi0,
@@ -147,6 +159,8 @@ The default beta is 1 and the default order is -3.
 correlation coefficients using maximum likelihood. This does not have a
 corresponding estimation of zero due to incompleted theory (Chapter 8).
 There is no default beta. The structure beta is the number of observations.
+\item nppoisll : poisson mixture using maximum likelihood. There is no structural parameter, and hence
+the template will pass beta but this beta will never be referenced.
 }
 
 The default method used is npnormll.
@@ -170,6 +184,9 @@ r
 system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -2))
 r
 system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormadw", order = -2))
+r
+data2 = rpois(1000, c(0, 2))
+system.time(r <- computemixdist(data2, pi0 = pi0, method = "nppoisll"))
 r
 system.time(r <- nspmix::cnm(nspmix::npnorm(data)))
 r

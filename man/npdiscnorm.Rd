@@ -28,5 +28,7 @@ pnpdiscnorm(x, mu0, pi0, stdev, h, lt = TRUE, lg = FALSE)
 The density and the distribution function of non-parametric discrete normal distribution
 }
 \details{
-\code{dnpdiscnorm} gives the density and \code{pnpdiscnorm} gives the CDF
+\code{dnpdiscnorm} gives the density and \code{pnpdiscnorm} gives the CDF.
+
+In this implementation, the support space is ..., -h, 0, h, ...
 }
