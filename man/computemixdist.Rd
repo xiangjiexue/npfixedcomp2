@@ -11,6 +11,7 @@
 \alias{computemixdist.npnormcvmw}
 \alias{computemixdist.npnormadw}
 \alias{computemixdist.nppoisll}
+\alias{computemixdist.nppoiscvm}
 \title{Computing non-parametric mixing distribution}
 \usage{
 computemixdist(v, method = "npnormll", ...)
@@ -104,6 +105,17 @@ computemixdist.npnormadw(
 )
 
 computemixdist.nppoisll(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
+
+computemixdist.nppoiscvm(
   v,
   mu0,
   pi0,

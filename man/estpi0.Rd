@@ -11,6 +11,7 @@
 \alias{estpi0.npnormcvmw}
 \alias{estpi0.npnormadw}
 \alias{estpi0.nppoisll}
+\alias{estpi0.nppoiscvm}
 \title{Computing non-parametric mixing distribution with estimated proportion at 0}
 \usage{
 estpi0(v, method = "npnormll", ...)
@@ -32,6 +33,8 @@ estpi0.npnormcvmw(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...)
 estpi0.npnormadw(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...)
 
 estpi0.nppoisll(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
+
+estpi0.nppoiscvm(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 }
 \arguments{
 \item{v}{observations}

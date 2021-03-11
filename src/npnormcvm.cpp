@@ -146,7 +146,7 @@ public:
 
 	void gradfun(const double &mu, const Eigen::VectorXd &dens,
 		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
-		Eigen::VectorXd fullden = (dens - this->precompute).cwiseProduct(weights);
+		Eigen::VectorXd fullden = (dens - this->precompute).cwiseProduct(this->weights);
 		double scale = 1 - this->pi0fixed.sum();
 		if (d0){
 			ansd0 = (pnpdiscnorm_(this->data, mu, scale, this->beta, this->h) - dens).dot(fullden) * 2;

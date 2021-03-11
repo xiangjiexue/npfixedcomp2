@@ -232,6 +232,14 @@ estpi0nppoisll_ <- function(data, weights, beta, val, initpt, initpr, gridpoints
     .Call('_npfixedcomp2_estpi0nppoisll_', PACKAGE = 'npfixedcomp2', data, weights, beta, val, initpt, initpr, gridpoints, tol, verbose)
 }
 
+nppoiscvm_ <- function(data, weights, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
+    .Call('_npfixedcomp2_nppoiscvm_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+estpi0nppoiscvm_ <- function(data, weights, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
+    .Call('_npfixedcomp2_estpi0nppoiscvm_', PACKAGE = 'npfixedcomp2', data, weights, beta, val, initpt, initpr, gridpoints, tol, verbose)
+}
+
 nptll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_nptll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }

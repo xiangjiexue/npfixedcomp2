@@ -194,7 +194,7 @@ Eigen::MatrixXd dpoisarray_(const Eigen::VectorXd &x,
 Eigen::VectorXd pnppois(const Eigen::VectorXd &x, 
 	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
 	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
-	return pnppois_(x, mu0, pi0, stdev, lg);
+	return pnppois_(x, mu0, pi0, stdev, lt, lg);
 }
 
 // [[Rcpp::export]]

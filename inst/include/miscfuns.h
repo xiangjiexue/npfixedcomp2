@@ -704,7 +704,7 @@ public:
 
 template <class ArgType, class ArgType2>
 inline typename densityarray<ArgType, ArgType2>::MatrixType
-ppoisarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = false, const bool &lg = false)
+ppoisarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const double &stdev, const bool &lt = true, const bool &lg = false)
 {
 	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
 	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
