@@ -9,12 +9,15 @@
 #' @examples
 #' data = rnorm(500, c(0, 2))
 #' r1 = computemixdist(data, pi0 = 0.5)
-#' posteriormean(data, r1)
+#' a1 = posteriormean(data, r1)
 #' r2 = computemixdist(data, pi0 = 0.5, method = "nptll") # equivalent to normal
-#' posteriormean(data, r2, fun = function(x) x^2)
+#' a2 = posteriormean(data, r2, fun = function(x) x^2)
 #' data = runif(500, min = -0.5, max = 0.5)
 #' r3 = computemixdist(data, method = "npnormcll", beta = 100)
-#' posteriormean(data, r3)
+#' a3 = posteriormean(data, r3)
+#' data = rpois(500, c(0, 2))
+#' r4 = computemixdist(data, method = "nppois")
+#' a4 = posteriormean(data, r4)
 #' @export
 posteriormean = function(x, result, fun = function(x) x){
   f = match.fun(paste0("posteriormean.", result$family))
@@ -45,6 +48,16 @@ posteriormean.npt = function(x, result, fun = function(x) x){
 #' @export
 posteriormean.npnormc = function(x, result, fun = function(x) x){
   temp = dnormcarray_(x, result$mix$pt, result$beta) *
+    rep(result$mix$pr, rep(length(x), length(result$mix$pr)))
+  .rowSums(temp * rep(fun(result$mix$pt), rep(length(x), length(result$mix$pt))),
+           m = length(x), n = length(result$mix$pt)) /
+    .rowSums(temp, m = length(x), n = length(result$mix$pt))
+}
+
+#' @rdname posteriormean
+#' @export
+posteriormean.nppois = function(x, result, fun = function(x) x){
+  temp = dpoisarray_(x, result$mix$pt, result$beta) *
     rep(result$mix$pr, rep(length(x), length(result$mix$pr)))
   .rowSums(temp * rep(fun(result$mix$pt), rep(length(x), length(result$mix$pt))),
            m = length(x), n = length(result$mix$pt)) /

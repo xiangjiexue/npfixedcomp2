@@ -5,6 +5,7 @@
 \alias{posteriormean.npnorm}
 \alias{posteriormean.npt}
 \alias{posteriormean.npnormc}
+\alias{posteriormean.nppois}
 \title{Find the posterior mean}
 \usage{
 posteriormean(x, result, fun = function(x) x)
@@ -14,6 +15,8 @@ posteriormean.npnorm(x, result, fun = function(x) x)
 posteriormean.npt(x, result, fun = function(x) x)
 
 posteriormean.npnormc(x, result, fun = function(x) x)
+
+posteriormean.nppois(x, result, fun = function(x) x)
 }
 \arguments{
 \item{x}{a vector of observations}
@@ -30,10 +33,13 @@ distribution based on the family in the result
 \examples{
 data = rnorm(500, c(0, 2))
 r1 = computemixdist(data, pi0 = 0.5)
-posteriormean(data, r1)
+a1 = posteriormean(data, r1)
 r2 = computemixdist(data, pi0 = 0.5, method = "nptll") # equivalent to normal
-posteriormean(data, r2, fun = function(x) x^2)
+a2 = posteriormean(data, r2, fun = function(x) x^2)
 data = runif(500, min = -0.5, max = 0.5)
 r3 = computemixdist(data, method = "npnormcll", beta = 100)
-posteriormean(data, r3)
+a3 = posteriormean(data, r3)
+data = rpois(500, c(0, 2))
+r4 = computemixdist(data, method = "nppois")
+a4 = posteriormean(data, r4)
 }

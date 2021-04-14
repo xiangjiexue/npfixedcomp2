@@ -298,7 +298,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 <span class='va'>data</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>1000</span>, mean <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormll"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.031   0.001   0.031 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.022   0.001   0.023 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 24
 #&gt; 
@@ -331,7 +331,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcvm"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.014   0.000   0.015 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.013   0.001   0.013 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 7
 #&gt; 
@@ -339,7 +339,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -1.360301e-13
+#&gt; [1] -7.630008e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -364,7 +364,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"nptll"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.078   0.001   0.080 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.077   0.000   0.077 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 24
 #&gt; 
@@ -372,7 +372,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "npt"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -9.528193e-05
+#&gt; [1] -9.528712e-05
 #&gt; 
 #&gt; $beta
 #&gt; [1] Inf
@@ -397,7 +397,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormad"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.022   0.000   0.023 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.018   0.000   0.018 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 12
 #&gt; 
@@ -405,7 +405,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -0.0003599596
+#&gt; [1] -0.0003599591
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -430,7 +430,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Hyperbolic.html'>tanh</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcll"</span>, beta <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.142   0.003   0.146 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.139   0.002   0.143 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 20
 #&gt; 
@@ -438,21 +438,21 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "npnormc"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -9.459235e-06
+#&gt; [1] -9.453699e-06
 #&gt; 
 #&gt; $beta
 #&gt; [1] 4
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt;  [1] -0.97638718 -0.91582602 -0.78103106  0.00000000  0.02847452  0.73497633
-#&gt;  [7]  0.84822981  0.95217224  0.97797874  0.98652942  0.99610345  0.99818745
+#&gt;  [1] -0.97638718 -0.91582603 -0.78103107  0.00000000  0.02847452  0.73497632
+#&gt;  [7]  0.84822981  0.95217224  0.97797875  0.98652942  0.99610345  0.99818745
 #&gt; [13]  0.99921169  0.99958934
 #&gt; 
 #&gt; $mix$pr
-#&gt;  [1] 7.767531e-05 2.710161e-02 6.047962e-02 0.000000e+00 3.285872e-01
-#&gt;  [6] 1.428905e-01 7.813433e-02 1.370084e-01 6.495827e-02 8.528830e-02
-#&gt; [11] 4.288184e-02 1.711823e-02 1.459932e-02 8.747171e-04
+#&gt;  [1] 7.767505e-05 2.710160e-02 6.047963e-02 0.000000e+00 3.285872e-01
+#&gt;  [6] 1.428905e-01 7.813435e-02 1.370084e-01 6.495828e-02 8.528824e-02
+#&gt; [11] 4.288185e-02 1.711822e-02 1.459931e-02 8.747169e-04
 #&gt; 
 #&gt; 
 #&gt; $ll
@@ -467,7 +467,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormllw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.079   0.001   0.080 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.043   0.002   0.045 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 22
 #&gt; 
@@ -475,7 +475,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -0.0001632413
+#&gt; [1] -0.0001632369
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -500,7 +500,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormcvmw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.039   0.001   0.040 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.027   0.001   0.027 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 9
 #&gt; 
@@ -508,7 +508,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -6.777635e-14
+#&gt; [1] -1.845744e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -533,29 +533,29 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"npnormadw"</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.016   0.001   0.016 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.011   0.000   0.011 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 15
+#&gt; [1] 12
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -1.327158e-05
+#&gt; [1] -5.585536e-09
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.0000000 0.1504843 1.9891413 4.4837626
+#&gt; [1] 0.0000000 0.1566451 1.9302599 2.1189265
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.000000000 0.529724185 0.467841469 0.002434346
+#&gt; [1] 0.0000000 0.5333872 0.2785527 0.1880601
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 0.1769495
+#&gt; [1] 0.1822308
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -567,7 +567,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "nspmix"</div><div class='input'><span class='va'>data2</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Poisson.html'>rpois</a></span><span class='op'>(</span><span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>computemixdist</span><span class='op'>(</span><span class='va'>data2</span>, pi0 <span class='op'>=</span> <span class='va'>pi0</span>, method <span class='op'>=</span> <span class='st'>"nppoisll"</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.003   0.000   0.003 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.004   0.000   0.004 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 16
 #&gt; 
@@ -575,17 +575,17 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; [1] "nppois"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -2.529858e-07
+#&gt; [1] -2.530327e-07
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 0.000000 1.694065 2.834589
+#&gt; [1] 0.000000 0.000000 1.694064 2.834588
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.4889106 0.0000000 0.4004425 0.1106469
+#&gt; [1] 0.4889106 0.0000000 0.4004424 0.1106471
 #&gt; 
 #&gt; 
 #&gt; $ll
@@ -600,7 +600,7 @@ the template will pass beta but this beta will never be referenced.</p></li>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>nspmix</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nspmix/man/cnm.html'>cnm</a></span><span class='op'>(</span><span class='fu'>nspmix</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nspmix/man/npnorm.html'>npnorm</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.103   0.032   0.137 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.105   0.034   0.141 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
