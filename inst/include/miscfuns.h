@@ -756,6 +756,149 @@ pnppois_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const Ma
 
 // end poisson CDF
 
+// begin t CDF
+
+template<class ArgType, class ArgType2>
+class pnt_functor {
+	const ArgType &x;
+	const ArgType2 &mu;
+	const double n;
+	const bool lt, lg;
+public:
+	pnt_functor(const ArgType& x_, const ArgType2 &mu_, const double &n_, const bool &lt_, 
+		const bool &lg_) : x(x_), mu(mu_), n(n_), lt(lt_), lg(lg_) {}
+
+	const double operator() (Index row, Index col) const {
+		return R::pnt(x.coeff(row), n, mu.coeff(col), lt, lg);
+	}
+};
+
+template <class ArgType, class ArgType2>
+inline CwiseNullaryOp<pnt_functor<ArgType, ArgType2>, typename densityarray<ArgType, ArgType2>::MatrixType>
+ptarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> &mu0, const double &n, const bool &lt = true, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType2);
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	return MatrixType::NullaryExpr(x.size(), mu0.size(), pnt_functor<ArgType, ArgType2>(x.derived(), mu0.derived(), n, lt, lg));
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+ptarray(const MatrixBase<ArgType>& x, const double &mu0, const double &n, const bool &lt = true, const bool &lg = false)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(ArgType);
+ 	return ptarray(x, Matrix<double, 1, 1>::Constant(1, mu0), n, lt, lg);
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnpt_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double& n, const bool &lt = true, const bool& lg = false){
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	
+	if (lg){
+		ans = ptarray(x, mu0, n, lt, true).array() + ((pi0 > 0) ? std::log(pi0) : -1e100);
+	}else{
+		ans = ptarray(x, mu0, n, lt, false) * pi0;
+	}
+
+	return ans;
+}
+
+template <class ArgType, class ArgType2, class ArgType3>
+inline typename densityarrayscale<ArgType>::MatrixType
+pnpt_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& n, const bool &lt = true, const bool& lg = false){
+	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (mu0.size() == 1){
+		ans = pnpt_(x, mu0.coeff(0), pi0.coeff(0), n, lt, lg);
+	}else{
+		if (lg){
+			ans = pnpt_(x, mu0[0], pi0[0], n, lt, true);
+			for (auto i = 1; i < mu0.size(); ++i){
+				ans = logspaceadd(ans, pnpt_(x, mu0[i], pi0[i], n, lt, true));
+			}
+		}else{
+			ans = pnormarray(x, mu0, n, lt, false) * pi0;
+		}	
+	}
+
+	return ans;
+}
+
+// end t CDF
+
+// begin discrete t density
+// The density of dnt is hard to compute and dnt is computed throught pnt, there is no point to use numerical integration with dnt
+// the x + h is not the same as mu - h !!!
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+ddisctarray(const MatrixBase<ArgType> &x, const double &mu0, const double &n, const double &h, const bool &lg = false){
+	// Trapezoid rule. Relative error <= 1e-6 / 12;
+	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType;
+	MatrixType ans(x.size(), 1);
+	ans = logspacesub(ptarray(x + MatrixType::Constant(x.size(), h), mu0, n, true, true), ptarray(x, mu0, n, true, true));
+	// R implementation suffers numerical stability in extreme circumstance, so manually setting a large value
+	// use of -500. keep finiteness in likelihood.
+	ans = ans.array().isNaN().select(MatrixType::Constant(x.size(), -100.), ans);
+
+	if (lg)
+		return ans;
+	else
+		return ans.array().exp();
+}
+
+template <class ArgType, class ArgType2>
+inline typename densityarray<ArgType, ArgType2>::MatrixType
+ddisctarray(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const double &n, const double &h, const bool &lg = false){
+	typedef typename densityarray<ArgType, ArgType2>::MatrixType MatrixType;
+	typedef typename densityarrayscale<ArgType>::MatrixType MatrixType2;
+	MatrixType ans(x.size(), mu0.size());
+	ans = logspacesub(ptarray(x + MatrixType2::Constant(x.size(), h), mu0, n, true, true), ptarray(x, mu0, n, true, true));
+		// R implementation suffers numerical stability in extreme circumstance, so manually setting a large value
+	ans = ans.array().isNaN().select(MatrixType::Constant(x.size(), mu0.size(), -100.), ans);
+
+	if (lg)
+		return ans;
+	else
+		return ans.array().exp();
+}
+
+template <class ArgType>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnpdisct_(const MatrixBase<ArgType> &x, const double &mu0, const double &pi0, const double &n, const double& h, const bool& lg = false){
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (lg){
+		ans = ddisctarray(x, mu0, n, h, true).array() + ((pi0 > 0) ? std::log(pi0) : -1e100);
+	}else{
+		ans = ddisctarray(x, mu0, n, h, false) * pi0;
+	}
+	return ans;
+}
+
+template <class ArgType, class ArgType2, class ArgType3>
+inline typename densityarrayscale<ArgType>::MatrixType
+dnpdisct_(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0, const MatrixBase<ArgType3> &pi0, const double& n, const double &h, const bool& lg = false){
+	EIGEN_STATIC_ASSERT_SAME_VECTOR_SIZE(ArgType2, ArgType3);
+	typename densityarrayscale<ArgType>::MatrixType ans(x.size(), 1);
+	if (mu0.size() == 1){
+		ans = dnpdisct_(x, mu0.coeff(0), pi0.coeff(0), n, h, lg);
+	}else{
+		if (lg){
+			ans = dnpdisct_(x, mu0[0], pi0[0], n, h, true);
+			for (auto i = 1; i < mu0.size(); ++i){
+				ans = logspaceadd(ans, dnpdisct_(x, mu0[i], pi0[i], n, h, true));
+			}
+		}else{
+			ans = ddisctarray(x, mu0, n, h, false) * pi0;
+		}	
+	}
+	return ans;
+}
+
+// end discrete t density
+
 // begin indexing
 	
 template<class ArgType, class RowIndexType, class ColIndexType>

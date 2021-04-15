@@ -88,13 +88,14 @@ Eigen::MatrixXd dnormcarray_(const Eigen::VectorXd &x,
 
 //' The density and the distribution function of non-parametric t distribution
 //'
-//' \code{dnpnorm} gives the density.
+//' \code{dnpt} gives the density, \code{pnpt} gives the distribution function.
 //'
 //' @title non-parametric t distribution
 //' @param x vector of observations, vector of quantiles
 //' @param mu0 the vector of support points
 //' @param df degree of freedom.
 //' @param pi0 the vector of weights correponding to the support points
+//' @param lt logical; if TRUE, the lower probability is computed
 //' @param lg logical; if TRUE, the result will be given in log scale.
 //' @rdname npt
 //' @export
@@ -110,6 +111,22 @@ Eigen::MatrixXd dtarray_(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0,
 	const double &df, const bool &lg = false){
 	return dtarray(x, mu0, df, lg);
+}
+
+//' @rdname npt
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd pnpt(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &df, const bool &lt = true, const bool &lg = false){
+	return pnpt_(x, mu0, pi0, df, lt, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd ptarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &df, const bool &lt = true, const bool &lg = false){
+	return ptarray(x, mu0, df, lt, lg);
 }
 
 //' The density and the distribution function of non-parametric discrete normal distribution
@@ -202,6 +219,35 @@ Eigen::MatrixXd ppoisarray_(const Eigen::VectorXd &x,
 	const Eigen::VectorXd &mu0,
 	const double &stdev = 1, const bool &lt = true, const bool &lg = false){
 	return ppoisarray(x, mu0, stdev, lt, lg);
+}
+
+//' The density of non-parametric discrete non-central t distribution
+//'
+//' \code{dnpdisct} gives the density .
+//'
+//' In this implementation, the support space is ..., -h, 0, h, ...
+//'
+//' @title non-parametric discrete non-central t distribution
+//' @param x vector of observations, vector of quantiles
+//' @param mu0 the vector of support points
+//' @param pi0 the vector of weights correponding to the support points
+//' @param df the degree of freedom
+//' @param h the bin width
+//' @param lg logical; if TRUE, the result will be given in log scale.
+//' @rdname npdisct
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd dnpdisct(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0, 
+	const double &df, const double &h, const bool &lg = false){
+	return dnpdisct_(x, mu0, pi0, df, h, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd ddisctarray_(const Eigen::VectorXd &x, 
+	const Eigen::VectorXd &mu0,
+	const double &df, const double &h, const bool &lg = false){
+	return ddisctarray(x, mu0, df, h, lg);
 }
 
 // [[Rcpp::export]]

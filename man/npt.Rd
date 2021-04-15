@@ -2,9 +2,12 @@
 % Please edit documentation in R/RcppExports.R
 \name{dnpt}
 \alias{dnpt}
+\alias{pnpt}
 \title{non-parametric t distribution}
 \usage{
 dnpt(x, mu0, pi0, df, lg = FALSE)
+
+pnpt(x, mu0, pi0, df, lt = TRUE, lg = FALSE)
 }
 \arguments{
 \item{x}{vector of observations, vector of quantiles}
@@ -16,10 +19,12 @@ dnpt(x, mu0, pi0, df, lg = FALSE)
 \item{df}{degree of freedom.}
 
 \item{lg}{logical; if TRUE, the result will be given in log scale.}
+
+\item{lt}{logical; if TRUE, the lower probability is computed}
 }
 \description{
 The density and the distribution function of non-parametric t distribution
 }
 \details{
-\code{dnpnorm} gives the density.
+\code{dnpt} gives the density, \code{pnpt} gives the distribution function.
 }

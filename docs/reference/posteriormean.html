@@ -73,7 +73,7 @@ distribution based on the family in the result" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">npfixedcomp2</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0007</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0008</span>
       </span>
     </div>
 
@@ -153,9 +153,9 @@ of <code>fun(x)</code>. The function <code>fun</code> must be vectorised.</p></t
 <span class='va'>r3</span> <span class='op'>=</span> <span class='fu'><a href='computemixdist.html'>computemixdist</a></span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormcll"</span>, beta <span class='op'>=</span> <span class='fl'>100</span><span class='op'>)</span>
 <span class='va'>a3</span> <span class='op'>=</span> <span class='fu'>posteriormean</span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>r3</span><span class='op'>)</span>
 <span class='va'>data</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Poisson.html'>rpois</a></span><span class='op'>(</span><span class='fl'>500</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>r4</span> <span class='op'>=</span> <span class='fu'><a href='computemixdist.html'>computemixdist</a></span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"nppois"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in get(as.character(FUN), mode = "function", envir = envir): object 'computemixdist.nppois' of mode 'function' was not found</span></div><div class='input'><span class='va'>a4</span> <span class='op'>=</span> <span class='fu'>posteriormean</span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>r4</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in paste0("posteriormean.", result$family): object 'r4' not found</span></div></pre>
+<span class='va'>r4</span> <span class='op'>=</span> <span class='fu'><a href='computemixdist.html'>computemixdist</a></span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"nppoisll"</span><span class='op'>)</span>
+<span class='va'>a4</span> <span class='op'>=</span> <span class='fu'>posteriormean</span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>r4</span><span class='op'>)</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -11,7 +11,7 @@
 \alias{computemixdist.npnormcvmw}
 \alias{computemixdist.npnormadw}
 \alias{computemixdist.nppoisll}
-\alias{computemixdist.nppoiscvm}
+\alias{computemixdist.nptllw}
 \title{Computing non-parametric mixing distribution}
 \usage{
 computemixdist(v, method = "npnormll", ...)
@@ -115,12 +115,12 @@ computemixdist.nppoisll(
   ...
 )
 
-computemixdist.nppoiscvm(
+computemixdist.nptllw(
   v,
   mu0,
   pi0,
   beta,
-  order,
+  order = -3,
   mix = NULL,
   gridpoints = NULL,
   ...
@@ -196,6 +196,8 @@ r
 system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormcvmw", order = -2))
 r
 system.time(r <- computemixdist(data, pi0 = pi0, method = "npnormadw", order = -2))
+r
+system.time(r <- computemixdist(data, pi0 = pi0, method = "nptllw", order = -2))
 r
 data2 = rpois(1000, c(0, 2))
 system.time(r <- computemixdist(data2, pi0 = pi0, method = "nppoisll"))

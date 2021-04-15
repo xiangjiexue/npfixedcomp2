@@ -66,13 +66,14 @@ dnormcarray_ <- function(x, mu0, n, lg = FALSE) {
 
 #' The density and the distribution function of non-parametric t distribution
 #'
-#' \code{dnpnorm} gives the density.
+#' \code{dnpt} gives the density, \code{pnpt} gives the distribution function.
 #'
 #' @title non-parametric t distribution
 #' @param x vector of observations, vector of quantiles
 #' @param mu0 the vector of support points
 #' @param df degree of freedom.
 #' @param pi0 the vector of weights correponding to the support points
+#' @param lt logical; if TRUE, the lower probability is computed
 #' @param lg logical; if TRUE, the result will be given in log scale.
 #' @rdname npt
 #' @export
@@ -82,6 +83,16 @@ dnpt <- function(x, mu0, pi0, df, lg = FALSE) {
 
 dtarray_ <- function(x, mu0, df, lg = FALSE) {
     .Call('_npfixedcomp2_dtarray_', PACKAGE = 'npfixedcomp2', x, mu0, df, lg)
+}
+
+#' @rdname npt
+#' @export
+pnpt <- function(x, mu0, pi0, df, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_pnpt', PACKAGE = 'npfixedcomp2', x, mu0, pi0, df, lt, lg)
+}
+
+ptarray_ <- function(x, mu0, df, lt = TRUE, lg = FALSE) {
+    .Call('_npfixedcomp2_ptarray_', PACKAGE = 'npfixedcomp2', x, mu0, df, lt, lg)
 }
 
 #' The density and the distribution function of non-parametric discrete normal distribution
@@ -150,6 +161,29 @@ pnppois <- function(x, mu0, pi0, stdev = 1, lt = TRUE, lg = FALSE) {
 
 ppoisarray_ <- function(x, mu0, stdev = 1, lt = TRUE, lg = FALSE) {
     .Call('_npfixedcomp2_ppoisarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, lt, lg)
+}
+
+#' The density of non-parametric discrete non-central t distribution
+#'
+#' \code{dnpdisct} gives the density .
+#'
+#' In this implementation, the support space is ..., -h, 0, h, ...
+#'
+#' @title non-parametric discrete non-central t distribution
+#' @param x vector of observations, vector of quantiles
+#' @param mu0 the vector of support points
+#' @param pi0 the vector of weights correponding to the support points
+#' @param df the degree of freedom
+#' @param h the bin width
+#' @param lg logical; if TRUE, the result will be given in log scale.
+#' @rdname npdisct
+#' @export
+dnpdisct <- function(x, mu0, pi0, df, h, lg = FALSE) {
+    .Call('_npfixedcomp2_dnpdisct', PACKAGE = 'npfixedcomp2', x, mu0, pi0, df, h, lg)
+}
+
+ddisctarray_ <- function(x, mu0, df, h, lg = FALSE) {
+    .Call('_npfixedcomp2_ddisctarray_', PACKAGE = 'npfixedcomp2', x, mu0, df, h, lg)
 }
 
 log1mexp_ <- function(x) {
@@ -232,19 +266,19 @@ estpi0nppoisll_ <- function(data, weights, beta, val, initpt, initpr, gridpoints
     .Call('_npfixedcomp2_estpi0nppoisll_', PACKAGE = 'npfixedcomp2', data, weights, beta, val, initpt, initpr, gridpoints, tol, verbose)
 }
 
-nppoiscvm_ <- function(data, weights, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
-    .Call('_npfixedcomp2_nppoiscvm_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
-}
-
-estpi0nppoiscvm_ <- function(data, weights, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
-    .Call('_npfixedcomp2_estpi0nppoiscvm_', PACKAGE = 'npfixedcomp2', data, weights, beta, val, initpt, initpr, gridpoints, tol, verbose)
-}
-
 nptll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_nptll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }
 
 estpi0nptll_ <- function(data, beta, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
     .Call('_npfixedcomp2_estpi0nptll_', PACKAGE = 'npfixedcomp2', data, beta, val, initpt, initpr, gridpoints, tol, verbose)
+}
+
+nptllw_ <- function(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
+    .Call('_npfixedcomp2_nptllw_', PACKAGE = 'npfixedcomp2', data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
+estpi0nptllw_ <- function(data, weights, beta, h, val, initpt, initpr, gridpoints, tol = 1e-6, verbose = 0L) {
+    .Call('_npfixedcomp2_estpi0nptllw_', PACKAGE = 'npfixedcomp2', data, weights, beta, h, val, initpt, initpr, gridpoints, tol, verbose)
 }
 

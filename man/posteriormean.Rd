@@ -40,6 +40,6 @@ data = runif(500, min = -0.5, max = 0.5)
 r3 = computemixdist(data, method = "npnormcll", beta = 100)
 a3 = posteriormean(data, r3)
 data = rpois(500, c(0, 2))
-r4 = computemixdist(data, method = "nppois")
+r4 = computemixdist(data, method = "nppoisll")
 a4 = posteriormean(data, r4)
 }

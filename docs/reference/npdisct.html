@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Estimating Covariance Matrix using Empirical Bayes — covestEB • npfixedcomp2</title>
+<title>non-parametric discrete non-central t distribution — dnpdisct • npfixedcomp2</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Estimating Covariance Matrix using Empirical Bayes — covestEB" />
-<meta property="og:description" content="Estimating covariance matrix using Empirical Bayes" />
+<meta property="og:title" content="non-parametric discrete non-central t distribution — dnpdisct" />
+<meta property="og:description" content="The density of non-parametric discrete non-central t distribution" />
 
 
 
@@ -103,73 +103,51 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Estimating Covariance Matrix using Empirical Bayes</h1>
+    <h1>non-parametric discrete non-central t distribution</h1>
     
-    <div class="hidden name"><code>covestEB.Rd</code></div>
+    <div class="hidden name"><code>npdisct.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Estimating covariance matrix using Empirical Bayes</p>
+    <p>The density of non-parametric discrete non-central t distribution</p>
     </div>
 
-    <pre class="usage"><span class='fu'>covestEB</span><span class='op'>(</span><span class='va'>X</span>, estpi0 <span class='op'>=</span> <span class='cn'>FALSE</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>3</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span>, force.nonbin <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-
-<span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span>, verbose <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>dnpdisct</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>df</span>, <span class='va'>h</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>X</th>
-      <td><p>a matrix of size n * p, where n is the number of observations and
-p is the number of variables</p></td>
+      <th>x</th>
+      <td><p>vector of observations, vector of quantiles</p></td>
     </tr>
     <tr>
-      <th>estpi0</th>
-      <td><p>logical; if TRUE, the NPMLE is estimated based on the
-estimation of pi0, which in this case can be used to detect sparsity or
-assume sparsity.</p></td>
+      <th>mu0</th>
+      <td><p>the vector of support points</p></td>
     </tr>
     <tr>
-      <th>order</th>
-      <td><p>the level of binning to use when the number of observations
-passed to the computation is greater than 5000.</p></td>
+      <th>pi0</th>
+      <td><p>the vector of weights correponding to the support points</p></td>
     </tr>
     <tr>
-      <th>verbose</th>
-      <td><p>logical; If TRUE, the intermediate results will be shown.</p></td>
+      <th>df</th>
+      <td><p>the degree of freedom</p></td>
     </tr>
     <tr>
-      <th>force.nonbin</th>
-      <td><p>logical; If TRUE, overwrites the default setting for
-large-scale computation.</p></td>
+      <th>h</th>
+      <td><p>the bin width</p></td>
+    </tr>
+    <tr>
+      <th>lg</th>
+      <td><p>logical; if TRUE, the result will be given in log scale.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>a list. a covariance matrix estimate of size p * p is given in mat,
-whether correction is done is given in correction, and the method for
-computing the density of sample correlation coefficients is given in method.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The function <code>covestEB</code> performs covariance matrix estimation using
-Fisher transformation, while the function <code>covestEB.cor</code> performs
-covariance estimation directly on sample correlation coefficients using
-one-parameter normal approximation.</p>
-<p>Covariance matrix estimation using Fisher transformation supports estimation
-sparsity as well as large-scale computation, while estimation on the original
-scale supports neither and it is for comparison only. It is recommended to
-perform estimation on Fisher-transformed sample correlation coefficients.</p>
+    <p><code>dnpdisct</code> gives the density .</p>
+<p>In this implementation, the support space is ..., -h, 0, h, ...</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>n</span> <span class='op'>=</span> <span class='fl'>100</span>; <span class='va'>p</span> <span class='op'>=</span> <span class='fl'>50</span>
-<span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>p</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span>, ncol <span class='op'>=</span> <span class='va'>p</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.015   0.001   0.016 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans1</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.041   0.000   0.040 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

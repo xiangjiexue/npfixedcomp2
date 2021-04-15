@@ -11,7 +11,7 @@
 \alias{estpi0.npnormcvmw}
 \alias{estpi0.npnormadw}
 \alias{estpi0.nppoisll}
-\alias{estpi0.nppoiscvm}
+\alias{estpi0.nptllw}
 \title{Computing non-parametric mixing distribution with estimated proportion at 0}
 \usage{
 estpi0(v, method = "npnormll", ...)
@@ -34,7 +34,7 @@ estpi0.npnormadw(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...)
 
 estpi0.nppoisll(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
 
-estpi0.nppoiscvm(v, beta, val, order, mix = NULL, gridpoints = NULL, ...)
+estpi0.nptllw(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...)
 }
 \arguments{
 \item{v}{observations}
@@ -93,6 +93,8 @@ r
 system.time(r <- estpi0(data, method = "nptll", val = 2, verbose = TRUE))
 r
 system.time(r <- estpi0(tanh(data), method = "npnormcll", val = 2, beta = 4, verbose = TRUE))
+r
+system.time(r <- estpi0(data, method = "nptllw", val = 2, verbose = TRUE))
 r
 data2 = rpois(1000, c(0, 2))
 system.time(r <- estpi0(data2, method = "nppoisll", val = 2))
