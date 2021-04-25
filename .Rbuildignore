@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 docs/
 .travis.yml
+README.*
+NEWS.md

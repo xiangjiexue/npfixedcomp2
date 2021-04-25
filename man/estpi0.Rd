@@ -57,7 +57,7 @@ estpi0.nptllw(v, beta, val, order = -3, mix = NULL, gridpoints = NULL, ...)
 computing non-parametric mixing distribution with estimated proportion at 0
 }
 \details{
-This is a function for computing non-parametric mixing
+These function are for computing non-parametric mixing
 distribution with estimated proportion at 0. Different families will
 have different threshold values.
 

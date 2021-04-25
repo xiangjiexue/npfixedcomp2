@@ -1,7 +1,25 @@
-#' npfixedcomp2
+#' The package npfixedcomp2
 #' 
-#' npfixedcomp2
+#' This package is for computing the estimates of a mixing distribution non-parametrically
+#' for some implemented family functions using various loss functions. It extends
+#' the estimation methods proposed by Wang (2007) in following ways:
 #' 
+#' - The mixing distribution can be estimated with component fixed.
+#' 
+#' - The mixing distribution can be estimated simultaneously with estimating the
+#' proportion of zero.
+#' 
+#' - The mixing distribution can be estimated using other loss function (in
+#' addition to maximum likelihood).
+#' 
+#' Solvers for finding new support points:
+#' 
+#' For the gradient function with derivative supplied, it uses the improved
+#' Brent's method by Zhang (2011), while the derivative-free solver is 
+#' Successive Parabolic Interpolation.
+#' 
+#' @references 
+#' Wang, Yong. "On Fast Computation of the Non-Parametric Maximum Likelihood Estimate of a Mixing Distribution." Journal of the Royal Statistical Society. Series B (Statistical Methodology) 69, no. 2 (2007): 185-98. \url{http://www.jstor.org/stable/4623262}.
 #' @docType package
 #' @author Xiangjie Xue
 #' @import Rcpp RcppEigen nspmix
@@ -36,19 +54,18 @@ gridpoints.nppois = utils::getFromNamespace("gridpoints.nppois", "nspmix")
 #' @export
 bin = function(data, order = -2){
   h = 10^order
-  data = floor(data / h) * h
-  t = table(data)
+  data = floor(data / h)
+  rg = range(data)
+  t = tabulate(data - rg[1] + 1)
   index = t != 0
-  list(v = as.numeric(names(t))[index], w = as.numeric(t)[index])
+  list(v = (h * (rg[1] : rg[2]))[index], w = t[index])
 }
 
 #' Computing non-parametric mixing distribution
 #' 
-#' These functions are used to make the object for computing the non-paramtric mixing
-#' distribution or estimating the proportion of zero using non-parametric methods.
+#' These functions are used to compute the estimates of a mixing distribution
+#' non-parametrically using various methods, with possibly fixed components.
 #'
-#' This is a generic function for making the object for computing the non-parametric
-#' mixing distribution or estimating the proportion of zero.
 #'
 #' current implemented families are:
 #'
@@ -68,11 +85,15 @@ bin = function(data, order = -2){
 #' The default beta is 1 and the default order is -3.
 #'
 #' - nptll : t-density using maximum likelihood (Chapter 3). The default beta is infinity (normal distribution).
+#' 
+#' - nptllw : Binned version of non-centrol t-distribution using maximum likelihood. 
+#' The default beta is infinity (normal distribution) and the default order is -3.
 #'
 #' - npnormcll : the one-parameter normal distribution used for approximating the sample
 #' correlation coefficients using maximum likelihood. This does not have a
 #' corresponding estimation of zero due to incompleted theory (Chapter 8).
 #' There is no default beta. The structure beta is the number of observations.
+#' 
 #' - nppoisll : poisson mixture using maximum likelihood. There is no structural parameter, and hence
 #' the template will pass beta but this beta will never be referenced.
 #'
@@ -123,7 +144,7 @@ computemixdist = function(v, method = "npnormll", ...){
 
 #' computing non-parametric mixing distribution with estimated proportion at 0
 #'
-#' This is a function for computing non-parametric mixing
+#' These function are for computing non-parametric mixing
 #' distribution with estimated proportion at 0. Different families will
 #' have different threshold values.
 #'

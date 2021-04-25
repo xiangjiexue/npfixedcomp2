@@ -149,11 +149,8 @@ computemixdist.nptllw(
 Computing non-parametric mixing distribution
 }
 \details{
-These functions are used to make the object for computing the non-paramtric mixing
-distribution or estimating the proportion of zero using non-parametric methods.
-
-This is a generic function for making the object for computing the non-parametric
-mixing distribution or estimating the proportion of zero.
+These functions are used to compute the estimates of a mixing distribution
+non-parametrically using various methods, with possibly fixed components.
 
 current implemented families are:
 \itemize{
@@ -167,6 +164,8 @@ The default beta is 1 and the default order is -3.
 \item npnormadw : Binned version of normal density using the Anderson-Darling distance (Chapter 6)
 The default beta is 1 and the default order is -3.
 \item nptll : t-density using maximum likelihood (Chapter 3). The default beta is infinity (normal distribution).
+\item nptllw : Binned version of non-centrol t-distribution using maximum likelihood.
+The default beta is infinity (normal distribution) and the default order is -3.
 \item npnormcll : the one-parameter normal distribution used for approximating the sample
 correlation coefficients using maximum likelihood. This does not have a
 corresponding estimation of zero due to incompleted theory (Chapter 8).

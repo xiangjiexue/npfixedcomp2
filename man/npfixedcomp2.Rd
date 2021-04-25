@@ -3,9 +3,29 @@
 \docType{package}
 \name{npfixedcomp2}
 \alias{npfixedcomp2}
-\title{npfixedcomp2}
+\title{The package npfixedcomp2}
 \description{
-npfixedcomp2
+This package is for computing the estimates of a mixing distribution non-parametrically
+for some implemented family functions using various loss functions. It extends
+the estimation methods proposed by Wang (2007) in following ways:
+}
+\details{
+\itemize{
+\item The mixing distribution can be estimated with component fixed.
+\item The mixing distribution can be estimated simultaneously with estimating the
+proportion of zero.
+\item The mixing distribution can be estimated using other loss function (in
+addition to maximum likelihood).
+}
+
+Solvers for finding new support points:
+
+For the gradient function with derivative supplied, it uses the improved
+Brent's method by Zhang (2011), while the derivative-free solver is
+Successive Parabolic Interpolation.
+}
+\references{
+Wang, Yong. "On Fast Computation of the Non-Parametric Maximum Likelihood Estimate of a Mixing Distribution." Journal of the Royal Statistical Society. Series B (Statistical Methodology) 69, no. 2 (2007): 185-98. \url{http://www.jstor.org/stable/4623262}.
 }
 \author{
 Xiangjie Xue
