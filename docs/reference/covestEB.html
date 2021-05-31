@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">npfixedcomp2</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0010</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0000</span>
       </span>
     </div>
 
@@ -170,7 +170,7 @@ perform estimation on Fisher-transformed sample correlation coefficients.</p>
 <span class='va'>X</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='va'>n</span> <span class='op'>*</span> <span class='va'>p</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='va'>n</span>, ncol <span class='op'>=</span> <span class='va'>p</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.013   0.001   0.015 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans1</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
+#&gt;   0.014   0.001   0.015 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>ans1</span> <span class='op'>&lt;-</span> <span class='fu'>covestEB.cor</span><span class='op'>(</span><span class='va'>X</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
 #&gt;   0.021   0.000   0.021 </div></pre>
   </div>

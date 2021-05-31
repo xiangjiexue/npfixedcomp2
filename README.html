@@ -361,7 +361,7 @@ pre code {
 <h2>Installation</h2>
 <p>The package can be installed via <em>devtools</em> or <em>remotes</em>:</p>
 <pre class="r"><code>devtools::install_github(&quot;xiangjiexue/npfixedcomp2&quot;)</code></pre>
-<p>NOTE: This package contains Fortran and C++ codes, make sure gfortran and gcc/clang is available.</p>
+<p>NOTE: This package contains Fortran and C++ codes with C++11 standard, so make sure gfortran and gcc/clang is available.</p>
 </div>
 <div id="available-family-functions" class="section level2">
 <h2>Available family functions</h2>
@@ -420,6 +420,20 @@ pre code {
 </tr>
 </tbody>
 </table>
+<p>It is noted that after version 1.1, all the header files are implemented as template. It is possible to write implementation using other scalar type rather than double (float, long double, etc.) provided that it is supported by Eigen, but please make sure that the precision is what you want.</p>
+<pre class="cpp"><code>template&lt;class Type&gt;
+class npfixedcomp
+{
+public:
+  ...
+};
+
+template&lt;class Type&gt;
+class npnormll : public npfixedcomp&lt;Type&gt;
+{
+public:
+  ...
+};</code></pre>
 </div>
 
 

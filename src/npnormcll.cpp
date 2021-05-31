@@ -5,36 +5,33 @@
 
 // [[Rcpp::depends(RcppEigen)]]
 
-class npnormcll : public npfixedcomp
+template<class Type>
+class npnormcll : public npfixedcomp<Type>
 {
 public:
 
-	npnormcll(const Eigen::VectorXd &data_, const Eigen::VectorXd &mu0fixed_, const Eigen::VectorXd &pi0fixed_,
-		const double &beta_, const Eigen::VectorXd &initpt_, const Eigen::VectorXd &initpr_, 
-		const Eigen::VectorXd &gridpoints_) : npfixedcomp(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
+	npnormcll(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &data_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0fixed_, 
+		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0fixed_, const Type &beta_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpt_, 
+		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpr_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &gridpoints_) : npfixedcomp<Type>(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
 		this->setprecompute();
-		family = "npnormc";
-		flag = "d0";
+		this->family = "npnormc";
+		this->flag = "d0";
 	}
 
-	double lossfunction(const Eigen::VectorXd &maps) const{
+	Type lossfunction(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &maps) const{
 		return (maps + this->precompute).array().log().sum() * -1.;
 	}
 
-	Eigen::VectorXd mapping(const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
+	Eigen::Matrix<Type, Eigen::Dynamic, 1> mapping(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
 		return dnpnormc_(this->data, mu0, pi0, this->beta);
 	}
 
-	void gradfun(const double &mu, const Eigen::VectorXd &dens,
-		double &ansd0, double &ansd1, const bool &d0, const bool &d1) const{
-		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
-		double scale = 1 - this->pi0fixed.sum();
+	void gradfun(const Type &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens,
+		Type &ansd0, Type &ansd1, const bool &d0, const bool &d1) const{
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> fullden = (dens + this->precompute).cwiseInverse();
+		Type scale = 1. - this->pi0fixed.sum();
 		if (d0){
 			ansd0 = (dens - dnpnormc_(this->data, mu, scale, this->beta)).dot(fullden);
-		}
-
-		if (d1){
-			ansd1 = 0;
 		}
 		
 		// Eigen::VectorXd temp2 = ((this->beta + 4) * std::pow(mu, 3.) -  3 * this->beta * mu * mu * this->data.array() +
@@ -43,37 +40,37 @@ public:
 		// ansd1 = temp2.cwiseProduct(temp).dot(fullden) * scale;
 	}
 
-	void gradfunvec(const Eigen::VectorXd &mu, const Eigen::VectorXd &dens,
-		Eigen::VectorXd &ansd0, Eigen::VectorXd &ansd1, const bool &d0, const bool &d1) const{
+	void gradfunvec(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens,
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd1, const bool &d0, const bool &d1) const{
 		ansd0.resize(mu.size());
 		ansd1.resize(mu.size());
-		Eigen::VectorXd fullden = (dens + this->precompute).cwiseInverse();
-		double scale = 1 - this->pi0fixed.sum();
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> fullden = (dens + this->precompute).cwiseInverse();
+		Type scale = 1. - this->pi0fixed.sum();
 		if (d0){
-			ansd0 = Eigen::VectorXd::Constant(mu.size(), dens.dot(fullden));
+			ansd0 = Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(mu.size(), dens.dot(fullden));
 			ansd0.noalias() -= dnormcarray(this->data, mu, this->beta).transpose() * fullden * scale;
 		}
 	}
 
-	void computeweights(const Eigen::VectorXd &mu0, Eigen::VectorXd &pi0, const Eigen::VectorXd &dens) const{
-		Eigen::VectorXd fp = dens + this->precompute;
-		Eigen::MatrixXd sp = dnormcarray(this->data, mu0, this->beta), tp = sp.array().colwise() / fp.array();
-		Eigen::VectorXd nw(pi0.size());
+	void computeweights(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens) const{
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> fp = dens + this->precompute;
+		Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> sp = dnormcarray(this->data, mu0, this->beta), tp = sp.array().colwise() / fp.array();
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> nw(pi0.size());
 
 		if (this->len > 1e3){
-			nw = pnnqp_(tp.transpose() * tp, tp.transpose() * (this->precompute.cwiseQuotient(fp) - Eigen::VectorXd::Constant(this->len, 2)), 1. - this->pi0fixed.sum());
+			nw = pnnqp_(tp.transpose() * tp, tp.transpose() * (this->precompute.cwiseQuotient(fp) - Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(this->len, 2)), 1. - this->pi0fixed.sum());
 		}else{
-			nw = pnnlssum_(tp, Eigen::VectorXd::Constant(this->len, 2) - this->precompute.cwiseQuotient(fp), 1. - this->pi0fixed.sum());
+			nw = pnnlssum_(tp, Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(this->len, 2) - this->precompute.cwiseQuotient(fp), 1. - this->pi0fixed.sum());
 		}
 		this->checklossfun2(sp * nw - dens, pi0, nw - pi0, tp.colwise().sum(), dens);
 	}
 
-	double hypofun(const double &ll, const double &minloss) const{
+	Type hypofun(const Type &ll, const Type &minloss) const{
 		return ll - minloss;
 	}
 
-	double familydensity(const double &x, const Eigen::VectorXd &mu0, const Eigen::VectorXd &pi0) const{
-		return dnpnormc_(Eigen::VectorXd::Constant(1, x), mu0, pi0, this->beta).coeff(0);
+	Type familydensity(const Type &x, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
+		return dnpnormc_(Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(1, x), mu0, pi0, this->beta).coeff(0);
 	}
 };
 
@@ -81,7 +78,7 @@ public:
 Rcpp::List npnormcll_(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fixed, const Eigen::VectorXd &pi0fixed,
 	const double &beta, const Eigen::VectorXd &initpt, const Eigen::VectorXd &initpr, const Eigen::VectorXd &gridpoints,
 	const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0){
-	npnormcll f(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints);
+	npnormcll<double> f(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints);
 	f.computemixdist(tol, maxit, verbose);
 	return f.result;
 }
@@ -90,7 +87,7 @@ Rcpp::List npnormcll_(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fix
 Rcpp::List estpi0npnormcll_(const Eigen::VectorXd &data,
 	const double &beta, const double &val, const Eigen::VectorXd &initpt, const Eigen::VectorXd &initpr, const Eigen::VectorXd &gridpoints,
 	const double &tol = 1e-6, const int &verbose = 0){
-	npnormcll f(data, Eigen::VectorXd::Zero(1), Eigen::VectorXd::Ones(1), beta, initpt, initpr, gridpoints);
+	npnormcll<double> f(data, Eigen::Matrix<double, 1, 1>::Zero(1), Eigen::Matrix<double, 1, 1>::Ones(1), beta, initpt, initpr, gridpoints);
 	f.estpi0(val, tol, verbose);
 	return f.result;
 }

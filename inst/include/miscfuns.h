@@ -538,7 +538,7 @@ ddiscnormarray(const MatrixBase<ArgType> &x, const typename MatrixBase<ArgType>:
 		ans = logspacesub(pnormarray(x, mu0 - h, stdev, true, true), pnormarray(x, mu0, stdev, true, true));
 	}else{
 		int N = std::max(std::ceil((x.array() - mu0).abs().maxCoeff() * 1e3 * std::pow(h, 1.5)), 5.);
-		double delta = h / N;
+		const typename MatrixBase<ArgType>::Scalar delta = h / N;
 		ans = (dnormarray(x, mu0, stdev) + dnormarray(x, mu0 - h, stdev)) * 0.5;
 		for (int i = 1; i < N; i++){
 			ans.noalias() += dnormarray(x, mu0 - delta * i, stdev);
@@ -563,7 +563,7 @@ ddiscnormarray(const MatrixBase<ArgType> &x, const MatrixBase<ArgType2> &mu0,
 			ans = logspacesub(pnormarray(x, mu0 - MatrixBase<ArgType2>::Constant(mu0.size(), h), stdev, true, true), pnormarray(x, mu0, stdev, true, true));
 		}else{
 			int N = std::max(std::ceil(std::max(x.maxCoeff() - mu0.minCoeff(), mu0.maxCoeff() - x.minCoeff()) * 1e3 * std::pow(h, 1.5)), 5.);
-			double delta = h / N;
+			const typename MatrixBase<ArgType>::Scalar delta = h / N;
 			ans = (dnormarray(x, mu0, stdev) + dnormarray(x, mu0 - MatrixBase<ArgType2>::Constant(mu0.size(), h), stdev)) * 0.5;
 			for (int i = 1; i < N; i++){
 				ans.noalias() += dnormarray(x, mu0 - MatrixBase<ArgType2>::Constant(mu0.size(), delta * i), stdev);
@@ -961,7 +961,7 @@ indexing(const MatrixBase<ArgType>& arg, const RowIndexType& row_indices)
 // begin pnnls
 template<class ArgType, class ArgType2>
 struct pnnls_struct {
-  typedef Matrix<typename ScalarBinaryOpTraits<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType, double>::ReturnType,
+  typedef Matrix<typename ScalarBinaryOpTraits<typename ArgType::Scalar, typename ArgType2::Scalar>::ReturnType,
                  ArgType::ColsAtCompileTime,
                  1,
                  ColMajor,
@@ -971,26 +971,25 @@ struct pnnls_struct {
 
 template<class ArgType, class ArgType2>
 inline typename pnnls_struct<ArgType, ArgType2>::MatrixType
-pnnlssum_(const MatrixBase<ArgType> &A, const MatrixBase<ArgType2> &b, const double &sum){
+pnnlssum_(const MatrixBase<ArgType> &A, const MatrixBase<ArgType2> &b, const typename MatrixBase<ArgType>::Scalar &sum){
 	int m = A.rows() + 1, n = A.cols();
-	MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous();
+	MatrixXd AA = ((A * sum).colwise() - b).colwise().homogeneous().template cast<double>();
 	VectorXd bb = Eigen::VectorXd::Zero(m - 1).homogeneous(), zz(m);
-	VectorXd w(n);
-	typename pnnls_struct<ArgType, ArgType2>::MatrixType x(n);
+	VectorXd w(n), x(n);
 	double rnorm;
 	VectorXi index(n);
 	int mode, k = 0;
 	pnnls_(AA.data(), &m, &m, &n, bb.data(), x.data(), &rnorm, w.data(), zz.data(), index.data(), &mode, &k);
-	x = x / x.sum() * sum;
-	return x;
+	typename pnnls_struct<ArgType, ArgType2>::MatrixType ans = x.template cast<typename pnnls_struct<ArgType, ArgType2>::MatrixType::Scalar>();
+	ans = ans / ans.sum() * sum;
+	return ans;
 }
 
 // The program pnnqp using eigen
 template<class ArgType, class ArgType2>
 inline typename pnnls_struct<ArgType, ArgType2>::MatrixType
-pnnqp_(const MatrixBase<ArgType> &q, const MatrixBase<ArgType2> &p, const double &sum){
-	SelfAdjointEigenSolver<MatrixXd> eig(q.rows());
-	eig.compute(q);
+pnnqp_(const MatrixBase<ArgType> &q, const MatrixBase<ArgType2> &p, const typename MatrixBase<ArgType>::Scalar &sum){
+	SelfAdjointEigenSolver<Matrix<typename ArgType::Scalar, ArgType::RowsAtCompileTime, ArgType::RowsAtCompileTime> > eig(q);
 	Matrix<typename ArgType::Scalar, ArgType::RowsAtCompileTime, 1> eigvec = eig.eigenvalues();
 	Matrix<typename ArgType::Scalar, ArgType::RowsAtCompileTime, ArgType::RowsAtCompileTime> eigmat = eig.eigenvectors();
 	int index = (eigvec.array() > eigvec.template tail<1>()[0] * 1e-15).count();
@@ -1003,15 +1002,15 @@ pnnqp_(const MatrixBase<ArgType> &q, const MatrixBase<ArgType2> &p, const double
 
 }
 
-
+template<class Type>
 class comparemu0
 {
 private:
-	Eigen::VectorXd mu0;
+	const Eigen::Ref<const Eigen::Matrix<Type, Eigen::Dynamic, 1> > mu0;
 public:
-	comparemu0(const Eigen::VectorXd &mu0_) : mu0(mu0_) {};
+	comparemu0(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0_) : mu0(mu0_) {};
 
-	const bool operator()(const int & x, const int & y) const {return mu0[x] < mu0[y];};
+	const bool operator()(int x, int y) const {return mu0[x] < mu0[y];};
 };
 
 

@@ -1,10 +1,13 @@
-## Since last version number
+## npfixedcomp2 1.1.0000
 
 Full ET for all density functions.
 
 Change the implementation for one-parameter normal.
 
-change to R's C implementation of log1pexp and log1mexp as available since R 4.1.0.
+Change to R's C implementation of log1pexp and log1mexp as available since R 4.1.0.
+
+The header file for computing the NPMLE/NPMDE as well as the implemented families
+are now written as class templates. It is then easier to change the precision.
 
 ## npfixedcomp2 1.0.0010
 

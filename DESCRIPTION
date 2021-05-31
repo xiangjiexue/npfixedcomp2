@@ -1,7 +1,7 @@
 Package: npfixedcomp2
 Type: Package
 Title: Non-parametric estimation of mixing distribution with possibily fixed components
-Version: 1.0.0010
+Version: 1.1.0000
 Date: 2021-05-31
 Authors@R: 
     person(given = "Xiangjie",
