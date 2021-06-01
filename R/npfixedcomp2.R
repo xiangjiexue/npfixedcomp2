@@ -134,8 +134,6 @@ bin = function(data, order = -2){
 #' data2 = rpois(1000, c(0, 2))
 #' system.time(r <- computemixdist(data2, pi0 = pi0, method = "nppoisll"))
 #' r
-#' system.time(r <- nspmix::cnm(nspmix::npnorm(data)))
-#' r
 #' @export
 computemixdist = function(v, method = "npnormll", ...){
   f = match.fun(paste0("computemixdist.", method))

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">npfixedcomp2</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0001</span>
       </span>
     </div>
 
@@ -202,15 +202,15 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; current val: 0.603503 fval: 887.362
 #&gt; Iter: 4 lower: 0.593962 upper: 0.603503
 #&gt; current val: 0.601896 fval: 887.26</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.042   0.001   0.042 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.039   0.001   0.040 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 6
+#&gt; [1] 5
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -2.842171e-14
+#&gt; [1] -5.684342e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -242,15 +242,15 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; current val: 0.603426 fval: 887.333
 #&gt; Iter: 4 lower: 0.594217 upper: 0.603426
 #&gt; current val: 0.601855 fval: 887.234</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.171   0.002   0.173 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.153   0.001   0.154 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 6
+#&gt; [1] 5
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] 5.684342e-14
+#&gt; [1] 0
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -275,14 +275,14 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormcvm"</span>, val <span class='op'>=</span> <span class='fl'>0.1</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
-#&gt; current val: 0.561794 fval: 0.0614314
+#&gt; current val: 0.561794 fval: 0.0614311
 #&gt; Iter: 2 lower: 0.561794 upper: 0.780897
-#&gt; current val: 0.663223 fval: 0.926025
+#&gt; current val: 0.663223 fval: 0.926024
 #&gt; Iter: 3 lower: 0.561794 upper: 0.612509
-#&gt; current val: 0.578257 fval: 0.107011
+#&gt; current val: 0.578257 fval: 0.10701
 #&gt; Iter: 4 lower: 0.570025 upper: 0.578257
-#&gt; current val: 0.576288 fval: 0.0999762</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.054   0.001   0.055 </div><div class='input'><span class='va'>r</span>
+#&gt; current val: 0.576288 fval: 0.0999768</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.033   0.000   0.034 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 5
 #&gt; 
@@ -290,7 +290,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -5.551115e-17
+#&gt; [1] 5.551115e-17
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -304,7 +304,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 0.1000004
+#&gt; [1] 0.1000001
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -315,40 +315,36 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormcvmw"</span>, val <span class='op'>=</span> <span class='fl'>0.1</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span>, order <span class='op'>=</span> <span class='op'>-</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
-#&gt; current val: 0.561629 fval: 0.0650354
+#&gt; current val: 0.561629 fval: 0.0650349
 #&gt; Iter: 2 lower: 0.561629 upper: 0.780815
 #&gt; current val: 0.661479 fval: 0.927662
 #&gt; Iter: 3 lower: 0.561629 upper: 0.611554
-#&gt; current val: 0.576144 fval: 0.106406
-#&gt; Iter: 4 lower: 0.568887 upper: 0.576144
-#&gt; current val: 0.574338 fval: 0.0999827
-#&gt; Iter: 5 lower: 0.574338 upper: 0.575241
-#&gt; current val: 0.574343 fval: 0.100001
-#&gt; Iter: 6 lower: 0.574341 upper: 0.574343
-#&gt; current val: 0.574342 fval: 0.099996</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.111   0.001   0.113 </div><div class='input'><span class='va'>r</span>
+#&gt; current val: 0.576145 fval: 0.106406
+#&gt; Iter: 4 lower: 0.568887 upper: 0.576145
+#&gt; current val: 0.574339 fval: 0.0999833</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.132   0.003   0.136 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 2
+#&gt; [1] 5
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -6.194622e-17
+#&gt; [1] 0
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 2.302964
+#&gt; [1] 0.000000 2.303115
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.5743431 0.4256569
+#&gt; [1] 0.5743435 0.4256565
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 0.09999905
+#&gt; [1] 0.1000006
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -359,22 +355,22 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; attr(,"class")
 #&gt; [1] "nspmix"</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data</span>, method <span class='op'>=</span> <span class='st'>"npnormad"</span>, val <span class='op'>=</span> <span class='fl'>1</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; Iter: 1 lower: 0 upper: 1
-#&gt; current val: 0.58104 fval: 0.730657
+#&gt; current val: 0.58104 fval: 0.730656
 #&gt; Iter: 2 lower: 0.58104 upper: 0.79052
 #&gt; current val: 0.738881 fval: 13.6504
 #&gt; Iter: 3 lower: 0.58104 upper: 0.659961
 #&gt; current val: 0.595265 fval: 1.08834
 #&gt; Iter: 4 lower: 0.588153 upper: 0.595265
-#&gt; current val: 0.59217 fval: 0.999936</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.052   0.001   0.052 </div><div class='input'><span class='va'>r</span>
+#&gt; current val: 0.59217 fval: 0.999937</div><div class='output co'>#&gt;    user  system elapsed 
+#&gt;   0.043   0.001   0.044 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 8
+#&gt; [1] 7
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] 0
+#&gt; [1] -1.136868e-13
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -384,11 +380,11 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; [1] 0.000000 2.329429
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.5921727 0.4078273
+#&gt; [1] 0.5921728 0.4078272
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 0.9999998
+#&gt; [1] 1
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -406,15 +402,15 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; current val: 0.592739 fval: 1.07356
 #&gt; Iter: 4 lower: 0.58712 upper: 0.592739
 #&gt; current val: 0.590145 fval: 0.999969</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.035   0.000   0.035 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.030   0.000   0.031 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 7
+#&gt; [1] 6
 #&gt; 
 #&gt; $family
 #&gt; [1] "npnorm"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] 7.727152e-14
+#&gt; [1] 4.973799e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
@@ -424,11 +420,11 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; [1] 0.000000 2.329319
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.590146 0.409854
+#&gt; [1] 0.5901461 0.4098539
 #&gt; 
 #&gt; 
 #&gt; $ll
-#&gt; [1] 1.000001
+#&gt; [1] 1
 #&gt; 
 #&gt; $flag
 #&gt; [1] "d1"
@@ -446,15 +442,15 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; current val: 0.603503 fval: 887.362
 #&gt; Iter: 4 lower: 0.593962 upper: 0.603503
 #&gt; current val: 0.601896 fval: 887.26</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.182   0.000   0.183 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.167   0.001   0.167 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 6
+#&gt; [1] 5
 #&gt; 
 #&gt; $family
 #&gt; [1] "npt"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] 0
+#&gt; [1] 2.842171e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] Inf
@@ -486,7 +482,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; current val: 0.366489 fval: 35.6415
 #&gt; Iter: 4 lower: 0.338607 upper: 0.366489
 #&gt; current val: 0.366042 fval: 35.6147</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.122   0.001   0.123 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.127   0.002   0.129 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
 #&gt; [1] 10
 #&gt; 
@@ -494,19 +490,19 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; [1] "npnormc"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -2.336568e-07
+#&gt; [1] -2.526692e-06
 #&gt; 
 #&gt; $beta
 #&gt; [1] 4
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] -0.8982123 -0.8141842  0.0000000  0.8384127  0.9692529  0.9894580  0.9963746
+#&gt; [1] -0.8981906 -0.8141733  0.0000000  0.8384119  0.9692532  0.9894581  0.9963748
 #&gt; [8]  0.9981044  0.9999507
 #&gt; 
 #&gt; $mix$pr
-#&gt; [1] 0.019301385 0.086812014 0.366040534 0.211994972 0.147307128 0.072424489
-#&gt; [7] 0.033360464 0.061209827 0.001549187
+#&gt; [1] 0.01931452 0.08679927 0.36604052 0.21199518 0.14730840 0.07242356 0.03336228
+#&gt; [8] 0.06120710 0.00154918
 #&gt; 
 #&gt; 
 #&gt; $ll
@@ -528,15 +524,15 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; current val: 0.603509 fval: 887.357
 #&gt; Iter: 4 lower: 0.594002 upper: 0.603509
 #&gt; current val: 0.601905 fval: 887.255</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   1.136   0.002   1.139 </div><div class='input'><span class='va'>r</span>
+#&gt;   1.065   0.004   1.072 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 6
+#&gt; [1] 5
 #&gt; 
 #&gt; $family
 #&gt; [1] "npt"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] 0
+#&gt; [1] -2.842171e-14
 #&gt; 
 #&gt; $beta
 #&gt; [1] Inf
@@ -562,22 +558,22 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 #&gt; [1] "nspmix"</div><div class='input'><span class='va'>data2</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Poisson.html'>rpois</a></span><span class='op'>(</span><span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/system.time.html'>system.time</a></span><span class='op'>(</span><span class='va'>r</span> <span class='op'>&lt;-</span> <span class='fu'>estpi0</span><span class='op'>(</span><span class='va'>data2</span>, method <span class='op'>=</span> <span class='st'>"nppoisll"</span>, val <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
 </div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;   0.005   0.000   0.006 </div><div class='input'><span class='va'>r</span>
+#&gt;   0.004   0.000   0.004 </div><div class='input'><span class='va'>r</span>
 </div><div class='output co'>#&gt; $iter
-#&gt; [1] 15
+#&gt; [1] 2
 #&gt; 
 #&gt; $family
 #&gt; [1] "nppois"
 #&gt; 
 #&gt; $min.gradient
-#&gt; [1] -5.684342e-14
+#&gt; [1] 0
 #&gt; 
 #&gt; $beta
 #&gt; [1] 1
 #&gt; 
 #&gt; $mix
 #&gt; $mix$pt
-#&gt; [1] 0.000000 1.948936
+#&gt; [1] 0.000000 1.948961
 #&gt; 
 #&gt; $mix$pr
 #&gt; [1] 0.5295802 0.4704198

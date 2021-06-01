@@ -102,7 +102,7 @@ Rcpp::List npnormad_(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fixe
 	const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0){
 	npnormad<double> f(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints);
 	f.computemixdist(tol, maxit, verbose);
-	return f.result;
+	return f.get_ans();
 }
 
 // [[Rcpp::export]]
@@ -111,7 +111,7 @@ Rcpp::List estpi0npnormad_(const Eigen::VectorXd &data,
 	const double &tol = 1e-6, const int &verbose = 0){
 	npnormad<double> f(data, Eigen::Matrix<double, 1, 1>::Zero(1), Eigen::Matrix<double, 1, 1>::Zero(1), beta, initpt, initpr, gridpoints);
 	f.estpi0(val, tol, verbose);
-	return f.result;
+	return f.get_ans();
 }
 
 // [[Rcpp::export]]
@@ -229,7 +229,7 @@ Rcpp::List npnormadw_(const Eigen::VectorXd &data, const Eigen::VectorXd &weight
 	const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0){
 	npnormadw<double> f(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints);
 	f.computemixdist(tol, maxit, verbose);
-	return f.result;
+	return f.get_ans();
 }
 
 // [[Rcpp::export]]
@@ -238,5 +238,5 @@ Rcpp::List estpi0npnormadw_(const Eigen::VectorXd &data, const Eigen::VectorXd &
 	const double &tol = 1e-6, const int &verbose = 0){
 	npnormadw<double> f(data, weights, Eigen::Matrix<double, 1, 1>::Zero(1), Eigen::Matrix<double, 1, 1>::Ones(1), beta, h, initpt, initpr, gridpoints);
 	f.estpi0(val, tol, verbose);
-	return f.result;
+	return f.get_ans();
 }

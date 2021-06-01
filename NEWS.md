@@ -1,3 +1,7 @@
+## npfixedcomp2 1.1.0001
+
+improvement on handling results. Added class method get_ans() to process the results.
+
 ## npfixedcomp2 1.1.0000
 
 Full ET for all density functions.

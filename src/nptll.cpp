@@ -75,7 +75,7 @@ Rcpp::List nptll_(const Eigen::VectorXd &data, const Eigen::VectorXd &mu0fixed, 
 	const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0){
 	nptll<double> f(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints);
 	f.computemixdist(tol, maxit, verbose);
-	return f.result;
+	return f.get_ans();
 }
 
 // [[Rcpp::export]]
@@ -84,7 +84,7 @@ Rcpp::List estpi0nptll_(const Eigen::VectorXd &data,
 	const double &tol = 1e-6, const int &verbose = 0){
 	nptll<double> f(data, Eigen::Matrix<double, 1, 1>::Zero(1), Eigen::Matrix<double, 1, 1>::Ones(1), beta, initpt, initpr, gridpoints);
 	f.estpi0(val, tol, verbose);
-	return f.result;
+	return f.get_ans();
 }
 
 // large-scale computation
@@ -167,7 +167,7 @@ Rcpp::List nptllw_(const Eigen::VectorXd &data, const Eigen::VectorXd &weights, 
 	const double &tol = 1e-6, const int &maxit = 100, const int &verbose = 0){
 	nptllw<double> f(data, weights, mu0fixed, pi0fixed, beta, h, initpt, initpr, gridpoints);
 	f.computemixdist(tol, maxit, verbose);
-	return f.result;
+	return f.get_ans();
 }
 
 // [[Rcpp::export]]
@@ -176,5 +176,5 @@ Rcpp::List estpi0nptllw_(const Eigen::VectorXd &data, const Eigen::VectorXd &wei
 	const double &tol = 1e-6, const int &verbose = 0){
 	nptllw<double> f(data, weights, Eigen::Matrix<double, 1, 1>::Zero(1), Eigen::Matrix<double, 1, 1>::Ones(1), beta, h, initpt, initpr, gridpoints);
 	f.estpi0(val, tol, verbose);
-	return f.result;
+	return f.get_ans();
 }

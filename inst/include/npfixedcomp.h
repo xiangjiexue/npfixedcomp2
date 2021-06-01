@@ -97,9 +97,12 @@ public:
 	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> initpr;
 	const Eigen::Ref<const Eigen::Matrix<Type, Eigen::Dynamic, 1> > gridpoints;
 	int len;
+	mutable int convergence, iter = 0;
 	mutable Rcpp::List result;
 	std::string family, flag;
 	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> precompute;
+	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> resultpt;
+	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> resultpr;
 
 	npfixedcomp(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &data_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0fixed_, 
 		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0fixed_, const Type &beta_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpt_,
@@ -381,7 +384,8 @@ public:
 	// compute mixing distribution
 	void computemixdist(const Type &tol = 1e-6, const int &maxit = 100, const int &verbose = 0) const{
 		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0 = initpt, pi0 = initpr * (1. - pi0fixed.sum());
-		int iter = 0, convergence = 0;
+		// int iter = 0, convergence = 0;
+		this->iter = 0;
 		Eigen::Matrix<Type, Eigen::Dynamic, 1> newpoints, dens = this->mapping(mu0, pi0);
 		Type closs = this->lossfunction(dens), nloss;
 
@@ -424,42 +428,47 @@ public:
 				Rcpp::Rcout<<"probabilities: "<<pi0.transpose()<<std::endl;
 				Rcpp::Rcout<<"loss:"<<this->lossfunction(this->mapping(mu0, pi0))<<std::endl;
 			}
-			iter++;
+			this->iter++;
 			dens = this->mapping(mu0, pi0);
 			nloss = this->lossfunction(dens);
 
 			if (closs - nloss < tol){
-				convergence = 0;
+				this->convergence = 0;
 				break;
 			}
 
-			if (iter > maxit){
-				convergence = 1;
+			if (this->iter > maxit){
+				this->convergence = 1;
 				break;
 			}
 
 			closs = nloss;
 		}while(true);
 
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new(mu0.size() + mu0fixed.size());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new(pi0.size() + pi0fixed.size());
-		mu0new.head(mu0.size()) = mu0; mu0new.tail(mu0fixed.size()) = mu0fixed;
-		pi0new.head(pi0.size()) = pi0; pi0new.tail(pi0fixed.size()) = pi0fixed;
+		this->resultpt.resize(mu0.size());
+		this->resultpr.resize(pi0.size());
+		this->resultpt = mu0;
+		this->resultpr = pi0;
+	}
+
+	Rcpp::List get_ans() const{
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new(this->resultpt.size() + mu0fixed.size());
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new(this->resultpr.size() + pi0fixed.size());
+		mu0new.head(this->resultpt.size()) = this->resultpt; mu0new.tail(mu0fixed.size()) = mu0fixed;
+		pi0new.head(this->resultpr.size()) = this->resultpr; pi0new.tail(pi0fixed.size()) = pi0fixed;
 
 		sortmix(mu0new, pi0new);
 		Eigen::Matrix<Type, Eigen::Dynamic, 1> maxgrad, maxgrad2;
-		this->gradfunvec(mu0, dens, maxgrad, maxgrad2, true, false);
+		this->gradfunvec(this->resultpt, this->mapping(this->resultpt, this->resultpr), maxgrad, maxgrad2, true, false);
 
-		Rcpp::List r = Rcpp::List::create(Rcpp::Named("iter") = iter,
+		return Rcpp::List::create(Rcpp::Named("iter") = iter,
 			Rcpp::Named("family") = family,
 			Rcpp::Named("min.gradient") = maxgrad.minCoeff(),
 			Rcpp::Named("beta") = this->beta,
 			Rcpp::Named("mix") = Rcpp::List::create(Rcpp::Named("pt") = mu0new, Rcpp::Named("pr") = pi0new),
-			Rcpp::Named("ll") = closs + this->extrafun(),
-			Rcpp::Named("flag") = flag,
-			Rcpp::Named("convergence") = convergence);
-
-		this->result = Rcpp::clone(r);
+			Rcpp::Named("ll") = this->lossfunction(this->mapping(this->resultpt, this->resultpr)) + this->extrafun(),
+			Rcpp::Named("flag") = this->flag,
+			Rcpp::Named("convergence") = this->convergence);
 	}
 
 	void estpi0(const Type &val, const Type &tol = 1e-6, const int &verbose = 0) const{
@@ -470,32 +479,24 @@ public:
 		this->pi0fixed.setZero();
 		this->setprecompute();
 		this->computemixdist(tol);
-		Type minloss = result["ll"], ll;
+		Type minloss = this->lossfunction(this->mapping(this->resultpt, this->resultpr)) + this->extrafun(), ll;
 		Eigen::Matrix<Type, Eigen::Dynamic, 1> dens = this->mapping(Eigen::Matrix<Type, 1, 1>::Zero(1), Eigen::Matrix<Type, 1, 1>::Ones(1));
 		if (this->hypofun(this->lossfunction(dens) + this->extrafun(), minloss) < val){
-			Type maxgrad, maxgrad2;
-			this->gradfun(0, dens, maxgrad, maxgrad2, true, false);
-			Rcpp::List r = Rcpp::List::create(Rcpp::Named("iter") = 0,
-				Rcpp::Named("family") = family,
-				Rcpp::Named("min.gradient") = maxgrad,
-				Rcpp::Named("beta") = this->beta,
-				Rcpp::Named("mix") = Rcpp::List::create(Rcpp::Named("pt") = 0, Rcpp::Named("pr") = 1),
-				Rcpp::Named("ll") = this->lossfunction(dens) + this->extrafun(),
-				Rcpp::Named("flag") = flag,
-				Rcpp::Named("convergence") = 0);
-
-			this->result = Rcpp::clone(r);
+			this->resultpt.resize(1);
+			this->resultpr.resize(1);
+			this->resultpt[0] = 0;
+			this->resultpr[0] = 1;
 		}else{
 			Type lb = 0, ub = 1, flb = minloss, fub = this->lossfunction(dens) + this->extrafun();
-			Rcpp::List mix = this->result["mix"];
-			Rcpp::NumericVector tmu0 = mix["pt"], tpi0 = mix["pr"];
-			Eigen::Map<Eigen::VectorXd> mu1(tmu0.begin(), tmu0.length());
-			Eigen::Map<Eigen::VectorXd> pi1(tpi0.begin(), tpi0.length());	
-			Type sp = this->familydensity(0, mu1.cast<Type>(), pi1.cast<Type>()) / this->familydensity(0, Eigen::Matrix<Type, 1, 1>::Zero(1), Eigen::Matrix<Type, 1, 1>::Ones(1));
+			// Rcpp::List mix = this->result["mix"];
+			// Rcpp::NumericVector tmu0 = mix["pt"], tpi0 = mix["pr"];
+			// Eigen::Map<Eigen::VectorXd> mu1(tmu0.begin(), tmu0.length());
+			// Eigen::Map<Eigen::VectorXd> pi1(tpi0.begin(), tpi0.length());	
+			Type sp = this->familydensity(0, this->resultpt, this->resultpr) / this->familydensity(0, Eigen::Matrix<Type, 1, 1>::Zero(1), Eigen::Matrix<Type, 1, 1>::Ones(1));
 			this->pi0fixed.setConstant(sp);
 			this->setprecompute();
 			this->computemixdist();
-			ll = this->result["ll"];
+			ll = this->lossfunction(this->mapping(this->resultpt, this->resultpr)) + this->extrafun();
 			int iter = 1;
 			Eigen::Matrix<Type, 3, 3> A;
 			Eigen::Matrix<Type, 3, 1> b, x1;
@@ -513,18 +514,14 @@ public:
 				}
 				sp = (lb + ub) / 2;
 
-				mix = this->result["mix"];
-				tmu0 = mix["pt"]; tpi0 = mix["pr"];
-				new (&mu1) Eigen::Map<Eigen::VectorXd>(tmu0.begin(), tmu0.length());
-				new (&pi1) Eigen::Map<Eigen::VectorXd>(tpi0.begin(), tpi0.length());
-				initpt.resize(mu1.size());
-				initpt = mu1.cast<Type>();
-				initpr.resize(pi1.size());
-				initpr = pi1.cast<Type>();
+				this->initpt.resize(this->resultpt.size());
+				this->initpt = this->resultpt;
+				this->initpr.resize(this->resultpr.size());
+				this->initpr = this->resultpr;
 				this->pi0fixed.setConstant(sp);
 				this->setprecompute();
 				this->computemixdist();
-				ll = this->result["ll"];
+				ll = this->lossfunction(this->mapping(this->resultpt, this->resultpr)) + this->extrafun();
 
 				A << lb * lb, lb, 1., 
 					 sp * sp, sp, 1., 
@@ -542,19 +539,15 @@ public:
 				sp = (-x1[1] + std::sqrt(x1[1] * x1[1] - 4 * x1[0] * x1[2])) / 2 / x1[0];
 				sp = (std::isnan(sp) | (sp < lb) | (sp > ub)) ? (lb + ub) / 2 : sp;
 
-				mix = this->result["mix"];
-				tmu0 = mix["pt"]; tpi0 = mix["pr"];
-				new (&mu1) Eigen::Map<Eigen::VectorXd>(tmu0.begin(), tmu0.length());
-				new (&pi1) Eigen::Map<Eigen::VectorXd>(tpi0.begin(), tpi0.length());
-				initpt.resize(mu1.size());
-				initpt = mu1.cast<Type>();
-				initpr.resize(pi1.size());
-				initpr = pi1.cast<Type>();
+				this->initpt.resize(this->resultpt.size());
+				this->initpt = this->resultpt;
+				this->initpr.resize(this->resultpr.size());
+				this->initpr = this->resultpr;
 				this->pi0fixed.setConstant(sp);
 				this->setprecompute();
 				this->computemixdist();
-				ll = this->result["ll"];
-				iter+=1;
+				ll = this->lossfunction(this->mapping(this->resultpt, this->resultpr)) + this->extrafun();
+				iter++;
 			}
 		}
 	}
