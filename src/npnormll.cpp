@@ -54,7 +54,8 @@ public:
 		}
 
 		if (d1){
-			ansd1 = (mu.transpose().colwise().replicate(this->len).colwise() - this->data).cwiseProduct(temp).transpose() * fullden * (scale / this->beta / this->beta);
+			ansd1 = Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::NullaryExpr(this->len, mu.size(), [this, &mu](Eigen::Index i, Eigen::Index j){return mu[j] - this->data[i];}).cwiseProduct(temp).transpose() * fullden * (scale / this->beta / this->beta);
+			// ansd1 = (mu.transpose().colwise().replicate(this->len).colwise() - this->data).cwiseProduct(temp).transpose() * fullden * (scale / this->beta / this->beta);
 		}
 	}
 

@@ -196,7 +196,8 @@ dnormarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, const
 	if (mu0.size() == 1){
 		ans = dnormarray(x, mu0.coeff(0), stdev, true);
 	}else{
-		ans = (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
+		// ans = (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
+		ans = MatrixType::NullaryExpr(x.size(), mu0.size(), [&x, &mu0](Eigen::Index i, Eigen::Index j){return mu0[j] - x[i];}).array().square() / (-2 * stdev * stdev) - (M_LN_SQRT_2PI + std::log(stdev));
 	}
 	if (lg){
 		return ans;
@@ -414,7 +415,7 @@ dnormcarray(const MatrixBase<ArgType>& x, const MatrixBase<ArgType2> & mu0, cons
 		ans = dnormcarray(x, mu0.coeff(0), n, true);
 	}else{
 		MatrixType stdevarray = ((1. - mu0.array().square()) / std::sqrt(n)).replicate(1, x.size()).transpose();
-		ans = (mu0.transpose().colwise().replicate(x.size()).colwise() - x).array().square() / (-2 * stdevarray.array().square()) - (M_LN_SQRT_2PI + stdevarray.array().log());
+		ans = MatrixType::NullaryExpr(x.size(), mu0.size(), [&x, &mu0](Eigen::Index i, Eigen::Index j){return mu0[j] - x[i];}).array().square() / (-2 * stdevarray.array().square()) - (M_LN_SQRT_2PI + stdevarray.array().log());
 	}
 	if (lg){
 		return ans;

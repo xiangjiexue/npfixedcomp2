@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // correlationmatrixcpp
 Eigen::MatrixXd correlationmatrixcpp(const Eigen::MatrixXd& G1, const double tau, const double tol);
 RcppExport SEXP _npfixedcomp2_correlationmatrixcpp(SEXP G1SEXP, SEXP tauSEXP, SEXP tolSEXP) {
