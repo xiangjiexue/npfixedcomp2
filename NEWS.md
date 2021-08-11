@@ -1,3 +1,7 @@
+## Since previous version
+
+density of multi-dimensional normal mixtures (dnpnormND, dnormNDarray_).
+
 ## npfixedcomp2 1.1.0002
 
 Improvement on outer minus in some expressions.

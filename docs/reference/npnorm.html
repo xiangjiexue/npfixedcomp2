@@ -117,18 +117,20 @@
 
     <pre class="usage"><span class='fu'>dnpnorm</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, stdev <span class='op'>=</span> <span class='fl'>1</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 
-<span class='fu'>pnpnorm</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, stdev <span class='op'>=</span> <span class='fl'>1</span>, lt <span class='op'>=</span> <span class='cn'>TRUE</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+<span class='fu'>pnpnorm</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, stdev <span class='op'>=</span> <span class='fl'>1</span>, lt <span class='op'>=</span> <span class='cn'>TRUE</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+
+<span class='fu'>dnpnormND</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>mu0</span>, <span class='va'>pi0</span>, <span class='va'>stdev</span>, lg <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>vector of observations, vector of quantiles</p></td>
+      <td><p>vector of observations, vector of quantiles for 1D and a m-by-n matrix for n-dimensional case.</p></td>
     </tr>
     <tr>
       <th>mu0</th>
-      <td><p>the vector of support points</p></td>
+      <td><p>the vector of support points for 1D and a k-by-n matrix for n-dimensional case.</p></td>
     </tr>
     <tr>
       <th>pi0</th>
@@ -136,7 +138,7 @@
     </tr>
     <tr>
       <th>stdev</th>
-      <td><p>standard deviation.</p></td>
+      <td><p>standard deviation for 1D and covariance matrix for multi-dimensional case.</p></td>
     </tr>
     <tr>
       <th>lg</th>
@@ -150,7 +152,8 @@
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>dnpnorm</code> gives the density, <code>pnpnorm</code> gives the distribution function.</p>
+    <p>One-dimensional case: <code>dnpnorm</code> gives the density, <code>pnpnorm</code> gives the distribution function.</p>
+<p>Multi-dimensional case: <code>dnpnormND</code> gives the density.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
