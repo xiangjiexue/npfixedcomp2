@@ -3,20 +3,23 @@
 \name{dnpnorm}
 \alias{dnpnorm}
 \alias{pnpnorm}
+\alias{dnpnormND}
 \title{non-parametric normal distribution}
 \usage{
 dnpnorm(x, mu0, pi0, stdev = 1, lg = FALSE)
 
 pnpnorm(x, mu0, pi0, stdev = 1, lt = TRUE, lg = FALSE)
+
+dnpnormND(x, mu0, pi0, stdev, lg = FALSE)
 }
 \arguments{
-\item{x}{vector of observations, vector of quantiles}
+\item{x}{vector of observations, vector of quantiles for 1D and a m-by-n matrix for n-dimensional case.}
 
-\item{mu0}{the vector of support points}
+\item{mu0}{the vector of support points for 1D and a k-by-n matrix for n-dimensional case.}
 
 \item{pi0}{the vector of weights correponding to the support points}
 
-\item{stdev}{standard deviation.}
+\item{stdev}{standard deviation for 1D and covariance matrix for multi-dimensional case.}
 
 \item{lg}{logical; if TRUE, the result will be given in log scale.}
 
@@ -26,5 +29,7 @@ pnpnorm(x, mu0, pi0, stdev = 1, lt = TRUE, lg = FALSE)
 The density and the distribution function of non-parametric normal distribution
 }
 \details{
-\code{dnpnorm} gives the density, \code{pnpnorm} gives the distribution function.
+One-dimensional case: \code{dnpnorm} gives the density, \code{pnpnorm} gives the distribution function.
+
+Multi-dimensional case: \code{dnpnormND} gives the density.
 }

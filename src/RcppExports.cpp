@@ -377,6 +377,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dnpnormND
+Eigen::VectorXd dnpnormND(const Eigen::MatrixXd& x, const Eigen::MatrixXd& mu0, const Eigen::VectorXd& pi0, const Eigen::MatrixXd& stdev, const bool& lg);
+RcppExport SEXP _npfixedcomp2_dnpnormND(SEXP xSEXP, SEXP mu0SEXP, SEXP pi0SEXP, SEXP stdevSEXP, SEXP lgSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0(pi0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type stdev(stdevSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lg(lgSEXP);
+    rcpp_result_gen = Rcpp::wrap(dnpnormND(x, mu0, pi0, stdev, lg));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dnormNDarray_
+Eigen::MatrixXd dnormNDarray_(const Eigen::MatrixXd& x, const Eigen::MatrixXd& mu0, const Eigen::MatrixXd& stdev, const bool& lg);
+RcppExport SEXP _npfixedcomp2_dnormNDarray_(SEXP xSEXP, SEXP mu0SEXP, SEXP stdevSEXP, SEXP lgSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type stdev(stdevSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type lg(lgSEXP);
+    rcpp_result_gen = Rcpp::wrap(dnormNDarray_(x, mu0, stdev, lg));
+    return rcpp_result_gen;
+END_RCPP
+}
 // npnormad_
 Rcpp::List npnormad_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormad_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
@@ -836,6 +865,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_ddisctarray_", (DL_FUNC) &_npfixedcomp2_ddisctarray_, 5},
     {"_npfixedcomp2_log1mexp_", (DL_FUNC) &_npfixedcomp2_log1mexp_, 1},
     {"_npfixedcomp2_logspaceadd_", (DL_FUNC) &_npfixedcomp2_logspaceadd_, 2},
+    {"_npfixedcomp2_dnpnormND", (DL_FUNC) &_npfixedcomp2_dnpnormND, 5},
+    {"_npfixedcomp2_dnormNDarray_", (DL_FUNC) &_npfixedcomp2_dnormNDarray_, 4},
     {"_npfixedcomp2_npnormad_", (DL_FUNC) &_npfixedcomp2_npnormad_, 10},
     {"_npfixedcomp2_estpi0npnormad_", (DL_FUNC) &_npfixedcomp2_estpi0npnormad_, 8},
     {"_npfixedcomp2_gfnpnormad", (DL_FUNC) &_npfixedcomp2_gfnpnormad, 7},

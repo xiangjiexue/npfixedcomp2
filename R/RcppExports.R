@@ -15,12 +15,14 @@ pnnqp <- function(q, p, sum) {
 
 #' The density and the distribution function of non-parametric normal distribution
 #'
-#' \code{dnpnorm} gives the density, \code{pnpnorm} gives the distribution function.
+#' One-dimensional case: \code{dnpnorm} gives the density, \code{pnpnorm} gives the distribution function.
+#'
+#' Multi-dimensional case: \code{dnpnormND} gives the density.
 #'
 #' @title non-parametric normal distribution
-#' @param x vector of observations, vector of quantiles
-#' @param mu0 the vector of support points
-#' @param stdev standard deviation.
+#' @param x vector of observations, vector of quantiles for 1D and a m-by-n matrix for n-dimensional case. 
+#' @param mu0 the vector of support points for 1D and a k-by-n matrix for n-dimensional case.
+#' @param stdev standard deviation for 1D and covariance matrix for multi-dimensional case.
 #' @param pi0 the vector of weights correponding to the support points
 #' @param lt logical; if TRUE, the lower probability is computed
 #' @param lg logical; if TRUE, the result will be given in log scale.
@@ -192,6 +194,16 @@ log1mexp_ <- function(x) {
 
 logspaceadd_ <- function(lx, ly) {
     .Call('_npfixedcomp2_logspaceadd_', PACKAGE = 'npfixedcomp2', lx, ly)
+}
+
+#' @rdname npnorm
+#' @export
+dnpnormND <- function(x, mu0, pi0, stdev, lg = FALSE) {
+    .Call('_npfixedcomp2_dnpnormND', PACKAGE = 'npfixedcomp2', x, mu0, pi0, stdev, lg)
+}
+
+dnormNDarray_ <- function(x, mu0, stdev, lg = FALSE) {
+    .Call('_npfixedcomp2_dnormNDarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, lg)
 }
 
 npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {

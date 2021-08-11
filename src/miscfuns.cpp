@@ -3,6 +3,7 @@
 // we only include RcppEigen.h which pulls Rcpp.h in for us
 #include "../inst/include/miscfuns.h"
 #include "../inst/include/npfixedcomp.h"
+#include "../inst/include/densityND.h"
 
 // [[Rcpp::depends(RcppEigen)]]
 
@@ -19,12 +20,14 @@ Eigen::VectorXd pnnqp(const Eigen::MatrixXd &q, const Eigen::VectorXd &p, const 
 
 //' The density and the distribution function of non-parametric normal distribution
 //'
-//' \code{dnpnorm} gives the density, \code{pnpnorm} gives the distribution function.
+//' One-dimensional case: \code{dnpnorm} gives the density, \code{pnpnorm} gives the distribution function.
+//'
+//' Multi-dimensional case: \code{dnpnormND} gives the density.
 //'
 //' @title non-parametric normal distribution
-//' @param x vector of observations, vector of quantiles
-//' @param mu0 the vector of support points
-//' @param stdev standard deviation.
+//' @param x vector of observations, vector of quantiles for 1D and a m-by-n matrix for n-dimensional case. 
+//' @param mu0 the vector of support points for 1D and a k-by-n matrix for n-dimensional case.
+//' @param stdev standard deviation for 1D and covariance matrix for multi-dimensional case.
 //' @param pi0 the vector of weights correponding to the support points
 //' @param lt logical; if TRUE, the lower probability is computed
 //' @param lg logical; if TRUE, the result will be given in log scale.
@@ -258,4 +261,20 @@ Eigen::VectorXd log1mexp_(const Eigen::VectorXd &x){
 // [[Rcpp::export]]
 Eigen::VectorXd logspaceadd_(const Eigen::VectorXd &lx, const Eigen::VectorXd &ly){
 	return logspaceadd(lx, ly);
+}
+
+//' @rdname npnorm
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd dnpnormND(const Eigen::MatrixXd &x, 
+	const Eigen::MatrixXd &mu0, const Eigen::VectorXd &pi0,
+	const Eigen::MatrixXd &stdev, const bool &lg = false){
+	return dnpnormND_(x, mu0, pi0, stdev, lg);
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd dnormNDarray_(const Eigen::MatrixXd &x, 
+	const Eigen::MatrixXd &mu0,
+	const Eigen::MatrixXd &stdev, const bool &lg = false){
+	return dnormNDarray(x, mu0, stdev, lg);
 }
