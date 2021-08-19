@@ -1,6 +1,11 @@
 ## Since previous version
 
-density of multi-dimensional normal mixtures (dnpnormND, dnormNDarray_).
+Density of multi-dimensional normal mixtures (dnpnormND, dnormNDarray_).
+
+Imported L-BFGS-B from https://github.com/yixuan/LBFGSpp/ and made some
+modifications tailored to finding new support points for npnorm2Dll
+
+experimental implementation of npnorm2Dll.
 
 ## npfixedcomp2 1.1.0002
 

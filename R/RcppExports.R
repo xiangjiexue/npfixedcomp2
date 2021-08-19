@@ -206,6 +206,14 @@ dnormNDarray_ <- function(x, mu0, stdev, lg = FALSE) {
     .Call('_npfixedcomp2_dnormNDarray_', PACKAGE = 'npfixedcomp2', x, mu0, stdev, lg)
 }
 
+colmix2D <- function(mu0, pi0, prec) {
+    invisible(.Call('_npfixedcomp2_colmix2D', PACKAGE = 'npfixedcomp2', mu0, pi0, prec))
+}
+
+npnorm2Dll_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
+    .Call('_npfixedcomp2_npnorm2Dll_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
+}
+
 npnormad_ <- function(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol = 1e-6, maxit = 100L, verbose = 0L) {
     .Call('_npfixedcomp2_npnormad_', PACKAGE = 'npfixedcomp2', data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose)
 }

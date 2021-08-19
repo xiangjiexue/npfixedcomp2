@@ -406,6 +406,38 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// colmix2D
+void colmix2D(const Eigen::MatrixXd& mu0, const Eigen::VectorXd& pi0, const double& prec);
+RcppExport SEXP _npfixedcomp2_colmix2D(SEXP mu0SEXP, SEXP pi0SEXP, SEXP precSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0(pi0SEXP);
+    Rcpp::traits::input_parameter< const double& >::type prec(precSEXP);
+    colmix2D(mu0, pi0, prec);
+    return R_NilValue;
+END_RCPP
+}
+// npnorm2Dll_
+Rcpp::List npnorm2Dll_(const Eigen::MatrixXd& data, const Eigen::MatrixXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const Eigen::MatrixXd& beta, const Eigen::MatrixXd& initpt, const Eigen::VectorXd& initpr, const Eigen::MatrixXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
+RcppExport SEXP _npfixedcomp2_npnorm2Dll_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type mu0fixed(mu0fixedSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type pi0fixed(pi0fixedSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type initpt(initptSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type initpr(initprSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type gridpoints(gridpointsSEXP);
+    Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< const int& >::type maxit(maxitSEXP);
+    Rcpp::traits::input_parameter< const int& >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(npnorm2Dll_(data, mu0fixed, pi0fixed, beta, initpt, initpr, gridpoints, tol, maxit, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
 // npnormad_
 Rcpp::List npnormad_(const Eigen::VectorXd& data, const Eigen::VectorXd& mu0fixed, const Eigen::VectorXd& pi0fixed, const double& beta, const Eigen::VectorXd& initpt, const Eigen::VectorXd& initpr, const Eigen::VectorXd& gridpoints, const double& tol, const int& maxit, const int& verbose);
 RcppExport SEXP _npfixedcomp2_npnormad_(SEXP dataSEXP, SEXP mu0fixedSEXP, SEXP pi0fixedSEXP, SEXP betaSEXP, SEXP initptSEXP, SEXP initprSEXP, SEXP gridpointsSEXP, SEXP tolSEXP, SEXP maxitSEXP, SEXP verboseSEXP) {
@@ -867,6 +899,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_npfixedcomp2_logspaceadd_", (DL_FUNC) &_npfixedcomp2_logspaceadd_, 2},
     {"_npfixedcomp2_dnpnormND", (DL_FUNC) &_npfixedcomp2_dnpnormND, 5},
     {"_npfixedcomp2_dnormNDarray_", (DL_FUNC) &_npfixedcomp2_dnormNDarray_, 4},
+    {"_npfixedcomp2_colmix2D", (DL_FUNC) &_npfixedcomp2_colmix2D, 3},
+    {"_npfixedcomp2_npnorm2Dll_", (DL_FUNC) &_npfixedcomp2_npnorm2Dll_, 10},
     {"_npfixedcomp2_npnormad_", (DL_FUNC) &_npfixedcomp2_npnormad_, 10},
     {"_npfixedcomp2_estpi0npnormad_", (DL_FUNC) &_npfixedcomp2_estpi0npnormad_, 8},
     {"_npfixedcomp2_gfnpnormad", (DL_FUNC) &_npfixedcomp2_gfnpnormad, 7},

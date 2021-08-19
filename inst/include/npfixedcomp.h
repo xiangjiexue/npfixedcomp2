@@ -595,4 +595,50 @@ public:
 
 };
 
+// begin of 2D implementation
+
+template<class Type>
+inline void simplifymix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2>& mu0, 
+	Eigen::Matrix<Type, Eigen::Dynamic, 1> & pi0){
+	if (mu0.rows() != 1) {
+		Eigen::VectorXi index = index2num((pi0.array().abs() > 1e-14).template cast<int>());
+		Eigen::Matrix<Type, Eigen::Dynamic, 2> mu0new = indexing(mu0, index, Eigen::VectorXi::LinSpaced(2, 0, 1));
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new = indexing(pi0, index);
+		pi0.lazyAssign(pi0new);
+		mu0.lazyAssign(mu0new);
+	}
+}
+
+// This function collpse the mixing distribution
+template<class Type>
+inline void collapsemix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2> &mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0, const Type &prec){
+	bool foo;
+	if (mu0.rows() > 1){
+		Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> distmat = Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
+			return (mu0.row(i) - mu0.row(j)).norm();
+		});
+		distmat.diagonal() = Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(mu0.rows(), std::numeric_limits<Type>::infinity());
+		int mini, minj;
+		foo = (distmat.array() <= prec).any();
+		Type temp;
+		while (foo){
+			distmat.minCoeff(&mini, &minj);
+			temp = pi0[mini] + pi0[minj];
+			mu0.row(mini) = (mu0.row(mini) * pi0[mini] + mu0.row(minj) * pi0[minj]) / temp;
+			pi0[minj] = 0;
+			pi0[mini] = temp;
+			simplifymix2D(mu0, pi0);
+			if (mu0.rows() <= 1) {
+				foo = false;
+			}else{
+				distmat.lazyAssign(Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
+					return (mu0.row(i) - mu0.row(j)).norm();
+				}));
+				distmat.diagonal() = Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(mu0.rows(), std::numeric_limits<Type>::infinity());
+				foo = (distmat.array() <= prec).any();
+			}
+		}
+	}
+}
+
 #endif

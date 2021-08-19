@@ -96,6 +96,11 @@ bin = function(data, order = -2){
 #' 
 #' - nppoisll : poisson mixture using maximum likelihood. There is no structural parameter, and hence
 #' the template will pass beta but this beta will never be referenced.
+#' 
+#' - npnorm2Dll : bi-variate normal mixture using maximum likelihood. The 
+#' structural parameter is the covariance matrix. Currently this implementation
+#' is experimental, and it could be very slow. Finding the new support points
+#' uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.
 #'
 #' The default method used is npnormll.
 #'
@@ -133,6 +138,9 @@ bin = function(data, order = -2){
 #' r
 #' data2 = rpois(1000, c(0, 2))
 #' system.time(r <- computemixdist(data2, pi0 = pi0, method = "nppoisll"))
+#' r
+#' data3 = matrix(rnorm(1000), 500, 2)
+#' system.time(r <- computemixdist(data3, method = "npnorm2Dll"))
 #' r
 #' @export
 computemixdist = function(v, method = "npnormll", ...){
@@ -518,6 +526,33 @@ estpi0.nptllw = function(v, beta, val, order = -3, mix = NULL, gridpoints = NULL
   }
   k = estpi0nptllw_(v1$v, v1$w, beta, 10^order, val, qt(pnorm(init$mix$pt), df = beta), init$mix$pr, 
                     sort(gridpoints), ...)
+  attr(k, "class") = "nspmix"
+  
+  k
+}
+
+#' @rdname computemixdist
+#' @export
+computemixdist.npnorm2Dll = function(v, mu0, pi0, beta, order, mix = NULL, gridpoints = NULL, ...){
+  if (missing(mu0)) {mu0 = matrix(0, 1, 2)}
+  if (missing(pi0)) {pi0 = 0}
+  if (missing(beta)) {beta = diag(2)}
+  v1 = npnorm(v[, 1])
+  v2 = npnorm(v[, 2])
+  if (is.null(gridpoints)) {
+    g1 = gridpoints.npnorm(v1, beta = beta[1, 1])
+    g2 = gridpoints.npnorm(v2, beta = beta[2, 2])
+    LLL = max(length(g1), length(g2))
+    g1 = sort(rep(g1, length = LLL))
+    g2 = sort(rep(g2, length = LLL))
+    gridpoints = cbind(g1, g2)
+  }
+  # think about what to do with mix;
+  init1 = initial.npnorm(v1, beta = beta[1, 1], mix = list(pt = mix$pt[, 1], pr = mix$pr))
+  init2 = initial.npnorm(v2, beta = beta[2, 2], mix = list(pt = mix$pt[, 2], pr = mix$pr))
+  k = npnorm2Dll_(v, mu0, pi0, beta, cbind(rep(init1$mix$pt, length(init2$mix$pt)),
+                                         rep(init2$mix$pt, each = length(init1$mix$pt))), 
+                as.numeric(outer(init1$mix$pr, init2$mix$pr)), gridpoints, ...)
   attr(k, "class") = "nspmix"
   
   k

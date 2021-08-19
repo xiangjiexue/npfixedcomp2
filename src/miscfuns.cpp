@@ -278,3 +278,14 @@ Eigen::MatrixXd dnormNDarray_(const Eigen::MatrixXd &x,
 	const Eigen::MatrixXd &stdev, const bool &lg = false){
 	return dnormNDarray(x, mu0, stdev, lg);
 }
+
+
+// temporary functions starts here
+// [[Rcpp::export]]
+void colmix2D(const Eigen::MatrixXd &mu0, const Eigen::VectorXd &pi0, const double &prec){
+	Eigen::Matrix<double, Eigen::Dynamic, 2> mu0_(mu0);
+	Eigen::VectorXd pi0_(pi0);
+	collapsemix2D(mu0_, pi0_, prec);
+	Rcpp::Rcout<<mu0_.transpose()<<std::endl;
+	Rcpp::Rcout<<pi0_.transpose()<<std::endl;
+}

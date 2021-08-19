@@ -12,6 +12,7 @@
 \alias{computemixdist.npnormadw}
 \alias{computemixdist.nppoisll}
 \alias{computemixdist.nptllw}
+\alias{computemixdist.npnorm2Dll}
 \title{Computing non-parametric mixing distribution}
 \usage{
 computemixdist(v, method = "npnormll", ...)
@@ -125,6 +126,17 @@ computemixdist.nptllw(
   gridpoints = NULL,
   ...
 )
+
+computemixdist.npnorm2Dll(
+  v,
+  mu0,
+  pi0,
+  beta,
+  order,
+  mix = NULL,
+  gridpoints = NULL,
+  ...
+)
 }
 \arguments{
 \item{v}{a vector of observations}
@@ -172,6 +184,10 @@ corresponding estimation of zero due to incompleted theory (Chapter 8).
 There is no default beta. The structure beta is the number of observations.
 \item nppoisll : poisson mixture using maximum likelihood. There is no structural parameter, and hence
 the template will pass beta but this beta will never be referenced.
+\item npnorm2Dll : bi-variate normal mixture using maximum likelihood. The
+structural parameter is the covariance matrix. Currently this implementation
+is experimental, and it could be very slow. Finding the new support points
+uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.
 }
 
 The default method used is npnormll.
@@ -200,5 +216,8 @@ system.time(r <- computemixdist(data, pi0 = pi0, method = "nptllw", order = -2))
 r
 data2 = rpois(1000, c(0, 2))
 system.time(r <- computemixdist(data2, pi0 = pi0, method = "nppoisll"))
+r
+data3 = matrix(rnorm(1000), 500, 2)
+system.time(r <- computemixdist(data3, method = "npnorm2Dll"))
 r
 }

@@ -1,7 +1,7 @@
 ---
 title: "Non-parametric estimation of mixing distribution and the proportion of zeros"
 author: "Xiangjie Xue"
-date: "11 August, 2021"
+date: "16 August, 2021"
 output: 
   html_document: 
     keep_md: yes
@@ -34,6 +34,7 @@ Since this package is written in C++, there are limited number of family functio
 | poisson | maximum likelihood | nppois | N/A (binning by default) |
 | normal | Cramer-von Mises | npnormcvm | npnormcvmw |
 | normal | Anderson-Darling | npnormad | npnormadw |
+| bivariate normal (experimental) | maximum likelihood | npnorm2Dll | N/A (not yet implemented) |
 
 It is noted that after version 1.1, all the header files are implemented as template.
 It is possible to write implementation using other scalar type rather than double
