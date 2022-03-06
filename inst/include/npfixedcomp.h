@@ -7,12 +7,12 @@
 #include "./miscfuns.h"
 
 template<class Type>
-inline void simplifymix(Eigen::Matrix<Type, Eigen::Dynamic, 1>& mu0, 
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> & pi0){
+inline void simplifymix(Eigen::VectorX<Type>& mu0, 
+	Eigen::VectorX<Type> & pi0){
 	if (mu0.size() != 1) {
 		Eigen::VectorXi index = index2num((pi0.array().abs() > 1e-14).template cast<int>());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new = mu0(index);
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new = pi0(index);
+		Eigen::VectorX<Type> mu0new = mu0(index);
+		Eigen::VectorX<Type> pi0new = pi0(index);
 		// int count = pi0.size() - pi0.cwiseEqual(0).count(), index = 0;
 		// Eigen::VectorXd mu0new(count), pi0new(count);
 		// for (int i = 0; i < mu0.size(); i++){
@@ -29,7 +29,7 @@ inline void simplifymix(Eigen::Matrix<Type, Eigen::Dynamic, 1>& mu0,
 
 // This function collpse the mixing distribution
 template<class Type>
-inline void collapsemix(Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0,
+inline void collapsemix(Eigen::VectorX<Type> &mu0, Eigen::VectorX<Type> &pi0,
 	const Type &prec){
 	bool foo;
 	if (mu0.size() > 1){
@@ -62,8 +62,8 @@ inline void collapsemix(Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, Eigen::Matr
 
 // This is much faster than previous version
 template<class Type>
-inline void sortmix(Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0){
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new = mu0, pi0new = pi0;
+inline void sortmix(Eigen::VectorX<Type> &mu0, Eigen::VectorX<Type> &pi0){
+	Eigen::VectorX<Type> mu0new = mu0, pi0new = pi0;
 	Eigen::VectorXi index = Eigen::VectorXi::LinSpaced(pi0.size(), 0, pi0.size() - 1);
 	std::sort(index.data(), index.data() + index.size(), comparemu0<Type>(mu0));
 	// for (int i = 0; i < mu0.size(); i++){
@@ -88,25 +88,25 @@ template<class Type>
 class npfixedcomp
 {
 public:
-	const Eigen::Ref<const Eigen::Matrix<Type, Eigen::Dynamic, 1> > data;
-	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0fixed;
-	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0fixed;
+	const Eigen::Ref<const Eigen::VectorX<Type> > data;
+	mutable Eigen::VectorX<Type> mu0fixed;
+	mutable Eigen::VectorX<Type> pi0fixed;
 	Type beta;
 	// pass it from R for now
-	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> initpt;
-	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> initpr;
-	const Eigen::Ref<const Eigen::Matrix<Type, Eigen::Dynamic, 1> > gridpoints;
+	mutable Eigen::VectorX<Type> initpt;
+	mutable Eigen::VectorX<Type> initpr;
+	const Eigen::Ref<const Eigen::VectorX<Type> > gridpoints;
 	int len;
 	mutable int convergence, iter = 0;
 	mutable Rcpp::List result;
 	std::string family, flag;
-	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> precompute;
-	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> resultpt;
-	mutable Eigen::Matrix<Type, Eigen::Dynamic, 1> resultpr;
+	mutable Eigen::VectorX<Type> precompute;
+	mutable Eigen::VectorX<Type> resultpt;
+	mutable Eigen::VectorX<Type> resultpr;
 
-	npfixedcomp(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &data_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0fixed_, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0fixed_, const Type &beta_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpt_,
-		 const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpr_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &gridpoints_) : data(data_),
+	npfixedcomp(const Eigen::VectorX<Type> &data_, const Eigen::VectorX<Type> &mu0fixed_, 
+		const Eigen::VectorX<Type> &pi0fixed_, const Type &beta_, const Eigen::VectorX<Type> &initpt_,
+		 const Eigen::VectorX<Type> &initpr_, const Eigen::VectorX<Type> &gridpoints_) : data(data_),
 	mu0fixed(mu0fixed_), pi0fixed(pi0fixed_), beta(beta_), initpt(initpt_), initpr(initpr_), gridpoints(gridpoints_){
 		this->len = this->data.size();
 	}
@@ -119,14 +119,14 @@ public:
 	// For each method, need passing lossfunction, gradfun, computeweights
 
 	// check loss function
-	void checklossfun(const Eigen::Matrix<Type, Eigen::Dynamic, 1> & mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> & pi0, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &eta, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &p, const int &maxit = 10) const{
+	void checklossfun(const Eigen::VectorX<Type> & mu0, Eigen::VectorX<Type> & pi0, 
+		const Eigen::VectorX<Type> &eta, const Eigen::VectorX<Type> &p, const int &maxit = 10) const{
 		Type llorigin = this->lossfunction(this->mapping(mu0, pi0));
 		Type sigma = 2., alpha = 0.3333;
 		int u = -1;
 		Type con = - p.dot(eta);
 		Type lhs, rhs;
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new(pi0.size());
+		Eigen::VectorX<Type> pi0new(pi0.size());
 		do{
 			u++;
 			sigma *= 0.5;
@@ -143,14 +143,14 @@ public:
 		}while(true);
 	}
 
-	virtual void checklossfun2(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &diff, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &eta, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &p, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens) const{
+	virtual void checklossfun2(const Eigen::VectorX<Type> &diff, Eigen::VectorX<Type> &pi0, 
+		const Eigen::VectorX<Type> &eta, const Eigen::VectorX<Type> &p, 
+		const Eigen::VectorX<Type> &dens) const{
 		Type llorigin = this->lossfunction(dens);
 		Type sigma = 2., alpha = 0.3333;
 		Type con = - p.dot(eta);
 		Type lhs, rhs;
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> ans(pi0);
+		Eigen::VectorX<Type> ans(pi0);
 		do{
 			sigma *= .5;
 			lhs = this->lossfunction(dens + sigma * diff);
@@ -167,10 +167,10 @@ public:
 	}
 
 	// collapsing
-	void collapse(Eigen::Matrix<Type, Eigen::Dynamic, 1> & mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> & pi0, const Type &tol = 1e-6) const{
+	void collapse(Eigen::VectorX<Type> & mu0, Eigen::VectorX<Type> & pi0, const Type &tol = 1e-6) const{
 		Type ll = this->lossfunction(this->mapping(mu0, pi0)), nll;
 		Type ntol = std::max(tol * 0.1, ll * 1e-16), prec;
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new = mu0, pi0new = pi0;
+		Eigen::VectorX<Type> mu0new = mu0, pi0new = pi0;
 		do {
 			if (mu0.size() <= 1) break;
 			prec = 10 * diff_(mu0).minCoeff();
@@ -185,7 +185,7 @@ public:
 	}
 
 	Type Brmin(const Type &lb, const Type &ub, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens, const Type & tol = 1e-6) const{
+		const Eigen::VectorX<Type> &dens, const Type & tol = 1e-6) const{
 		Type fa, fb, a = lb, b = ub, duma, dumb;
 		this->gradfun(a, dens, duma, fa, false, true);
 		this->gradfun(b, dens, dumb, fb, false, true);
@@ -239,14 +239,17 @@ public:
 		}
 	}
 
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> solvegradd1(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens, const Type & tol = 1e-6) const{
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pointsval, pointsgrad;
+	Eigen::VectorX<Type> solvegradd1(const Eigen::VectorX<Type> &dens, const Type & tol = 1e-6) const{
+		Eigen::VectorX<Type> pointsval, pointsgrad;
 		this->gradfunvec(this->gridpoints, dens, pointsval, pointsgrad, false, true);
 		const int L = this->gridpoints.size();
-		Eigen::VectorXi index = index2num((pointsgrad.head(L - 1).array() < 0).template cast<int>() * (pointsgrad.tail(L - 1).array() > 0).template cast<int>());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> ans(index.size());
+		//check this approximation
+		double gradapprox = (this->gridpoints.template tail<1>()[0] - this->gridpoints.template head<1>()[0]) * this->beta; // check this approximation
+		Eigen::VectorXi index = index2num((pointsgrad.head(L - 1).array() < 0).template cast<int>() * (pointsgrad.tail(L - 1).array() > 0).template cast<int>() * (pointsval.head(L - 1).array() < gradapprox).template cast<int>() * (pointsval.tail(L - 1).array() < gradapprox).template cast<int>());
+		
+		Eigen::VectorX<Type> ans(index.size());
 		if (index.size() > 0){
-			ans = Eigen::Matrix<Type, Eigen::Dynamic, 1>::NullaryExpr(index.size(),
+			ans = Eigen::VectorX<Type>::NullaryExpr(index.size(),
 				[this, &index, &dens, &tol](Eigen::Index row){
 					return this->Brmin(this->gridpoints[index[row]], this->gridpoints[index[row] + 1], dens, tol);
 				});
@@ -256,7 +259,7 @@ public:
 			// 	ans[i] = x;
 			// }
 			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
-			Eigen::Matrix<Type, Eigen::Dynamic, 1> anstemp = ans(index2num((pointsval.array() < 0).template cast<int>()));
+			Eigen::VectorX<Type> anstemp = ans(index2num((pointsval.array() < 0).template cast<int>()));
 			ans = anstemp;
 		}
 		Type pv2,ps2;
@@ -275,7 +278,7 @@ public:
 	}
 
 	Type Dfmin(const Eigen::Matrix<Type, 3, 1> &x1, const Eigen::Matrix<Type, 3, 1> &fx1,
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens, const Type &tol = 1e-6) const{
+		const Eigen::VectorX<Type> &dens, const Type &tol = 1e-6) const{
 		Type lb = x1[0], ub = x1[2], newpoint, fnewpoint, dummy;
 		Eigen::Matrix<Type, 3, 1> xx(x1), fxx(fx1);
 
@@ -336,19 +339,19 @@ public:
 		}
 	}
 
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> solvegradd0(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens, const Type &tol = 1e-6) const{
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pointsval, pointsgrad; // pointsgrad not referenced.
+	Eigen::VectorX<Type> solvegradd0(const Eigen::VectorX<Type> &dens, const Type &tol = 1e-6) const{
+		Eigen::VectorX<Type> pointsval, pointsgrad; // pointsgrad not referenced.
 		this->gradfunvec(this->gridpoints, dens, pointsval, pointsgrad, true, false);
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> temp = diff_(pointsval);
+		Eigen::VectorX<Type> temp = diff_(pointsval);
 		const int L = temp.size();
 		Eigen::VectorXi index = index2num((temp.head(L - 1).array() < 0).template cast<int>() * (temp.tail(L - 1).array() > 0).template cast<int>());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> ans(index.size());
+		Eigen::VectorX<Type> ans(index.size());
 		if (index.size() > 0){
-			ans = Eigen::Matrix<Type, Eigen::Dynamic, 1>::NullaryExpr(index.size(),
+			ans = Eigen::VectorX<Type>::NullaryExpr(index.size(),
 				[this, &index, &dens, &pointsval, &tol](Eigen::Index row){
 					return this->Dfmin(this->gridpoints.template segment<3>(index[row]), pointsval.template segment<3>(index[row]), dens, tol);
 				});
-			Eigen::Matrix<Type, Eigen::Dynamic, 1> anstemp = ans(index2num(1 - ans.array().isNaN().template cast<int>()));
+			Eigen::VectorX<Type> anstemp = ans(index2num(1 - ans.array().isNaN().template cast<int>()));
 			ans = anstemp;
 			// double x, fx;
 			// for (auto ptr = index.data(); ptr < index.data() + index.size(); ptr++){
@@ -373,7 +376,7 @@ public:
 		return ans;
 	}
 
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> solvegrad(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens, const Type & tol = 1e-6) const{
+	Eigen::VectorX<Type> solvegrad(const Eigen::VectorX<Type> &dens, const Type & tol = 1e-6) const{
 		if (this->flag == "d1"){
 			return solvegradd1(dens, tol);
 		}else{
@@ -383,10 +386,10 @@ public:
 
 	// compute mixing distribution
 	void computemixdist(const Type &tol = 1e-6, const int &maxit = 100, const int &verbose = 0) const{
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0 = initpt, pi0 = initpr * (1. - pi0fixed.sum());
+		Eigen::VectorX<Type> mu0 = initpt, pi0 = initpr * (1. - pi0fixed.sum());
 		// int iter = 0, convergence = 0;
 		this->iter = 0;
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> newpoints, dens = this->mapping(mu0, pi0);
+		Eigen::VectorX<Type> newpoints, dens = this->mapping(mu0, pi0);
 		Type closs = this->lossfunction(dens), nloss;
 
 		do{
@@ -395,7 +398,7 @@ public:
 			mu0.conservativeResize(mu0.size() + newpoints.size());
 			pi0.conservativeResize(pi0.size() + newpoints.size());
 			mu0.tail(newpoints.size()) = newpoints;
-			pi0.tail(newpoints.size()) = Eigen::Matrix<Type, Eigen::Dynamic, 1>::Zero(newpoints.size());
+			pi0.tail(newpoints.size()) = Eigen::VectorX<Type>::Zero(newpoints.size());
 			sortmix(mu0, pi0);
 
 			if (verbose >= 1){
@@ -406,7 +409,7 @@ public:
 			
 			if (verbose >= 2){
 				Rcpp::Rcout<<"new points: "<<newpoints.transpose()<<std::endl;
-				Eigen::Matrix<Type, Eigen::Dynamic, 1> pointsval, pointsgrad;
+				Eigen::VectorX<Type> pointsval, pointsgrad;
 				this->gradfunvec(newpoints, dens, pointsval, pointsgrad, true, true);
 				Rcpp::Rcout<<"gradient: "<<pointsval.transpose()<<std::endl;
 				if (this->flag == "d1") {Rcpp::Rcout<<"gradient derivative: "<<pointsgrad.transpose()<<std::endl;}
@@ -452,13 +455,13 @@ public:
 	}
 
 	Rcpp::List get_ans() const{
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new(this->resultpt.size() + mu0fixed.size());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new(this->resultpr.size() + pi0fixed.size());
+		Eigen::VectorX<Type> mu0new(this->resultpt.size() + mu0fixed.size());
+		Eigen::VectorX<Type> pi0new(this->resultpr.size() + pi0fixed.size());
 		mu0new.head(this->resultpt.size()) = this->resultpt; mu0new.tail(mu0fixed.size()) = mu0fixed;
 		pi0new.head(this->resultpr.size()) = this->resultpr; pi0new.tail(pi0fixed.size()) = pi0fixed;
 
 		sortmix(mu0new, pi0new);
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> maxgrad, maxgrad2;
+		Eigen::VectorX<Type> maxgrad, maxgrad2;
 		this->gradfunvec(this->resultpt, this->mapping(this->resultpt, this->resultpr), maxgrad, maxgrad2, true, false);
 
 		return Rcpp::List::create(Rcpp::Named("iter") = iter,
@@ -480,7 +483,7 @@ public:
 		this->setprecompute();
 		this->computemixdist(tol);
 		Type minloss = this->lossfunction(this->mapping(this->resultpt, this->resultpr)) + this->extrafun(), ll;
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> dens = this->mapping(Eigen::Matrix<Type, 1, 1>::Zero(1), Eigen::Matrix<Type, 1, 1>::Ones(1));
+		Eigen::VectorX<Type> dens = this->mapping(Eigen::Matrix<Type, 1, 1>::Zero(1), Eigen::Matrix<Type, 1, 1>::Ones(1));
 		if (this->hypofun(this->lossfunction(dens) + this->extrafun(), minloss) < val){
 			this->resultpt.resize(1);
 			this->resultpr.resize(1);
@@ -554,20 +557,20 @@ public:
 
 	// functions to each specific type
 
-	virtual Eigen::Matrix<Type, Eigen::Dynamic, 1> mapping(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
+	virtual Eigen::VectorX<Type> mapping(const Eigen::VectorX<Type> &mu0, const Eigen::VectorX<Type> &pi0) const{
 		return Eigen::Matrix<Type, 1, 1>::Zero(1);
 	}
 
-	virtual Type lossfunction(const Eigen::Matrix<Type, Eigen::Dynamic, 1> & maps) const{
+	virtual Type lossfunction(const Eigen::VectorX<Type> & maps) const{
 		return 0;
 	}
 
-	virtual void gradfun(const Type &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens,
+	virtual void gradfun(const Type &mu, const Eigen::VectorX<Type> &dens,
 		Type &ansd0, Type & ansd1, const bool &d0, const bool &d1) const{}
 
 	// vectorised function for gradfund1 (can be overwriten)
-	virtual void gradfunvec(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens, 
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd1, const bool &d0, const bool& d1) const{
+	virtual void gradfunvec(const Eigen::VectorX<Type> &mu, const Eigen::VectorX<Type> &dens, 
+		Eigen::VectorX<Type> &ansd0, Eigen::VectorX<Type> &ansd1, const bool &d0, const bool& d1) const{
 		ansd0.resize(mu.size());
 		ansd1.resize(mu.size());
 		Type *ansd0ptr = ansd0.data(), *ansd1ptr = ansd1.data();
@@ -576,8 +579,8 @@ public:
 		}
 	}
 
-	virtual void computeweights(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, 
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens) const{}
+	virtual void computeweights(const Eigen::VectorX<Type> &mu0, 
+		Eigen::VectorX<Type> &pi0, const Eigen::VectorX<Type> &dens) const{}
 
 	virtual Type extrafun() const{
 		return 0;
@@ -589,7 +592,7 @@ public:
 		return 0;
 	}
 
-	virtual Type familydensity(const Type &x, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
+	virtual Type familydensity(const Type &x, const Eigen::VectorX<Type> &mu0, const Eigen::VectorX<Type> &pi0) const{
 		return 0;
 	}
 
@@ -599,11 +602,11 @@ public:
 
 template<class Type>
 inline void simplifymix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2>& mu0, 
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> & pi0){
+	Eigen::VectorX<Type> & pi0){
 	if (mu0.rows() != 1) {
 		Eigen::VectorXi index = index2num((pi0.array().abs() > 1e-14).template cast<int>());
 		Eigen::Matrix<Type, Eigen::Dynamic, 2> mu0new = mu0(index, Eigen::all);
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new = pi0(index);
+		Eigen::VectorX<Type> pi0new = pi0(index);
 		pi0 = pi0new;
 		mu0 = mu0new;
 	}
@@ -611,13 +614,13 @@ inline void simplifymix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2>& mu0,
 
 // This function collpse the mixing distribution
 template<class Type>
-inline void collapsemix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2> &mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0, const Type &prec){
+inline void collapsemix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2> &mu0, Eigen::VectorX<Type> &pi0, const Type &prec){
 	bool foo;
 	if (mu0.rows() > 1){
-		Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> distmat = Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
+		Eigen::MatrixX<Type> distmat = Eigen::MatrixX<Type>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
 			return (mu0.row(i) - mu0.row(j)).norm();
 		});
-		distmat.diagonal() = Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(mu0.rows(), std::numeric_limits<Type>::infinity());
+		distmat.diagonal() = Eigen::VectorX<Type>::Constant(mu0.rows(), std::numeric_limits<Type>::infinity());
 		int mini, minj;
 		foo = (distmat.array() <= prec).any();
 		Type temp;
@@ -631,10 +634,10 @@ inline void collapsemix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2> &mu0, Eigen::Ma
 			if (mu0.rows() <= 1) {
 				foo = false;
 			}else{
-				distmat = Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
+				distmat = Eigen::MatrixX<Type>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
 					return (mu0.row(i) - mu0.row(j)).norm();
 				});
-				distmat.diagonal() = Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(mu0.rows(), std::numeric_limits<Type>::infinity());
+				distmat.diagonal() = Eigen::VectorX<Type>::Constant(mu0.rows(), std::numeric_limits<Type>::infinity());
 				foo = (distmat.array() <= prec).any();
 			}
 		}

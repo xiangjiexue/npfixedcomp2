@@ -109,34 +109,52 @@ is not yet done, and hence it is recommand to use with precaution.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">estpi0</span><span class="op">(</span><span class="va">data</span>, method <span class="op">=</span> <span class="st">"npnormll"</span>, val <span class="op">=</span> <span class="fl">2</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 1 lower: 0 upper: 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.587672 fval: 887.52</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.293836 upper: 0.587672</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.585199 fval: 887.391</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.540854 fval: 895.488</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.270427 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.40029 fval: 885.503</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.470572 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.50286 fval: 885.618</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 4 lower: 0.521857 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.530279 fval: 885.828</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 5 lower: 0.535567 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.537854 fval: 885.927</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 6 lower: 0.539354 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.539998 fval: 885.959</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 7 lower: 0.540426 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.540609 fval: 885.969</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 8 lower: 0.540732 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.540784 fval: 885.971</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 9 lower: 0.540819 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.540834 fval: 885.972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 10 lower: 0.540844 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.540849 fval: 885.972</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 11 lower: 0.540852 upper: 0.540854</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.540853 fval: 885.972</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.039   0.000   0.040 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.092   0.001   0.093 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $family</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -5.684342e-14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -1.415486e-06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.161092</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 1.822199 2.175916</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5871929 0.4128071</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5408540 0.1179567 0.3411893</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 887.4947</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 885.9724</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $flag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "d1"</span>
@@ -154,7 +172,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.584747 upper: 0.588829</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.587229 fval: 887.371</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.262   0.003   0.267 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.167   0.002   0.170 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
@@ -163,7 +181,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -2.842171e-14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
@@ -189,15 +207,15 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">estpi0</span><span class="op">(</span><span class="va">data</span>, method <span class="op">=</span> <span class="st">"npnormcvm"</span>, val <span class="op">=</span> <span class="fl">0.1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 1 lower: 0 upper: 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.579927 fval: 0.194234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.289964 upper: 0.579927</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.461012 fval: 0.0141004</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.520469 upper: 0.579927</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.554309 fval: 0.0778666</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 4 lower: 0.554309 upper: 0.567118</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.560645 fval: 0.1001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.579924 fval: 0.194214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.289962 upper: 0.579924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.46399 fval: 0.0133268</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.521957 upper: 0.579924</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.554819 fval: 0.0795046</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 4 lower: 0.554819 upper: 0.567371</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.560644 fval: 0.100095</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.059   0.001   0.062 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.053   0.001   0.055 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
@@ -213,14 +231,14 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.197569</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.197581</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5606189 0.4393811</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.09999996</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.09999995</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $flag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "d1"</span>
@@ -232,15 +250,15 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">estpi0</span><span class="op">(</span><span class="va">data</span>, method <span class="op">=</span> <span class="st">"npnormcvmw"</span>, val <span class="op">=</span> <span class="fl">0.1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, order <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 1 lower: 0 upper: 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.580238 fval: 0.209413</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.290119 upper: 0.580238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.451065 fval: 0.0146137</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.515651 upper: 0.580238</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.549983 fval: 0.0719631</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 4 lower: 0.549983 upper: 0.565111</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.558342 fval: 0.100156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.580334 fval: 0.210015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.290167 upper: 0.580334</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.453154 fval: 0.0138187</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.516744 upper: 0.580334</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.550426 fval: 0.0732817</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 4 lower: 0.550426 upper: 0.56538</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.558342 fval: 0.100155</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.219   0.001   0.220 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.149   0.001   0.151 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
@@ -256,14 +274,14 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.195892</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.195917</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5583012 0.4416988</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.09999932</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.09999926</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $flag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "d1"</span>
@@ -275,13 +293,13 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">estpi0</span><span class="op">(</span><span class="va">data</span>, method <span class="op">=</span> <span class="st">"npnormad"</span>, val <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 1 lower: 0 upper: 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.583558 fval: 1.13074</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.291779 upper: 0.583558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.558346 fval: 0.490327</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.570952 upper: 0.583558</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.579373 fval: 0.999686</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.584078 fval: 1.14774</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.292039 upper: 0.584078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.555942 fval: 0.447285</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.57001 upper: 0.584078</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.579368 fval: 0.999564</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.069   0.000   0.070 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.051   0.001   0.052 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
@@ -290,14 +308,14 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.136868e-13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.243823</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.243831</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.579383 0.420617</span>
@@ -316,32 +334,34 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">estpi0</span><span class="op">(</span><span class="va">data</span>, method <span class="op">=</span> <span class="st">"npnormadw"</span>, val <span class="op">=</span> <span class="fl">1</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, order <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 1 lower: 0 upper: 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.583873 fval: 1.21728</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.291936 upper: 0.583873</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.544392 fval: 0.314434</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.564132 upper: 0.583873</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.577024 fval: 0.998811</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.584223 fval: 1.2292</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.292112 upper: 0.584223</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.542954 fval: 0.297032</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 3 lower: 0.563589 upper: 0.584223</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.577018 fval: 1.05786</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 4 lower: 0.570303 upper: 0.577018</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.575484 fval: 0.999986</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.048   0.000   0.048 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.037   0.000   0.037 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $family</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -1.412204e-13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.4869e-14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.242782</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.199558</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5770636 0.4229364</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5754846 0.4245154</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
@@ -361,7 +381,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.293836 upper: 0.587672</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.585199 fval: 887.391</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.093   0.000   0.093 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    0.09    0.00    0.09 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6</span>
@@ -370,7 +390,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npt"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.421085e-13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -2.273737e-13</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
@@ -404,7 +424,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 4 lower: 0.340375 upper: 0.378453</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.373701 fval: 58.8379</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.740   0.002   0.746 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.440   0.002   0.444 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
@@ -413,7 +433,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnormc"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -3.944927e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -3.945023e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
@@ -424,8 +444,8 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.9757480  0.9884145  0.9964577  0.9994700</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.003093495 0.034868789 0.051059911 0.373720488 0.188005423 0.085826481</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.114814781 0.045314386 0.087308005 0.015988242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.003093495 0.034868790 0.051059910 0.373720488 0.188005422 0.085826480</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.114814791 0.045314378 0.087308005 0.015988242</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
@@ -445,7 +465,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Iter: 2 lower: 0.293878 upper: 0.587756</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> current val: 0.584811 fval: 887.365</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.623   0.001   0.627 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.611   0.002   0.615 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
@@ -454,7 +474,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npt"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -2.842171e-14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
@@ -481,7 +501,7 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-in"><span class="va">data2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">estpi0</span><span class="op">(</span><span class="va">data2</span>, method <span class="op">=</span> <span class="st">"nppoisll"</span>, val <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.006   0.000   0.006 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.005   0.000   0.006 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
@@ -497,10 +517,10 @@ is not yet done, and hence it is recommand to use with precaution.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.059058</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 2.059057</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5376284 0.4623716</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5376281 0.4623719</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>

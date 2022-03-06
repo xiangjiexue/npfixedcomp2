@@ -10,9 +10,9 @@ class npnormcvm : public npfixedcomp<Type>
 {
 public:
 
-	npnormcvm(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &data_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0fixed_, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0fixed_, const Type &beta_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpt_, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpr_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &gridpoints_) : npfixedcomp<Type>(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
+	npnormcvm(const Eigen::VectorX<Type> &data_, const Eigen::VectorX<Type> &mu0fixed_, 
+		const Eigen::VectorX<Type> &pi0fixed_, const Type &beta_, const Eigen::VectorX<Type> &initpt_, 
+		const Eigen::VectorX<Type> &initpr_, const Eigen::VectorX<Type> &gridpoints_) : npfixedcomp<Type>(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
 		// data should be sorted beforehand
 		this->setprecompute();
 		this->family = "npnorm";
@@ -21,21 +21,21 @@ public:
 
 	void setprecompute() const{
 		this->precompute.resize(this->len);
-		this->precompute = Eigen::Matrix<Type, Eigen::Dynamic, 1>::LinSpaced(this->len, 1., 2. * this->len - 1.) / (2. * this->len) - 
+		this->precompute = Eigen::VectorX<Type>::LinSpaced(this->len, 1., 2. * this->len - 1.) / (2. * this->len) - 
 			mapping(this->mu0fixed, this->pi0fixed);
 	}
 
-	Type lossfunction(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &maps) const{
+	Type lossfunction(const Eigen::VectorX<Type> &maps) const{
 		return (maps - this->precompute).squaredNorm();
 	}
 
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> mapping(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
+	Eigen::VectorX<Type> mapping(const Eigen::VectorX<Type> &mu0, const Eigen::VectorX<Type> &pi0) const{
 		return pnpnorm_(this->data, mu0, pi0, this->beta);
 	}
 
-	void gradfun(const Type &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens,
+	void gradfun(const Type &mu, const Eigen::VectorX<Type> &dens,
 		Type &ansd0, Type &ansd1, const bool &d0, const bool &d1) const{
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> fullden = dens - this->precompute;
+		Eigen::VectorX<Type> fullden = dens - this->precompute;
 		Type scale = 1. - this->pi0fixed.sum();
 		if (d0){
 			ansd0 = (pnpnorm_(this->data, mu, scale, this->beta) - dens).dot(fullden) * 2.;	
@@ -45,22 +45,22 @@ public:
 		}
 	}
 
-	void gradfunvec(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens,
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd1, const bool &d0, const bool &d1) const{
+	void gradfunvec(const Eigen::VectorX<Type> &mu, const Eigen::VectorX<Type> &dens,
+		Eigen::VectorX<Type> &ansd0, Eigen::VectorX<Type> &ansd1, const bool &d0, const bool &d1) const{
 		ansd0.resize(mu.size());
 		ansd1.resize(mu.size());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> fullden = dens - this->precompute;
+		Eigen::VectorX<Type> fullden = dens - this->precompute;
 		Type scale = 1. - this->pi0fixed.sum();
 		if (d0){
 			// ansd0 = (pnormarray(this->data, mu, this->beta).transpose() * fullden * scale - Eigen::VectorXd::Constant(mu.size(), fullden.dot(dens))) * 2;
-			ansd0 = pnormarray(this->data, mu, this->beta).transpose() * fullden * (scale * 2.) - Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(mu.size(), fullden.dot(dens) * 2.);
+			ansd0 = pnormarray(this->data, mu, this->beta).transpose() * fullden * (scale * 2.) - Eigen::VectorX<Type>::Constant(mu.size(), fullden.dot(dens) * 2.);
 		}
 		if (d1){
 			ansd1 = dnormarray(this->data, mu, this->beta).transpose() * fullden * -2 * scale;
 		}
 	}
 
-	void computeweights(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens) const{
+	void computeweights(const Eigen::VectorX<Type> &mu0, Eigen::VectorX<Type> &pi0, const Eigen::VectorX<Type> &dens) const{
 		Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> fp = pnormarray(this->data, mu0, this->beta);
 		if (this->len > 1e3){
 			pi0 = pnnqp_(fp.transpose() * fp, fp.transpose() * this->precompute * -1., 1. - this->pi0fixed.sum());
@@ -77,8 +77,8 @@ public:
 		return ll;
 	}
 
-	Type familydensity(const Type &x, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
-		return dnpnorm_(Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(1, x), mu0, pi0, this->beta).coeff(0);
+	Type familydensity(const Type &x, const Eigen::VectorX<Type> &mu0, const Eigen::VectorX<Type> &pi0) const{
+		return dnpnorm_(Eigen::VectorX<Type>::Constant(1, x), mu0, pi0, this->beta).coeff(0);
 	}
 };
 
@@ -115,13 +115,13 @@ template<class Type>
 class npnormcvmw : public npfixedcomp<Type>
 {
 public:
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> weights;
+	Eigen::VectorX<Type> weights;
 	Type h;
 
-	npnormcvmw(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &data_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &weights_, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0fixed_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0fixed_,
-		const Type &beta_, const Type &h_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpt_, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &initpr_, 
-		const Eigen::Matrix<Type, Eigen::Dynamic, 1> &gridpoints_) : npfixedcomp<Type>(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
+	npnormcvmw(const Eigen::VectorX<Type> &data_, const Eigen::VectorX<Type> &weights_, 
+		const Eigen::VectorX<Type> &mu0fixed_, const Eigen::VectorX<Type> &pi0fixed_,
+		const Type &beta_, const Type &h_, const Eigen::VectorX<Type> &initpt_, const Eigen::VectorX<Type> &initpr_, 
+		const Eigen::VectorX<Type> &gridpoints_) : npfixedcomp<Type>(data_, mu0fixed_, pi0fixed_, beta_, initpt_, initpr_, gridpoints_){
 		// data should be sorted beforehand
 		this->weights.resize(this->len);
 		this->weights = weights_;
@@ -133,23 +133,23 @@ public:
 
 	void setprecompute() const{
 		this->precompute.resize(this->len);
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> ecdf(weights);
+		Eigen::VectorX<Type> ecdf(weights);
 		std::partial_sum(ecdf.data(), ecdf.data() + ecdf.size(), ecdf.data(), std::plus<Type>());
 		this->precompute = (ecdf - this->weights / 2) / this->weights.sum() - 
 			mapping(this->mu0fixed, this->pi0fixed);
 	}
 
-	Type lossfunction(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &maps) const{
+	Type lossfunction(const Eigen::VectorX<Type> &maps) const{
 		return (maps - this->precompute).cwiseAbs2().dot(this->weights);
 	}
 
-	Eigen::Matrix<Type, Eigen::Dynamic, 1> mapping(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
+	Eigen::VectorX<Type> mapping(const Eigen::VectorX<Type> &mu0, const Eigen::VectorX<Type> &pi0) const{
 		return pnpdiscnorm_(this->data, mu0, pi0, this->beta, this->h);
 	}
 
-	void gradfun(const Type &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens,
+	void gradfun(const Type &mu, const Eigen::VectorX<Type> &dens,
 		Type &ansd0, Type &ansd1, const bool &d0, const bool &d1) const{
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> fullden = (dens - this->precompute).cwiseProduct(this->weights);
+		Eigen::VectorX<Type> fullden = (dens - this->precompute).cwiseProduct(this->weights);
 		Type scale = 1. - this->pi0fixed.sum();
 		if (d0){
 			ansd0 = (pnpdiscnorm_(this->data, mu, scale, this->beta, this->h) - dens).dot(fullden) * 2;
@@ -160,11 +160,11 @@ public:
 		}
 	}
 
-	void gradfunvec(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens,
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &ansd1, const bool &d0, const bool &d1) const{
+	void gradfunvec(const Eigen::VectorX<Type> &mu, const Eigen::VectorX<Type> &dens,
+		Eigen::VectorX<Type> &ansd0, Eigen::VectorX<Type> &ansd1, const bool &d0, const bool &d1) const{
 		ansd0.resize(mu.size());
 		ansd1.resize(mu.size());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> fullden = (dens - this->precompute).cwiseProduct(this->weights);
+		Eigen::VectorX<Type> fullden = (dens - this->precompute).cwiseProduct(this->weights);
 		Type scale = 1. - this->pi0fixed.sum();
 		if (d0){
 			ansd0 = (pdiscnormarray(this->data, mu, this->beta, this->h) * scale - dens.rowwise().replicate(mu.size())).transpose() * fullden * 2;
@@ -174,13 +174,13 @@ public:
 		}
 	}
 
-	void computeweights(const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &dens) const{
+	void computeweights(const Eigen::VectorX<Type> &mu0, Eigen::VectorX<Type> &pi0, const Eigen::VectorX<Type> &dens) const{
 		pi0 = pnnlssum_(pdiscnormarray(this->data, mu0, this->beta, this->h).cwiseProduct(this->weights.cwiseSqrt().replicate(1, mu0.size())),
 			this->precompute.cwiseProduct(this->weights.cwiseSqrt()), 1. - this->pi0fixed.sum());
 	}
 
 	Type extrafun() const{
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> ecdf(weights);
+		Eigen::VectorX<Type> ecdf(weights);
 		std::partial_sum(ecdf.data(), ecdf.data() + ecdf.size(), ecdf.data(), std::plus<Type>());
 		return this->weights.sum() / 3. - ((ecdf - this->weights / 2.) / this->weights.sum()).cwiseAbs2().dot(this->weights);
 	}
@@ -189,8 +189,8 @@ public:
 		return ll;
 	}
 
-	Type familydensity(const Type &x, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, const Eigen::Matrix<Type, Eigen::Dynamic, 1> &pi0) const{
-		return dnpdiscnorm_(Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(1, x), mu0, pi0, this->beta, this->h).coeff(0);
+	Type familydensity(const Type &x, const Eigen::VectorX<Type> &mu0, const Eigen::VectorX<Type> &pi0) const{
+		return dnpdiscnorm_(Eigen::VectorX<Type>::Constant(1, x), mu0, pi0, this->beta, this->h).coeff(0);
 	}
 };
 

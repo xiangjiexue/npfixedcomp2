@@ -228,26 +228,26 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-in"><span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span>, mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"npnormll"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.036   0.001   0.037 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.022   0.001   0.023 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 20</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $family</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -9.528668e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -6.162974e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1473455 1.9718642 2.9959354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1474301 1.9721235 2.9977157</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00000000 0.53041976 0.45782007 0.01176017</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00000000 0.53047352 0.45784441 0.01168207</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
@@ -263,30 +263,30 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"npnormcvm"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.017   0.000   0.018 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.008   0.001   0.009 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $family</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -2.395306e-14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -1.794555e-06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1585935 2.0155947</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.2877139  0.0000000  0.8715501  2.2596155</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.5386374 0.4613626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.2610342 0.0000000 0.4219475 0.3170183</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.03071343</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.05518125</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $flag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "d1"</span>
@@ -298,7 +298,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"nptll"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.074   0.001   0.075 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.076   0.001   0.076 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 24</span>
@@ -307,17 +307,17 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npt"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -9.528091e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -9.528974e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1473455 1.9718642 2.9959353</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1473455 1.9718642 2.9959354</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00000000 0.53041975 0.45782007 0.01176018</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00000000 0.53041976 0.45782007 0.01176017</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
@@ -333,7 +333,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"npnormad"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.027   0.001   0.028 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.022   0.000   0.022 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 12</span>
@@ -342,21 +342,21 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.0003599591</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -6.161008e-08</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1483473 1.9544469 2.3759327</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 0.152603 1.919625 2.093057</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00000000 0.53095300 0.42321313 0.04583387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.5340233 0.2428401 0.2231366</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1816632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1821343</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $flag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "d1"</span>
@@ -368,7 +368,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Hyperbolic.html" class="external-link">tanh</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"npnormcll"</span>, beta <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.255   0.002   0.259 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.160   0.002   0.164 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 20</span>
@@ -377,21 +377,21 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnormc"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -9.457214e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -9.459915e-06</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.97638718 -0.91582603 -0.78103107  0.00000000  0.02847452  0.73497632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -0.97638718 -0.91582602 -0.78103107  0.00000000  0.02847452  0.73497633</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7]  0.84822981  0.95217224  0.97797874  0.98652942  0.99610345  0.99818746</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [13]  0.99921169  0.99958934</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 7.767509e-05 2.710160e-02 6.047962e-02 0.000000e+00 3.285872e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 1.428905e-01 7.813434e-02 1.370084e-01 6.495827e-02 8.528828e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11] 4.288186e-02 1.711822e-02 1.459931e-02 8.747163e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 7.767522e-05 2.710160e-02 6.047962e-02 0.000000e+00 3.285872e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 1.428905e-01 7.813433e-02 1.370084e-01 6.495825e-02 8.528831e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11] 4.288186e-02 1.711823e-02 1.459931e-02 8.747121e-04</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
@@ -407,7 +407,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"npnormllw"</span>, order <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.100   0.001   0.101 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.063   0.001   0.064 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 22</span>
@@ -416,14 +416,14 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.0001632363</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.000163241</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1472468 1.9726278 3.0115051</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1472468 1.9726278 3.0115052</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.5303727 0.4583648 0.0112625</span>
@@ -442,30 +442,30 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"npnormcvmw"</span>, order <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.046   0.001   0.047 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.009   0.000   0.011 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $family</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -6.545629e-14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -4.918745e-14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1624174 2.0193714</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -1  0  1  3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.5380375 0.4619625</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1508132 0.0000000 0.6929631 0.1562237</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0307244</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.227686</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $flag</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "d1"</span>
@@ -477,7 +477,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"npnormadw"</span>, order <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.013   0.000   0.014 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.011   0.000   0.012 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 12</span>
@@ -486,7 +486,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -5.5992e-09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -5.599393e-09</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
@@ -512,7 +512,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nspmix"</span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data</span>, pi0 <span class="op">=</span> <span class="va">pi0</span>, method <span class="op">=</span> <span class="st">"nptllw"</span>, order <span class="op">=</span> <span class="op">-</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.210   0.001   0.210 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.211   0.000   0.211 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 22</span>
@@ -521,17 +521,17 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npt"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.0001632446</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.0001632193</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] Inf</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1472463 1.9726271 3.0115030</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0000000 0.1472463 1.9726271 3.0115029</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00000000 0.53037249 0.45836479 0.01126272</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.00000000 0.53037249 0.45836479 0.01126273</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
@@ -557,17 +557,17 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "nppois"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -2.52869e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -2.529498e-07</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 0.000000 1.694065 2.834590</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.000000 0.000000 1.694064 2.834589</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mix$pr</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4889106 0.0000000 0.4004427 0.1106468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.4889106 0.0000000 0.4004425 0.1106470</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $ll</span>
@@ -584,7 +584,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-in"><span class="va">data3</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>, <span class="fl">500</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">computemixdist</span><span class="op">(</span><span class="va">data3</span>, method <span class="op">=</span> <span class="st">"npnorm2Dll"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   2.825   0.047   2.880 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2.414   0.037   2.458 </span>
 <span class="r-in"><span class="va">r</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 7</span>
@@ -593,7 +593,7 @@ uses L-BFGS-B method provided by https://github.com/yixuan/LBFGSpp/.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "npnorm2D"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min.gradient</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -1.705303e-13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.598721e-14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $beta</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>

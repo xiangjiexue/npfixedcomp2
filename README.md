@@ -1,7 +1,7 @@
 ---
 title: "Non-parametric estimation of mixing distribution and the proportion of zeros"
 author: "Xiangjie Xue"
-date: "16 August, 2021"
+date: "06 三月, 2022"
 output: 
   html_document: 
     keep_md: yes
