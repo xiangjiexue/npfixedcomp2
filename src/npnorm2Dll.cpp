@@ -65,7 +65,7 @@ public:
 		if (d0)
 			ansd0 = (dens - temp).dot(fullden);
 		if (d1)
-			ansd1 = temp.transpose() * (mu.replicate(this->len, 1) - this->data) * this->beta.inverse();
+			ansd1 = temp.cwiseProduct(fullden).transpose() * (mu.replicate(this->len, 1) - this->data) * this->beta.inverse();
 	}
 
 	void gradfunvec(const Eigen::Matrix<Type, Eigen::Dynamic, 2> &mu, const Eigen::VectorX<Type> &dens,
@@ -153,36 +153,44 @@ public:
 		Type fval;
 		Eigen::VectorX<Type> xval(2, 1), lb(2, 1), ub(2, 1);
 		LBFGSpp::LBFGSBParam<Type> param;
-		param.epsilon = tol;
-		param.max_linesearch = 100;
-		param.max_iterations = 100;
+		param.m = 3;
+		param.max_iterations = 10;
+		param.delta = 1e-4;
     	LBFGSpp::LBFGSBSolver<Type> solver(param);
     	this->setdens(dens);
 		for (int i = 0; i < this->gridpoints.rows() - 1; ++i)
 			for (int j = 0; j < this->gridpoints.rows() - 1; ++j){
 				// check this approximation
-				// double gradapprox = (this->gridpoints.maxCoeff() - this->gridpoints.minCoeff()) * this->beta.maxCoeff();
-				// Eigen::Matrix<Type, 1, 2> temp(1, 2), dumm(1, 2);
-				// double gp0, gp1, gp2, gp3;
-				// temp << this->gridpoints(i, 0), this->gridpoints(j, 1);
-				// this->gradfun(temp, dens, gp0, dumm, true, false);
-				// temp << this->gridpoints(i, 0), this->gridpoints(j + 1, 1);
-				// this->gradfun(temp, dens, gp1, dumm, true, false);
-				// temp << this->gridpoints(i + 1, 0), this->gridpoints(j, 1);
-				// this->gradfun(temp, dens, gp2, dumm, true, false);
-				// temp << this->gridpoints(i + 1, 0), this->gridpoints(j + 1, 1);
-				// this->gradfun(temp, dens, gp3, dumm, true, false);
-				// if (gp0 > gradapprox | gp1 > gradapprox | gp2 > gradapprox | gp3 > gradapprox){continue;}
+				double gradapprox = (this->gridpoints(i + 1, 0) - this->gridpoints(i, 0)) * (this->gridpoints(j + 1, 1) - this->gridpoints(j, 1)) * this->beta.maxCoeff();
+				Eigen::Matrix<Type, 1, 2> temp(1, 2), dumm0(1, 2), dumm1(1, 2), dumm2(1, 2), dumm3(1, 2);
+				double gp0, gp1, gp2, gp3;
+				temp << this->gridpoints(i, 0), this->gridpoints(j, 1);
+				this->gradfun(temp, dens, gp0, dumm0, true, true);
+				temp << this->gridpoints(i, 0), this->gridpoints(j + 1, 1);
+				this->gradfun(temp, dens, gp1, dumm1, true, true);
+				temp << this->gridpoints(i + 1, 0), this->gridpoints(j, 1);
+				this->gradfun(temp, dens, gp2, dumm2, true, true);
+				temp << this->gridpoints(i + 1, 0), this->gridpoints(j + 1, 1);
+				this->gradfun(temp, dens, gp3, dumm3, true, true);
+				if (gp0 < gradapprox & gp1 < gradapprox & gp2 < gradapprox & gp3 < gradapprox &
+					dumm0[0] < 0 & dumm0[1] < 0 & dumm1[0] < 0 & dumm1[1] > 0 &
+					dumm2[0] > 0 & dumm2[1] < 0 & dumm3[0] > 0 & dumm3[1] > 0){
 
-				lb << this->gridpoints(i, 0), this->gridpoints(j, 1);
-				ub << this->gridpoints(i + 1, 0), this->gridpoints(j + 1, 1);
-				xval = (lb + ub) * .5;
-				// Rcpp::Rcout<<lb.transpose()<<"    "<<ub.transpose()<<"     "<<xval.transpose()<<"     ";
-				solver.minimize(*this, xval, fval, lb, ub);
-				// Rcpp::Rcout<<xval.transpose()<<" "<<iter<<" "<<fval<<std::endl;
-				if (fval < 0){
-					ans.conservativeResize(ans.rows() + 1, 2);
-					ans.bottomRows(1) = xval.transpose();
+					lb << this->gridpoints(i, 0), this->gridpoints(j, 1);
+					ub << this->gridpoints(i + 1, 0), this->gridpoints(j + 1, 1);
+					xval = (lb + ub) * .5;
+					// Rcpp::Rcout<<lb.transpose()<<"    "<<ub.transpose()<<"     "<<xval.transpose()<<"     ";
+					solver.minimize(*this, xval, fval, lb, ub);
+					if (fval < 0){
+						ans.conservativeResize(ans.rows() + 1, 2);
+						ans.bottomRows(1) = xval.transpose();
+						// Rcpp::Rcout<<lb.transpose()<<" "<<ub.transpose()<<std::endl;
+						// Rcpp::Rcout<<xval.transpose()<<" "<<iter<<" "<<fval<<std::endl;
+						// Rcpp::Rcout<<dumm0<<std::endl;
+						// Rcpp::Rcout<<dumm1<<std::endl;
+						// Rcpp::Rcout<<dumm2<<std::endl;
+						// Rcpp::Rcout<<dumm3<<std::endl<<std::endl;
+					}
 				}
 			}
 		return ans;
