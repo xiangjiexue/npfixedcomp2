@@ -1,4 +1,4 @@
-## Since previous version
+## npfixedcomp2 1.1.0003
 
 Density of multi-dimensional normal mixtures (dnpnormND, dnormNDarray_).
 
@@ -6,6 +6,8 @@ Imported L-BFGS-B from https://github.com/yixuan/LBFGSpp/ and made some
 modifications tailored to finding new support points for npnorm2Dll
 
 experimental implementation of npnorm2Dll.
+
+adopted changes for Eigen 3.4
 
 ## npfixedcomp2 1.1.0002
 

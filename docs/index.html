@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">npfixedcomp2</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0002</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0003</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -63,22 +59,25 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<hr>
-<p>title: “Non-parametric estimation of mixing distribution and the proportion of zeros” author: “Xiangjie Xue” date: “16 August, 2021” output: html_document: keep_md: yes —</p>
-<p><a href="https://travis-ci.com/xiangjiexue/npfixedcomp2"><img src="https://travis-ci.com/xiangjiexue/npfixedcomp2.svg?branch=main" alt="Build Status"></a></p>
-<p>This is a R package for estimating the mixing distribution and the proportion of null effects accompanying the <a href="https://hdl.handle.net/2292/54659">doctoral thesis</a> by Xiangjie Xue. The main webpage of this package is <a href="https://xiangjiexue.github.io/npfixedcomp2">here</a>.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>The package can be installed via <em>devtools</em> or <em>remotes</em>:</p>
+
+<p>This is a R package for estimating the mixing distribution and the
+proportion of null effects accompanying the <a href="https://hdl.handle.net/2292/54659" class="external-link">doctoral thesis</a> by Xiangjie
+Xue. The main webpage of this package is <a href="https://xiangjiexue.github.io/npfixedcomp2" class="external-link">here</a>.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>The package can be installed via <em>devtools</em> or
+<em>remotes</em>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"xiangjiexue/npfixedcomp2"</span><span class="op">)</span></code></pre></div>
-<p>NOTE: This package contains Fortran and C++ codes with C++11 standard, so make sure gfortran and gcc/clang is available.</p>
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"xiangjiexue/npfixedcomp2"</span><span class="op">)</span></code></pre></div>
+<p>NOTE: This package contains Fortran and C++ codes with C++11
+standard, so make sure gfortran and gcc/clang is available.</p>
 </div>
-<div id="available-family-functions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#available-family-functions" class="anchor"></a>Available family functions</h2>
-<p>Since this package is written in C++, there are limited number of family functions available.</p>
+<div class="section level2">
+<h2 id="available-family-functions">Available family functions<a class="anchor" aria-label="anchor" href="#available-family-functions"></a>
+</h2>
+<p>Since this package is written in C++, there are limited number of
+family functions available.</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -137,35 +136,55 @@
 </tr>
 </tbody>
 </table>
-<p>It is noted that after version 1.1, all the header files are implemented as template. It is possible to write implementation using other scalar type rather than double (float, long double, etc.) provided that it is supported by Eigen, but please make sure that the precision is what you want.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">class</span> npfixedcomp</span>
-<span id="cb2-3"><a href="#cb2-3"></a>{</span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="kw">public</span>:</span>
-<span id="cb2-5"><a href="#cb2-5"></a>  ...</span>
-<span id="cb2-6"><a href="#cb2-6"></a>};</span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="kw">template</span>&lt;<span class="kw">class</span> Type&gt;</span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="kw">class</span> npnormll : <span class="kw">public</span> npfixedcomp&lt;Type&gt;</span>
-<span id="cb2-10"><a href="#cb2-10"></a>{</span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="kw">public</span>:</span>
-<span id="cb2-12"><a href="#cb2-12"></a>  ...</span>
-<span id="cb2-13"><a href="#cb2-13"></a>};</span></code></pre></div>
+<p>It is noted that after version 1.1, all the header files are
+implemented as template. It is possible to write implementation using
+other scalar type rather than double (float, long double, etc.) provided
+that it is supported by Eigen, but please make sure that the precision
+is what you want.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> Type<span class="op">&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> npfixedcomp</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span><span class="kw">class</span> Type<span class="op">&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> npnormll <span class="op">:</span> <span class="kw">public</span> npfixedcomp<span class="op">&lt;</span>Type<span class="op">&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
 </div>
 
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-2">GPL-2</a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-2" class="external-link">GPL-2</a></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing npfixedcomp2</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Xiangjie Xue <br><small class="roles"> Author, maintainer </small>  </li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://travis-ci.com/xiangjiexue/npfixedcomp2" class="external-link"><img src="https://travis-ci.com/xiangjiexue/npfixedcomp2.svg?branch=main" alt="Build Status"></a></li>
 </ul>
 </div>
 
@@ -174,11 +193,14 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Xiangjie Xue.</p>
+  <p></p>
+<p>Developed by Xiangjie Xue.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>
@@ -186,6 +208,8 @@
 
   
 
+
+  
 
   </body>
 </html>

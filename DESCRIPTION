@@ -1,8 +1,8 @@
 Package: npfixedcomp2
 Type: Package
 Title: Non-parametric estimation of mixing distribution with possibily fixed components
-Version: 1.1.0002
-Date: 2021-08-10
+Version: 1.1.0003
+Date: 2022-03-06
 Authors@R: 
     person(given = "Xiangjie",
            family = "Xue",
@@ -15,4 +15,4 @@ LinkingTo: Rcpp, RcppEigen
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

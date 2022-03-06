@@ -11,8 +11,8 @@ inline void simplifymix(Eigen::Matrix<Type, Eigen::Dynamic, 1>& mu0,
 	Eigen::Matrix<Type, Eigen::Dynamic, 1> & pi0){
 	if (mu0.size() != 1) {
 		Eigen::VectorXi index = index2num((pi0.array().abs() > 1e-14).template cast<int>());
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new = indexing(mu0, index);
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new = indexing(pi0, index);
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> mu0new = mu0(index);
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new = pi0(index);
 		// int count = pi0.size() - pi0.cwiseEqual(0).count(), index = 0;
 		// Eigen::VectorXd mu0new(count), pi0new(count);
 		// for (int i = 0; i < mu0.size(); i++){
@@ -22,8 +22,8 @@ inline void simplifymix(Eigen::Matrix<Type, Eigen::Dynamic, 1>& mu0,
 		// 		index++;
 		// 	}
 		// }
-		pi0.lazyAssign(pi0new);
-		mu0.lazyAssign(mu0new);
+		pi0 = pi0new;
+		mu0 = mu0new;
 	}
 }
 
@@ -70,8 +70,8 @@ inline void sortmix(Eigen::Matrix<Type, Eigen::Dynamic, 1> &mu0, Eigen::Matrix<T
 	// 	mu0[i] = mu0new[index[i]];
 	// 	pi0[i] = pi0new[index[i]];
 	// }
-	mu0 = indexing(mu0new, index);
-	pi0 = indexing(pi0new, index);
+	mu0 = mu0new(index);
+	pi0 = pi0new(index);
 }
 
 template<class Type>
@@ -177,8 +177,8 @@ public:
 			collapsemix(mu0new, pi0new, prec);
 			nll = this->lossfunction(this->mapping(mu0new, pi0new));
 			if (nll <= ll + ntol){
-				pi0.lazyAssign(pi0new);
-				mu0.lazyAssign(mu0new);
+				pi0 = pi0new;
+				mu0 = mu0new;
 			}else{break;}
 		} while(true);
 		simplifymix(mu0, pi0);
@@ -256,8 +256,8 @@ public:
 			// 	ans[i] = x;
 			// }
 			this->gradfunvec(ans, dens, pointsval, pointsgrad, true, false);
-			Eigen::Matrix<Type, Eigen::Dynamic, 1> anstemp = indexing(ans, index2num((pointsval.array() < 0).template cast<int>()));
-			ans.lazyAssign(anstemp);
+			Eigen::Matrix<Type, Eigen::Dynamic, 1> anstemp = ans(index2num((pointsval.array() < 0).template cast<int>()));
+			ans = anstemp;
 		}
 		Type pv2,ps2;
 		this->gradfun(this->gridpoints[0], dens, pv2, ps2, true, false);
@@ -348,8 +348,8 @@ public:
 				[this, &index, &dens, &pointsval, &tol](Eigen::Index row){
 					return this->Dfmin(this->gridpoints.template segment<3>(index[row]), pointsval.template segment<3>(index[row]), dens, tol);
 				});
-			Eigen::Matrix<Type, Eigen::Dynamic, 1> anstemp = indexing(ans, index2num(1 - ans.array().isNaN().template cast<int>()));
-			ans.lazyAssign(anstemp);
+			Eigen::Matrix<Type, Eigen::Dynamic, 1> anstemp = ans(index2num(1 - ans.array().isNaN().template cast<int>()));
+			ans = anstemp;
 			// double x, fx;
 			// for (auto ptr = index.data(); ptr < index.data() + index.size(); ptr++){
 			// 	// inputx << gridpoints[index[i]], gridpoints[index[i] + 2], gridpoints[index[i] + 1];
@@ -390,7 +390,7 @@ public:
 		Type closs = this->lossfunction(dens), nloss;
 
 		do{
-			newpoints.lazyAssign(this->solvegrad(dens, tol));
+			newpoints = this->solvegrad(dens, tol);
 
 			mu0.conservativeResize(mu0.size() + newpoints.size());
 			pi0.conservativeResize(pi0.size() + newpoints.size());
@@ -602,10 +602,10 @@ inline void simplifymix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2>& mu0,
 	Eigen::Matrix<Type, Eigen::Dynamic, 1> & pi0){
 	if (mu0.rows() != 1) {
 		Eigen::VectorXi index = index2num((pi0.array().abs() > 1e-14).template cast<int>());
-		Eigen::Matrix<Type, Eigen::Dynamic, 2> mu0new = indexing(mu0, index, Eigen::VectorXi::LinSpaced(2, 0, 1));
-		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new = indexing(pi0, index);
-		pi0.lazyAssign(pi0new);
-		mu0.lazyAssign(mu0new);
+		Eigen::Matrix<Type, Eigen::Dynamic, 2> mu0new = mu0(index, Eigen::all);
+		Eigen::Matrix<Type, Eigen::Dynamic, 1> pi0new = pi0(index);
+		pi0 = pi0new;
+		mu0 = mu0new;
 	}
 }
 
@@ -631,9 +631,9 @@ inline void collapsemix2D(Eigen::Matrix<Type, Eigen::Dynamic, 2> &mu0, Eigen::Ma
 			if (mu0.rows() <= 1) {
 				foo = false;
 			}else{
-				distmat.lazyAssign(Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
+				distmat = Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::NullaryExpr(mu0.rows(), mu0.rows(), [&mu0](Eigen::Index i, Eigen::Index j){
 					return (mu0.row(i) - mu0.row(j)).norm();
-				}));
+				});
 				distmat.diagonal() = Eigen::Matrix<Type, Eigen::Dynamic, 1>::Constant(mu0.rows(), std::numeric_limits<Type>::infinity());
 				foo = (distmat.array() <= prec).any();
 			}
